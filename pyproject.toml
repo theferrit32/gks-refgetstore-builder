@@ -1,0 +1,11 @@
+[project]
+name = "gks-refgetstore-builder"
+version = "0.1.0"
+description = "Build a gtars RefgetStore archive (NCBI + Ensembl) with the per-sequence and per-collection aliases GA4GH tools need to use refget as an alias backend."
+requires-python = ">=3.11"
+dependencies = [
+    "gtars>=0.8.0",
+]
+
+[tool.uv]
+package = false
