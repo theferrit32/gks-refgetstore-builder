@@ -13,7 +13,7 @@ set -euo pipefail
 HERE="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 
 # --- defaults (flags override env override these) ---------------------------
-REMOTE="${RGS_REMOTE:-theferrit32-public}"
+REMOTE="${RGS_REMOTE:-}"                 # required, no default
 BUCKET="${RGS_BUCKET:-}"                 # required, no default
 DATE="$(date -u +%Y-%m-%d)"
 PREFIX="${RGS_PREFIX:-refgetstore/${DATE}}"
@@ -34,7 +34,7 @@ Uploads the RefgetStore directory to REMOTE:BUCKET/PREFIX as individual objects.
 Options:
   --bucket NAME       Target bucket (REQUIRED; also RGS_BUCKET). No default, so
                       nothing can upload to the wrong place by accident.
-  --remote NAME       rclone remote (default: theferrit32-public; RGS_REMOTE).
+  --remote NAME       rclone remote (REQUIRED; also RGS_REMOTE).
   --prefix PREFIX     Object key prefix (default: refgetstore/<UTC-date>;
                       RGS_PREFIX). Set explicitly to control the full path.
   --store-dir DIR     Store directory to upload (default: ./store; RGS_STORE_DIR).
@@ -74,6 +74,7 @@ die() { echo "ERROR: $*" >&2; exit 1; }
 
 # --- preflight --------------------------------------------------------------
 command -v rclone >/dev/null 2>&1 || die "rclone not found on PATH"
+[ -n "$REMOTE" ] || die "--remote is required (or set RGS_REMOTE)"
 [ -n "$BUCKET" ] || die "--bucket is required (or set RGS_BUCKET)"
 [ -d "$STORE_DIR" ] || die "store dir not found: $STORE_DIR"
 [ -f "$STORE_DIR/rgstore.json" ] || \
