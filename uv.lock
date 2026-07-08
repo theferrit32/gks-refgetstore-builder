@@ -5,7 +5,7 @@ requires-python = ">=3.11"
 [[package]]
 name = "gks-refgetstore-builder"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "gtars" },
 ]

@@ -3,6 +3,24 @@
 /downloads/
 *.part
 
+# Generated analysis artifacts (regenerable; large or machine-only).
+# build.lock.json and parity_summary.md are intentionally NOT ignored — they are
+# small, portable provenance/report records meant to be committed.
+/build_full.log
+/parity_by_digest.tsv
+/parity_summary.md
+/build_gaps.tsv
+/seqrepo_equivalence_report.json
+/.probe_cache/
+sources.toml.bak.*
+
+# Local-only working notes / one-off analysis (kept on disk, not part of the repo)
+/TODO.md
+/UPLOAD_PLAN.md
+/SEQREPO_PARITY.md
+/parity_membership.py
+/probe_source_coverage.py
+
 # Python
 __pycache__/
 *.py[cod]

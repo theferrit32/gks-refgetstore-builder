@@ -1,0 +1,433 @@
+#!/usr/bin/env python
+"""Build-lock: a provenance record of exactly what a build consumed.
+
+`build.lock.json` pins, for one build, every concrete source file the build read:
+its URL, cached path, byte length, sha256 of the (compressed) bytes, and the
+collection digest it produced in the store — plus build metadata (timestamp, git
+commit, gtars version, the `sources.toml` hash, store counts).
+
+Two roles:
+  * **provenance / reproducibility** — the source of truth for "what build X used".
+    `gks-refgetstore verify --lock` re-checks the cache against the pinned sha256s.
+  * **file <-> refget-digest mapping** — because each ingested file becomes exactly
+    one collection and the store persists collection membership, the lock's
+    `url -> collection_digest` is all `provenance.py` needs to answer
+    `file -> digests` / `digest -> files` on demand (no giant table stored).
+
+NOTE on "lock" semantics: some sources are **mutable upstream** (current RefSeq
+shards, current Ensembl release), so this is a record of a build, not a hard pin
+future fetches must match — re-fetching a mutable source and finding it changed
+is expected drift, not corruption. The `mutable` flag marks these.
+"""
+
+from __future__ import annotations
+
+import hashlib
+import json
+import subprocess
+import sys
+import urllib.error
+import urllib.request
+from dataclasses import dataclass, field
+from datetime import datetime, timezone
+from pathlib import Path
+
+# build_store imports this module lazily (inside run_build) to avoid a circular
+# import, so importing from it at module load is safe here.
+from build_store import iter_source_urls, load_config, mirror_cache_path
+
+SCHEMA = "gks-refgetstore-build-lock/1"
+CHUNK = 1 << 20
+
+
+def sha256_file(path: Path) -> str:
+    h = hashlib.sha256()
+    with path.open("rb") as fh:
+        while chunk := fh.read(CHUNK):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def is_mutable(url: str) -> bool:
+    """True for sources NCBI/Ensembl refresh in place (current, non-archived).
+
+    Everything under the immutable archives (genomes/all, historical GBFF, older
+    Ensembl releases) is stable; only the "current" endpoints drift."""
+    return (
+        "/mRNA_Prot/" in url            # current RefSeq transcript/protein shards
+        or "/RefSeqGene/" in url         # current RefSeqGene
+        or "/release-113/" in url        # pinned-current Ensembl release
+    )
+
+
+def _git_info(repo_root: Path) -> dict:
+    def run(*args: str) -> str | None:
+        try:
+            out = subprocess.run(
+                ["git", "-C", str(repo_root), *args],
+                capture_output=True, text=True, check=True,
+            )
+            return out.stdout.strip()
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            return None
+
+    commit = run("rev-parse", "HEAD")
+    status = run("status", "--porcelain")
+    describe = run("describe", "--tags", "--always", "--dirty")
+    return {
+        "commit": commit,
+        "describe": describe,
+        "dirty": bool(status) if status is not None else None,
+    }
+
+
+def _gtars_version() -> str | None:
+    try:
+        from importlib.metadata import version
+        return version("gtars")
+    except Exception:  # noqa: BLE001
+        return None
+
+
+def records_from_log(log_path: Path) -> dict[str, dict]:
+    """Reconstruct file -> collection from a build log (for backfilling a lock).
+
+    Parses the gtars import line ``Added <digest> (<n> seqs) from <path> in ...``.
+    For GBFF the ``<path>`` is the converted ``…gbff.gz.fasta`` sibling; callers
+    key by the source cache path, so both the exact path and (if it ends
+    ``.fasta``) the stripped path are recorded.
+    """
+    out: dict[str, dict] = {}
+    with log_path.open() as fh:
+        for line in fh:
+            if not line.startswith("Added "):
+                continue
+            # Added <digest> (<n> seqs) from <path> in <t>s
+            try:
+                rest = line[len("Added "):]
+                digest, rest = rest.split(" (", 1)
+                n_seqs = int(rest.split(" seqs) from ", 1)[0])
+                path = rest.split(" seqs) from ", 1)[1].rsplit(" in ", 1)[0].strip()
+            except (ValueError, IndexError):
+                continue
+            rec = {"collection_digest": digest.strip(), "n_sequences": n_seqs}
+            out[path] = rec
+            if path.endswith(".fasta"):
+                out[path[: -len(".fasta")]] = rec
+    return out
+
+
+def _rel(download_dir: Path, cache_path: Path) -> str:
+    try:
+        return str(cache_path.relative_to(download_dir))
+    except ValueError:
+        return str(cache_path)
+
+
+def source_record(
+    kind: str, owner: str, url: str, download_dir: Path,
+    collection_by_cachepath: dict[str, dict], hash_files: bool = True,
+) -> dict:
+    """One lock entry for a single source URL (bytes, sha256, collection, etc.)."""
+    cache_path = mirror_cache_path(download_dir, url)
+    rec: dict = {
+        "kind": kind, "owner": owner, "url": url,
+        "cache_path": _rel(download_dir, cache_path), "mutable": is_mutable(url),
+    }
+    if cache_path.exists() and cache_path.stat().st_size > 0:
+        rec["bytes"] = cache_path.stat().st_size
+        rec["sha256"] = sha256_file(cache_path) if hash_files else None
+        rec["present"] = True
+    else:
+        rec["bytes"] = None
+        rec["sha256"] = None
+        rec["present"] = False
+    coll = collection_by_cachepath.get(str(cache_path))
+    rec["collection_digest"] = coll["collection_digest"] if coll else None
+    rec["n_sequences"] = coll["n_sequences"] if coll else None
+    return rec
+
+
+def _build_meta(config_path: Path, store) -> dict:
+    try:
+        stats = dict(store.stats())
+    except Exception:  # noqa: BLE001
+        stats = {}
+    config_path = Path(config_path)
+    return {
+        "timestamp_utc": datetime.now(timezone.utc).isoformat(),
+        "git": _git_info(config_path.resolve().parent),
+        "gtars_version": _gtars_version(),
+        "sources_toml": {
+            "path": str(config_path),
+            "sha256": sha256_file(config_path) if config_path.exists() else None,
+        },
+        "store": {
+            "n_sequences": stats.get("n_sequences"),
+            "n_collections": stats.get("n_collections"),
+        },
+    }
+
+
+def build_lock_dict(
+    *,
+    config_path: Path,
+    download_dir: Path,
+    assemblies: list,
+    seqsets: list,
+    collection_by_cachepath: dict[str, dict],
+    store,
+    hash_files: bool = True,
+) -> dict:
+    """Full-build lock: one entry per source in the whole manifest (replace)."""
+    sources = [
+        source_record(k, o, u, download_dir, collection_by_cachepath, hash_files)
+        for k, o, u in iter_source_urls(assemblies, seqsets)
+    ]
+    return {"schema": SCHEMA, "build": _build_meta(config_path, store), "sources": sources}
+
+
+def merge_into_lock(
+    existing_lock: dict | None,
+    *,
+    config_path: Path,
+    download_dir: Path,
+    touched_sources: list[tuple[str, str, str]],
+    collection_by_cachepath: dict[str, dict],
+    store,
+    hash_files: bool = True,
+) -> dict:
+    """Partial-build lock (add-to): upsert only the touched sources' entries into
+    an existing lock, preserving all others. Falls back to a fresh lock of just
+    the touched sources when no existing lock is present."""
+    by_rel: dict[str, dict] = {}
+    if existing_lock:
+        for s in existing_lock.get("sources", []):
+            by_rel[s["cache_path"]] = s
+    for k, o, u in touched_sources:
+        rec = source_record(k, o, u, download_dir, collection_by_cachepath, hash_files)
+        by_rel[rec["cache_path"]] = rec
+    sources = sorted(by_rel.values(), key=lambda r: (r.get("kind", ""), r["cache_path"]))
+    return {"schema": SCHEMA, "build": _build_meta(config_path, store), "sources": sources}
+
+
+@dataclass
+class LockCheck:
+    """Result of comparing the files a build would ingest against a lock."""
+    matched: list[str] = field(default_factory=list)          # in lock, sha256 unchanged
+    changed: list[tuple] = field(default_factory=list)        # (rel, lock_sha, actual_sha, mutable)
+    new: list[str] = field(default_factory=list)              # present, not in lock (no baseline)
+    missing: list[str] = field(default_factory=list)          # not in cache
+    only_in_lock: list[str] = field(default_factory=list)     # in lock, not in this build
+
+    @property
+    def drift(self) -> bool:
+        return bool(self.changed)
+
+    @property
+    def set_differs(self) -> bool:
+        return bool(self.new or self.only_in_lock)
+
+
+def evaluate_cache_vs_lock(build_files: list[tuple[str, Path]], lock: dict) -> LockCheck:
+    """Per-file drift check (check B). ``build_files`` is (rel_cache_path, abs_path)
+    for each file the build would ingest. Compares the intersection with the lock
+    by sha256; classifies the rest. Does not consider set membership fatal -- that
+    is the caller's policy (check C)."""
+    lock_by_rel = {s["cache_path"]: s for s in lock.get("sources", [])}
+    res = LockCheck()
+    seen: set[str] = set()
+    for rel, path in build_files:
+        seen.add(rel)
+        locked = lock_by_rel.get(rel)
+        if not path.exists() or path.stat().st_size == 0:
+            res.missing.append(rel)
+            continue
+        if locked and locked.get("sha256"):
+            actual = sha256_file(path)
+            if actual == locked["sha256"]:
+                res.matched.append(rel)
+            else:
+                res.changed.append((rel, locked["sha256"], actual, bool(locked.get("mutable"))))
+        else:
+            res.new.append(rel)
+    res.only_in_lock = sorted(set(lock_by_rel) - seen)
+    return res
+
+
+def write_lock(path: Path, lock: dict) -> None:
+    path.write_text(json.dumps(lock, indent=2) + "\n", encoding="utf-8")
+
+
+def load_lock(path: Path) -> dict:
+    return json.loads(Path(path).read_text(encoding="utf-8"))
+
+
+# --------------------------------------------------------------------------- verify
+
+def _human(n: float) -> str:
+    for unit in ("B", "KB", "MB", "GB", "TB"):
+        if n < 1024:
+            return f"{n:.1f}{unit}"
+        n /= 1024
+    return f"{n:.1f}PB"
+
+
+def gzip_intact(path: Path) -> tuple[bool, str]:
+    """``gzip -t`` — validates the decompressed CRC32 + length trailer."""
+    proc = subprocess.run(["gzip", "-t", str(path)], capture_output=True, text=True)
+    if proc.returncode == 0:
+        return True, "gzip ok"
+    return False, (proc.stderr.strip() or f"gzip -t exit {proc.returncode}")
+
+
+def remote_size(url: str, timeout: int) -> int | None:
+    """Content-Length from an HTTP HEAD, or None if unavailable."""
+    req = urllib.request.Request(
+        url, method="HEAD", headers={"User-Agent": "gks-refgetstore-builder"}
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as resp:  # noqa: S310
+            cl = resp.headers.get("Content-Length")
+            return int(cl) if cl is not None else None
+    except (urllib.error.URLError, ValueError, TimeoutError, OSError):
+        return None
+
+
+def _verify_integrity(args) -> int:
+    """Check (A): each manifest file present + (for .gz) gzip-intact; optionally
+    compare local size to the server's Content-Length."""
+    assemblies, seqsets = load_config(args.config)
+    sources = list(iter_source_urls(assemblies, seqsets))
+    if args.limit:
+        sources = sources[: args.limit]
+
+    missing: list[str] = []
+    corrupt: list[str] = []
+    size_mismatch: list[str] = []
+    ok = 0
+    for i, (kind, owner, url) in enumerate(sources, 1):
+        target = mirror_cache_path(args.cache_dir, url)
+        rel = _rel(args.cache_dir, target)
+        if not target.exists() or target.stat().st_size == 0:
+            missing.append(rel)
+            print(f"[{i}/{len(sources)}] MISSING  {rel}")
+            continue
+        size = target.stat().st_size
+        problems: list[str] = []
+        if target.suffix == ".gz":
+            good, msg = gzip_intact(target)
+            if not good:
+                problems.append(f"gzip: {msg}")
+                corrupt.append(rel)
+        if args.check_remote:
+            rsize = remote_size(url, args.timeout)
+            if rsize is None:
+                problems.append("remote size unavailable")
+            elif rsize != size:
+                problems.append(f"size local={size} remote={rsize}")
+                size_mismatch.append(rel)
+        status = "ok" if not problems else "FAIL"
+        detail = f"  ({'; '.join(problems)})" if problems else ""
+        print(f"[{i}/{len(sources)}] {status:7} {_human(size):>9}  {rel}{detail}")
+        if not problems:
+            ok += 1
+
+    print(f"\nchecked={len(sources)} ok={ok} missing={len(missing)} "
+          f"corrupt={len(corrupt)} size_mismatch={len(size_mismatch)}", file=sys.stderr)
+    for label, items in (("MISSING", missing), ("CORRUPT", corrupt),
+                         ("SIZE MISMATCH", size_mismatch)):
+        if items:
+            print(f"{label}:", file=sys.stderr)
+            for r in items:
+                print(f"  {r}", file=sys.stderr)
+    return 1 if (missing or corrupt or size_mismatch) else 0
+
+
+def _verify_against_lock(args) -> int:
+    """Checks (B) per-file drift and (C, with --strict-set) set reproducibility,
+    manifest-driven, using the shared evaluator."""
+    lock = load_lock(args.lock)
+    assemblies, seqsets = load_config(args.config)
+    sources = list(iter_source_urls(assemblies, seqsets))
+    if args.limit:
+        sources = sources[: args.limit]
+
+    build_files: list[tuple[str, Path]] = []
+    rel_to_path: dict[str, Path] = {}
+    for _, _, url in sources:
+        target = mirror_cache_path(args.cache_dir, url)
+        rel = _rel(args.cache_dir, target)
+        build_files.append((rel, target))
+        rel_to_path[rel] = target
+    res = evaluate_cache_vs_lock(build_files, lock)
+
+    corrupt: list[str] = []
+    new_ok = 0
+    for rel in res.new:
+        p = rel_to_path[rel]
+        if p.suffix == ".gz":
+            good, msg = gzip_intact(p)
+            if not good:
+                corrupt.append(rel)
+                print(f"CORRUPT  {rel}  ({msg})")
+                continue
+        new_ok += 1
+    for rel in res.matched:
+        print(f"MATCH    {rel}")
+    for rel, lsha, asha, mut in res.changed:
+        print(f"CHANGED  {rel}{' (mutable)' if mut else ''}  "
+              f"lock={lsha[:16]}… actual={asha[:16]}…")
+
+    print(f"\nlock={args.lock} manifest={args.config}", file=sys.stderr)
+    print(f"per-file: matched={len(res.matched)} changed={len(res.changed)} "
+          f"new={new_ok} missing={len(res.missing)} corrupt={len(corrupt)}", file=sys.stderr)
+    print(f"set-diff: in_build_not_lock={len(res.new)} "
+          f"in_lock_not_build={len(res.only_in_lock)}", file=sys.stderr)
+    for label, items in (
+        ("CHANGED (drift/corruption)", [r for r, *_ in res.changed]),
+        ("MISSING", res.missing), ("CORRUPT", corrupt),
+        ("in lock, not used by this build", res.only_in_lock),
+    ):
+        if items:
+            print(f"{label}:", file=sys.stderr)
+            for r in items:
+                print(f"  {r}", file=sys.stderr)
+
+    fail = bool(res.missing or res.changed or corrupt)
+    if args.strict_set and res.set_differs:
+        print("STRICT-SET: build and lock file sets differ", file=sys.stderr)
+        fail = True
+    return 1 if fail else 0
+
+
+def run_verify(args) -> int:
+    """Execute the ``verify`` subcommand (verify-only; never ingests)."""
+    if args.lock:
+        return _verify_against_lock(args)
+    return _verify_integrity(args)
+
+
+def run_lock(args) -> int:
+    """Execute the ``lock`` subcommand: (re)generate a build.lock.json for a build
+    that already ran, reconstructing file->collection from its log."""
+    from gtars.refget import RefgetStore  # local import: keeps module light
+
+    assemblies, seqsets = load_config(args.config)
+    collection_by_cachepath = records_from_log(args.from_log)
+    print(f"parsed {len(collection_by_cachepath)} collection record(s) from "
+          f"{args.from_log}", file=sys.stderr)
+
+    store = RefgetStore.open_local(str(args.store_dir))
+    lock = build_lock_dict(
+        config_path=args.config, download_dir=args.cache_dir,
+        assemblies=assemblies, seqsets=seqsets,
+        collection_by_cachepath=collection_by_cachepath, store=store,
+    )
+    fasta_sources = [s for s in lock["sources"] if s["kind"] != "assembly_report"]
+    mapped = [s for s in fasta_sources if s["collection_digest"]]
+    print(f"sources={len(lock['sources'])} fasta/gbff={len(fasta_sources)} "
+          f"collection-mapped={len(mapped)}", file=sys.stderr)
+    write_lock(args.out, lock)
+    print(f"wrote {args.out}", file=sys.stderr)
+    return 0

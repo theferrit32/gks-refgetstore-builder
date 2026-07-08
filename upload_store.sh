@@ -115,8 +115,8 @@ try:
 except Exception:
     gtars_version = None
 
-# source pins from assemblies.toml
-cfg_path = repo / "assemblies.toml"
+# source pins from sources.toml
+cfg_path = repo / "sources.toml"
 assemblies, seqsets = [], []
 if cfg_path.exists():
     cfg = tomllib.loads(cfg_path.read_text())

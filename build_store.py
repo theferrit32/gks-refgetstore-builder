@@ -8,22 +8,22 @@ reports. See README.md for details.
 
 from __future__ import annotations
 
-import argparse
+import gzip
 import logging
-import sys
 import tempfile
 import tomllib
 import urllib.request
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Iterator
+from urllib.parse import urlsplit
 
 from gtars.refget import RefgetStore
 
 logger = logging.getLogger("build_store")
 
 REPO_ROOT = Path(__file__).resolve().parent
-DEFAULT_CONFIG = Path(__file__).parent / "assemblies.toml"
+DEFAULT_CONFIG = Path(__file__).parent / "sources.toml"
 DEFAULT_STORE = Path(__file__).parent / "store"
 DEFAULT_DOWNLOADS = Path(__file__).parent / "downloads"
 
@@ -51,11 +51,32 @@ class SeqsetConfig:
 
     name: str
     namespace: str
-    url_template: str
+    url_template: str | None = None
     shard_range: list[int] | None = None
+    urls: list[str] | None = None
+    format: str = "fasta"
+
+    def __post_init__(self) -> None:
+        if (self.url_template is None) == (self.urls is None):
+            raise ValueError(
+                f"seqset {self.name!r}: set exactly one of url_template or urls"
+            )
+        if self.urls is not None and self.shard_range is not None:
+            raise ValueError(
+                f"seqset {self.name!r}: shard_range is not valid with urls"
+            )
+        if self.format not in ("fasta", "gbff"):
+            raise ValueError(
+                f"seqset {self.name!r}: format must be 'fasta' or 'gbff', "
+                f"got {self.format!r}"
+            )
 
     def iter_shard_urls(self) -> Iterator[tuple[str, str]]:
         """Yield (shard_label, url) pairs. Shard label is "" for unsharded."""
+        if self.urls is not None:
+            for i, url in enumerate(self.urls, 1):
+                yield str(i), url
+            return
         if self.shard_range is None:
             yield "", self.url_template
             return
@@ -107,6 +128,94 @@ def load_config(
     return assemblies, seqsets
 
 
+def mirror_cache_path(cache_root: Path, url: str) -> Path:
+    """Cache path that mirrors the source host + full path under ``cache_root``.
+
+    ``https://ftp.ncbi.nlm.nih.gov/genomes/all/.../X_rna.fna.gz`` caches to
+    ``<cache_root>/ftp.ncbi.nlm.nih.gov/genomes/all/.../X_rna.fna.gz``.
+
+    Mirroring host + full path is collision-proof by construction: different
+    annotation-release snapshots and per-patch assembly dirs routinely ship
+    FASTAs with identical basenames (e.g. ``GCF_000001405.39_GRCh38.p13_rna.fna.gz``
+    recurs across every dated AR109 release) but live at distinct paths, so
+    caching by basename alone would silently reuse the wrong file. The layout is
+    also human-navigable and lets the fetcher (``fetch_sources.py``) and the
+    builder share one cache.
+    """
+    parts = urlsplit(url)
+    return cache_root / parts.netloc / parts.path.lstrip("/")
+
+
+def gbff_to_fasta(gbff_path: Path, out_path: Path) -> int:
+    """Convert a (gzipped) GenBank flat file to FASTA, keyed by accession.version.
+
+    Streams the GBFF: each record's ``VERSION`` line supplies the FASTA header
+    (the accession.version, which becomes the ``namespace:<accn.ver>`` alias),
+    and the ``ORIGIN``..``//`` block supplies the sequence. Only the accession
+    and sequence are needed for refget ingestion, so all other GenBank fields
+    are skipped. Returns the number of records written.
+
+    Used for the curated-history source
+    (``…_knownrefseq_rna.gbff.gz``), which is distributed only as GBFF and holds
+    replaced/suppressed ``NM_``/``NR_`` versions available in no bulk FASTA.
+    """
+    opener = gzip.open if gbff_path.suffix == ".gz" else open
+    records = 0
+    version: str | None = None
+    seq_parts: list[str] = []
+    in_origin = False
+    tmp = out_path.with_suffix(out_path.suffix + ".part")
+    tmp.parent.mkdir(parents=True, exist_ok=True)
+    with opener(gbff_path, "rt") as fh, tmp.open("w") as out:  # type: ignore[operator]
+        for line in fh:
+            if in_origin:
+                if line.startswith("//"):
+                    if version and seq_parts:
+                        out.write(f">{version}\n{''.join(seq_parts)}\n")
+                        records += 1
+                    version, seq_parts, in_origin = None, [], False
+                else:
+                    # ORIGIN sequence lines: leading base-count, then 10-char
+                    # blocks of letters separated by spaces.
+                    seq_parts.append("".join(c for c in line if c.isalpha()))
+            elif line.startswith("VERSION"):
+                version = line.split()[1] if len(line.split()) > 1 else None
+            elif line.startswith("ORIGIN"):
+                in_origin = True
+    tmp.replace(out_path)
+    return records
+
+
+def resolve_gbff_fasta(gbff_path: Path, force: bool) -> Path:
+    """Return a cached FASTA rendering of ``gbff_path``, converting if needed."""
+    out_path = gbff_path.parent / (gbff_path.name + ".fasta")
+    if out_path.exists() and out_path.stat().st_size > 0 and not force:
+        logger.info("using cached gbff->fasta %s", out_path)
+        return out_path
+    logger.info("converting gbff -> fasta %s", gbff_path)
+    n = gbff_to_fasta(gbff_path, out_path)
+    logger.info("  wrote %d records to %s", n, out_path)
+    return out_path
+
+
+def iter_source_urls(
+    assemblies: list[AssemblyConfig], seqsets: list[SeqsetConfig]
+) -> Iterator[tuple[str, str, str]]:
+    """Yield ``(kind, owner, url)`` for every remote file the config references.
+
+    ``kind`` is ``seqset``/``assembly_fasta``/``assembly_report``; ``owner`` is
+    the seqset name or assembly namespace. Used by ``fetch_sources.py`` to
+    pre-populate the cache and by tooling to enumerate the full source set.
+    """
+    for s in seqsets:
+        for _, url in s.iter_shard_urls():
+            yield "seqset", s.name, url
+    for a in assemblies:
+        if a.load_fasta and not a.fasta_path:
+            yield "assembly_fasta", a.namespace, a.fasta_url
+        yield "assembly_report", a.namespace, a.report_url
+
+
 def ensure_download(url: str, target: Path, force: bool) -> Path:
     target.parent.mkdir(parents=True, exist_ok=True)
     if target.exists() and not force:
@@ -132,7 +241,7 @@ def resolve_fasta_source(
         logger.warning("fasta_path %s not found; falling back to download", local)
     return ensure_download(
         entry.fasta_url,
-        download_dir / Path(entry.fasta_url).name,
+        mirror_cache_path(download_dir, entry.fasta_url),
         force,
     )
 
@@ -142,7 +251,7 @@ def resolve_report_source(
 ) -> Path:
     return ensure_download(
         entry.report_url,
-        download_dir / f"{entry.namespace}.assembly_report.txt",
+        mirror_cache_path(download_dir, entry.report_url),
         force,
     )
 
@@ -239,6 +348,7 @@ def add_aliases_for_row(
     refseq_ac = row.get("RefSeq-Accn", "").strip()
     ucsc_name = row.get("UCSC-style-name", "").strip()
     genbank_ac = row.get("GenBank-Accn", "").strip()
+    seq_name = row.get("Sequence-Name", "").strip()
 
     # Scope: we only alias sequences that are actually in the RefSeq dataset.
     # Rows with RefSeq-Accn=na are GenBank-only contigs that the NCBI
@@ -259,6 +369,11 @@ def add_aliases_for_row(
         return
 
     stats.rows_resolved += 1
+    # The NCBI Sequence-Name (e.g. "1", "MT", "HSCHR1_CTG1_UNLOCALIZED") is the
+    # spelling seqrepo uses for its assembly namespaces, distinct from the UCSC
+    # "chr1"/"chrM" form. Add it so seqrepo-style lookups (GRCh38:1) resolve.
+    if seq_name and seq_name.lower() not in NA_VALUES:
+        add_unique_alias(store, namespace, seq_name, digest, stats)
     if ucsc_name and ucsc_name.lower() not in NA_VALUES:
         add_unique_alias(store, namespace, ucsc_name, digest, stats)
     if genbank_ac and genbank_ac.lower() not in NA_VALUES:
@@ -291,6 +406,7 @@ def process_assembly(
     download_dir: Path,
     force_download: bool,
     global_name_map_cache: dict[str, dict[str, str]],
+    provenance: dict[str, dict] | None = None,
 ) -> AssemblyStats:
     stats = AssemblyStats(namespace=entry.namespace)
     logger.info("=== %s ===", entry.namespace)
@@ -304,6 +420,11 @@ def process_assembly(
         coll_meta, was_new = store.add_sequence_collection_from_fasta(str(fasta_path))
         coll_digest = coll_meta.digest
         stats.collection_digest = coll_digest
+        if provenance is not None:
+            provenance[str(mirror_cache_path(download_dir, entry.fasta_url))] = {
+                "collection_digest": coll_digest,
+                "n_sequences": coll_meta.n_sequences,
+            }
         logger.info(
             "collection %s (%s, %d sequences)",
             coll_digest,
@@ -343,6 +464,7 @@ def process_seqset(
     entry: SeqsetConfig,
     download_dir: Path,
     force_download: bool,
+    provenance: dict[str, dict] | None = None,
 ) -> SeqsetStats:
     """Ingest a flat/sharded seqset and alias every header name.
 
@@ -367,7 +489,7 @@ def process_seqset(
     pending: dict[str, str] = {}
 
     for shard_label, url in entry.iter_shard_urls():
-        target = download_dir / Path(url).name
+        target = mirror_cache_path(download_dir, url)
         logger.info(
             "shard %s%s",
             shard_label or "-",
@@ -379,6 +501,14 @@ def process_seqset(
             logger.warning("download failed for %s: %s", url, exc)
             stats.warnings += 1
             continue
+
+        if entry.format == "gbff":
+            try:
+                fasta_path = resolve_gbff_fasta(fasta_path, force_download)
+            except Exception as exc:  # noqa: BLE001
+                logger.warning("gbff conversion failed for %s: %s", fasta_path, exc)
+                stats.warnings += 1
+                continue
 
         try:
             coll_meta, was_new = store.add_sequence_collection_from_fasta(
@@ -397,6 +527,13 @@ def process_seqset(
         )
         stats.shards_processed += 1
         stats.sequences_ingested += coll_meta.n_sequences
+        if provenance is not None:
+            # key by the source cache path (the .gbff.gz for GBFF, not the
+            # converted .fasta) so it matches iter_source_urls at lock time
+            provenance[str(target)] = {
+                "collection_digest": coll_meta.digest,
+                "n_sequences": coll_meta.n_sequences,
+            }
 
         name_to_digest = build_name_to_digest_map(store, coll_meta.digest)
         for name, digest in name_to_digest.items():
@@ -471,6 +608,34 @@ def print_summary(
     )
 
 
+def report_lock_check(check, mode: str) -> None:
+    """Log the pre-flight lock-check outcome, emphasis per mode."""
+    if check.changed:
+        logger.warning(
+            "lock check: %d file(s) CHANGED vs lock (content drift):", len(check.changed)
+        )
+        for rel, lsha, asha, mut in check.changed[:20]:
+            logger.warning(
+                "  %s%s  lock=%s… actual=%s…",
+                rel, " (mutable)" if mut else "", lsha[:12], asha[:12],
+            )
+    if check.missing:
+        logger.warning(
+            "lock check: %d file(s) not in cache (will be fetched, unchecked): %s",
+            len(check.missing), ", ".join(check.missing[:5]) + (" …" if len(check.missing) > 5 else ""),
+        )
+    if check.set_differs:
+        emit = logger.warning if mode == "strict" else logger.info
+        emit(
+            "lock check: file set differs (in_build_not_lock=%d, in_lock_not_build=%d)",
+            len(check.new), len(check.only_in_lock),
+        )
+    logger.info(
+        "lock check: matched=%d changed=%d new=%d missing=%d",
+        len(check.matched), len(check.changed), len(check.new), len(check.missing),
+    )
+
+
 def iter_selected_assemblies(
     entries: list[AssemblyConfig], selected: str | None
 ) -> Iterator[AssemblyConfig]:
@@ -501,42 +666,8 @@ def iter_selected_seqsets(
         raise SystemExit(f"no seqset with name {selected!r} in config")
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
-    parser.add_argument("--store-dir", type=Path, default=DEFAULT_STORE)
-    parser.add_argument("--download-dir", type=Path, default=DEFAULT_DOWNLOADS)
-    parser.add_argument(
-        "--assembly",
-        type=str,
-        default=None,
-        help="Process only this assembly namespace (skips seqsets).",
-    )
-    parser.add_argument(
-        "--seqset",
-        type=str,
-        default=None,
-        help="Process only this seqset name (skips assemblies).",
-    )
-    parser.add_argument(
-        "--skip-assemblies",
-        action="store_true",
-        help="Skip all [[assembly]] entries.",
-    )
-    parser.add_argument(
-        "--skip-seqsets",
-        action="store_true",
-        help="Skip all [[seqset]] entries.",
-    )
-    parser.add_argument("--force-download", action="store_true")
-    parser.add_argument("--verbose", "-v", action="store_true")
-    args = parser.parse_args()
-
-    logging.basicConfig(
-        level=logging.DEBUG if args.verbose else logging.INFO,
-        format="%(levelname)s %(name)s: %(message)s",
-    )
-
+def run_build(args) -> int:
+    """Execute the ``build`` subcommand from a parsed args namespace."""
     assemblies, seqsets = load_config(args.config)
     logger.info(
         "loaded %d assembly + %d seqset entries from %s",
@@ -546,46 +677,114 @@ def main() -> None:
     )
 
     args.store_dir.mkdir(parents=True, exist_ok=True)
-    args.download_dir.mkdir(parents=True, exist_ok=True)
+    args.cache_dir.mkdir(parents=True, exist_ok=True)
 
     store = RefgetStore.on_disk(str(args.store_dir))
     logger.info("opened store at %s (mode=%s)", args.store_dir, store.storage_mode)
+
+    import build_lock  # lazy: avoids a circular import at module load
 
     # If the user passes --assembly or --seqset, they implicitly only want
     # that kind — otherwise we run both.
     run_assemblies = not args.skip_assemblies and args.seqset is None
     run_seqsets = not args.skip_seqsets and args.assembly is None
 
+    sel_assemblies = (
+        list(iter_selected_assemblies(assemblies, args.assembly)) if run_assemblies else []
+    )
+    sel_seqsets = (
+        list(iter_selected_seqsets(seqsets, args.seqset)) if run_seqsets else []
+    )
+    # The concrete files this run will touch (used for both the pre-flight check
+    # and the partial add-to merge).
+    run_sources = list(iter_source_urls(sel_assemblies, sel_seqsets))
+
+    # ---- pre-flight lock check (before ingesting anything) ----
+    existing_lock = build_lock.load_lock(args.lock) if args.lock.exists() else None
+    check: build_lock.LockCheck | None = None
+    if existing_lock is None:
+        logger.info("no existing lock at %s; skipping pre-flight check", args.lock)
+    elif args.lock_check_mode == "ignore":
+        logger.info("lock-check-mode=ignore; skipping pre-flight check")
+    else:
+        build_files = [
+            (
+                str(mirror_cache_path(args.cache_dir, url).relative_to(args.cache_dir)),
+                mirror_cache_path(args.cache_dir, url),
+            )
+            for _, _, url in run_sources
+        ]
+        check = build_lock.evaluate_cache_vs_lock(build_files, existing_lock)
+        report_lock_check(check, args.lock_check_mode)
+
     all_stats: list[AssemblyStats] = []
     seqset_stats: list[SeqsetStats] = []
     global_name_map_cache: dict[str, dict[str, str]] = {}
+    provenance: dict[str, dict] = {}
 
-    if run_assemblies:
-        for entry in iter_selected_assemblies(assemblies, args.assembly):
-            stats = process_assembly(
-                store,
-                entry,
-                args.download_dir,
-                args.force_download,
-                global_name_map_cache,
+    for entry in sel_assemblies:
+        all_stats.append(
+            process_assembly(
+                store, entry, args.cache_dir, args.force_download,
+                global_name_map_cache, provenance,
             )
-            all_stats.append(stats)
-
-    if run_seqsets:
-        for entry in iter_selected_seqsets(seqsets, args.seqset):
-            seqset_stats.append(
-                process_seqset(
-                    store,
-                    entry,
-                    args.download_dir,
-                    args.force_download,
-                )
+        )
+    for entry in sel_seqsets:
+        seqset_stats.append(
+            process_seqset(
+                store, entry, args.cache_dir, args.force_download, provenance,
             )
+        )
 
     logger.info("persisting store to %s", args.store_dir)
     store.write()
     print_summary(all_stats, seqset_stats, store)
 
+    # ---- lock write decision ----
+    full_build = (
+        args.assembly is None
+        and args.seqset is None
+        and not args.skip_assemblies
+        and not args.skip_seqsets
+    )
+    # The write gate keys on CONTENT DRIFT (never silently overwrite a good hash);
+    # under strict, a differing file SET also suppresses the write. Both are
+    # overridable with --force-lock.
+    suppress = False
+    if check is not None and not args.force_lock:
+        if check.drift:
+            suppress = True
+            logger.warning(
+                "content drift vs lock on %d file(s); NOT writing lock "
+                "(use --force-lock to re-baseline)", len(check.changed),
+            )
+        elif args.lock_check_mode == "strict" and check.set_differs:
+            suppress = True
+            logger.warning(
+                "strict: build file set differs from lock; NOT writing lock "
+                "(use --lock-check-mode subset, or --force-lock to re-baseline)",
+            )
 
-if __name__ == "__main__":
-    sys.exit(main())
+    if args.no_lock:
+        logger.info("skipping build-lock write (--no-lock)")
+    elif suppress:
+        logger.warning("build-lock NOT updated; preserving %s", args.lock)
+    elif full_build:
+        logger.info("writing build-lock (hashing cache) -> %s", args.lock)
+        lock = build_lock.build_lock_dict(
+            config_path=args.config, download_dir=args.cache_dir,
+            assemblies=assemblies, seqsets=seqsets,
+            collection_by_cachepath=provenance, store=store,
+        )
+        build_lock.write_lock(args.lock, lock)
+        logger.info("wrote build-lock with %d sources", len(lock["sources"]))
+    else:
+        logger.info("partial build; merging %d touched source(s) into %s",
+                    len(run_sources), args.lock)
+        merged = build_lock.merge_into_lock(
+            existing_lock, config_path=args.config, download_dir=args.cache_dir,
+            touched_sources=run_sources, collection_by_cachepath=provenance, store=store,
+        )
+        build_lock.write_lock(args.lock, merged)
+        logger.info("build-lock now has %d sources", len(merged["sources"]))
+    return 0

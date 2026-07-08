@@ -11,5 +11,17 @@ dependencies = [
     "gtars>=0.8.0",
 ]
 
-[tool.uv]
-package = false
+[project.scripts]
+gks-refgetstore = "cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+include = [
+    "cli.py",
+    "build_store.py",
+    "build_lock.py",
+    "fetch_sources.py",
+]
