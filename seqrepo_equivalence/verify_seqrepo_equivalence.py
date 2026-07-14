@@ -276,6 +276,22 @@ def compare_aliases(
     refget_digests: set[str],
     max_examples: int,
 ) -> AliasComparison:
+    """Compare one mapped SeqRepo namespace with its RefgetStore counterpart.
+
+    Args:
+        seqrepo_ns: Source SeqRepo namespace.
+        refget_ns: Corresponding RefgetStore namespace.
+        group: Compatibility group, such as ``core`` or ``additional``.
+        sr_map: SeqRepo alias-to-digest mapping.
+        rg_map: RefgetStore alias-to-digest mapping.
+        known_divergent: Accepted alias-to-cause digest divergences.
+        refget_digests: All digests present in the RefgetStore.
+        max_examples: Per-category cap for diagnostic examples.
+
+    Shared aliases are classified as matching, explained, or unexplained digest
+    mismatches. SeqRepo-only aliases are then attributed to version drift, an
+    alias-naming gap, a backfill candidate, or a missing sequence.
+    """
     cmp = AliasComparison(
         seqrepo_ns=seqrepo_ns,
         refget_ns=refget_ns,
@@ -399,6 +415,17 @@ def compute_digest_coverage(
 def compute_verdict(
     comparisons: list[AliasComparison], coverage: DigestCoverage, fail_on: str
 ) -> dict:
+    """Convert namespace comparisons into the backwards-compatibility verdict.
+
+    Args:
+        comparisons: Per-namespace alias comparison results.
+        coverage: Whole-store digest coverage result, retained for report context.
+        fail_on: ``none``, ``mismatch``, or ``gaps`` failure policy.
+
+    Only core namespaces determine the default verdict. Additional patch and
+    legacy namespaces remain visible in the report but are not folded into the
+    core pass/fail criteria.
+    """
     core = [c for c in comparisons if c.group == "core"]
     extra = [c for c in comparisons if c.group == "additional"]
     unexplained = sum(c.mismatch_unexplained for c in core)

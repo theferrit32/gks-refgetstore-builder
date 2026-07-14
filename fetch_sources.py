@@ -76,7 +76,16 @@ def download(url: str, target: Path, timeout: int, retries: int) -> int:
 
 
 def run_fetch(args) -> int:
-    """Execute the ``fetch`` subcommand: pre-populate the cache from the manifest."""
+    """Pre-populate the mirrored source cache from the manifest.
+
+    Args:
+        args: Parsed CLI options for source filters, cache location, retries,
+            timeout, dry-run mode, and the minimum free-space threshold.
+
+    Existing nonempty files are retained, while missing files are downloaded
+    atomically. Individual download failures are reported after the run and
+    produce a nonzero result; insufficient free disk space stops further fetches.
+    """
     assemblies, seqsets = load_config(args.config)
     sources = list(iter_source_urls(assemblies, seqsets))
     if args.only:

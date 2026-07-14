@@ -128,7 +128,43 @@ def source_record(
     kind: str, owner: str, url: str, download_dir: Path,
     collection_by_cachepath: dict[str, dict], hash_files: bool = True,
 ) -> dict:
-    """One lock entry for a single source URL (bytes, sha256, collection, etc.)."""
+    """Build the lock record for one manifest-referenced remote source.
+
+    ``url`` is mapped to its expected local cache location with
+    :func:`build_store.mirror_cache_path`. The resulting record intentionally
+    captures the local cache state at lock-generation time, rather than making
+    a remote request:
+
+    - ``kind`` identifies ``seqset``, ``assembly_fasta``, or
+      ``assembly_report``; ``owner`` identifies the containing manifest entry.
+    - ``cache_path`` is relative to ``download_dir`` when possible, while
+      ``url`` remains the authoritative remote origin.
+    - ``mutable`` is a policy classification derived from the URL. It denotes
+      endpoints known to refresh in place; it is not an HTTP immutability
+      guarantee.
+    - ``present`` is true only when the cache file exists and has nonzero size.
+      ``bytes`` and ``sha256`` describe that local file; ``present`` does not
+      verify gzip integrity or that the remote object is still available.
+    - ``collection_digest`` and ``n_sequences`` come from build-time
+      provenance, keyed by the absolute cache path. They describe the gtars
+      sequence collection produced from this source, not an individual sequence
+      digest or the number of globally new deduplicated sequences in the store.
+
+    Args:
+        kind: Source role emitted by :func:`build_store.iter_source_urls`.
+        owner: Assembly namespace or seqset name that references ``url``.
+        url: Manifest URL for the cached source file.
+        download_dir: Root of the mirrored download cache.
+        collection_by_cachepath: Build provenance keyed by absolute cache path.
+        hash_files: Compute a SHA-256 for present files; disable only for callers
+            that intentionally need a metadata-only record.
+
+    Returns:
+        A JSON-serializable source entry for ``build.lock.json``. Missing cache
+        files retain their identity fields but have null size and hash values.
+        Collection provenance is populated independently when supplied by the
+        build.
+    """
     cache_path = mirror_cache_path(download_dir, url)
     rec: dict = {
         "kind": kind, "owner": owner, "url": url,

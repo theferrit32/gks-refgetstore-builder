@@ -345,6 +345,18 @@ def add_aliases_for_row(
     name_to_digest: dict[str, str],
     stats: AssemblyStats,
 ) -> None:
+    """Add supported aliases from one NCBI assembly-report row.
+
+    Args:
+        store: RefgetStore receiving sequence aliases.
+        row: Parsed NCBI assembly-report row.
+        namespace: Assembly namespace for sequence-name and UCSC aliases.
+        name_to_digest: RefSeq accession-to-digest mapping for the source FASTA.
+        stats: Mutable assembly counters updated for aliases, skips, and warnings.
+
+    GenBank-only rows and rows absent from the FASTA are skipped. Resolved rows
+    receive assembly-scoped aliases plus global ``refseq`` and ``insdc`` aliases.
+    """
     refseq_ac = row.get("RefSeq-Accn", "").strip()
     ucsc_name = row.get("UCSC-style-name", "").strip()
     genbank_ac = row.get("GenBank-Accn", "").strip()
@@ -408,6 +420,19 @@ def process_assembly(
     global_name_map_cache: dict[str, dict[str, str]],
     provenance: dict[str, dict] | None = None,
 ) -> AssemblyStats:
+    """Ingest one assembly and materialize its assembly-report aliases.
+
+    Args:
+        store: On-disk RefgetStore to update.
+        entry: Manifest assembly configuration and source URLs.
+        download_dir: Root of the mirrored source cache.
+        force_download: Re-fetch cached source files when true.
+        global_name_map_cache: Reusable fallback map for report-only assemblies.
+        provenance: Optional cache-path-to-collection metadata for the build lock.
+
+    A full assembly FASTA produces a collection and provenance record. A
+    report-only entry resolves aliases against the existing store instead.
+    """
     stats = AssemblyStats(namespace=entry.namespace)
     logger.info("=== %s ===", entry.namespace)
     fasta_path = resolve_fasta_source(entry, download_dir, force_download)
@@ -667,7 +692,16 @@ def iter_selected_seqsets(
 
 
 def run_build(args) -> int:
-    """Execute the ``build`` subcommand from a parsed args namespace."""
+    """Execute the ``build`` subcommand and conditionally refresh its lock.
+
+    Args:
+        args: Parsed CLI options controlling source selection, cache/store paths,
+            downloads, and build-lock policy.
+
+    Full builds replace the lock with all manifest sources; selected builds merge
+    only touched sources. Content drift or a strict file-set mismatch suppresses
+    a lock write unless the caller explicitly forces a re-baseline.
+    """
     assemblies, seqsets = load_config(args.config)
     logger.info(
         "loaded %d assembly + %d seqset entries from %s",

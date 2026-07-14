@@ -203,6 +203,16 @@ def section_ground_truth(store: RefgetStore, r: Report) -> None:
 
 
 def section_coverage(store: RefgetStore, r: Report) -> None:
+    """Check report-derived alias coverage for the primary assembly namespaces.
+
+    Args:
+        store: RefgetStore under verification.
+        r: Accumulator receiving named pass/fail checks.
+
+    For each configured primary report, verifies RefSeq, UCSC, and GenBank
+    aliases in their assembly and global namespaces. GenBank-only report rows
+    are excluded because the RefSeq genomic FASTA does not contain their bytes.
+    """
     print("\n[D] Assembly report coverage")
     for namespace in ("GRCh38", "GRCh38.p14", "GRCh37", "GRCh37.p13"):
         report_path = DOWNLOAD_DIR / f"{namespace}.assembly_report.txt"
@@ -259,6 +269,16 @@ def section_coverage(store: RefgetStore, r: Report) -> None:
 
 
 def section_invariants(store: RefgetStore, r: Report) -> None:
+    """Check stable cross-build sequence identities and expected differences.
+
+    Args:
+        store: RefgetStore under verification.
+        r: Accumulator receiving named pass/fail checks.
+
+    The checks cover shared chromosome and mitochondrial sequences across patch
+    releases, a deliberate GRCh37/GRCh38 chromosome difference, and the RefSeq
+    mitochondrial accession round-trip.
+    """
     print("\n[E] Cross-patch / cross-build invariants")
 
     def digest_for(ns: str, alias: str) -> str | None:
