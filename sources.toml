@@ -171,111 +171,109 @@ urls = [
 # accession.version). See SEQREPO_PARITY.md and sources.toml.bak.2026-07-07.
 
 # ---------------------------------------------------------------------------
-# Patch-ladder alias fanout (load_fasta=false; report-only, no FASTA download)
+# Patch-ladder assembly coverage
 # ---------------------------------------------------------------------------
 # seqrepo exposes per-patch assembly namespaces (GRCh38.p1-p12, GRCh37 select
-# patches). The underlying sequences are already in the store via the p14/p13
-# full loads above, so these entries only fetch the small assembly_report.txt
-# and add the per-patch alias spellings (e.g. GRCh38.p3:HSCHR1_CTG1). Retired
-# FIX scaffolds dropped before p14 won't resolve (documented drift). GRCh37
-# p11/p12 publish a report but no genomic FASTA -- harmless since load_fasta is
-# false and the fasta_url is never fetched.
+# patches). Load each available genomic FASTA so retired FIX scaffolds not in
+# the p14/p13 full loads are present as well as the per-patch alias spellings.
+# GRCh37 p11/p12 publish a report but no genomic FASTA, so they remain
+# report-only and cannot contribute their retired scaffolds.
 
 [[assembly]]
 namespace = "GRCh38.p1"
 fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.27_GRCh38.p1/GCF_000001405.27_GRCh38.p1_genomic.fna.gz"
 report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.27_GRCh38.p1/GCF_000001405.27_GRCh38.p1_assembly_report.txt"
-load_fasta = false
+load_fasta = true
 
 [[assembly]]
 namespace = "GRCh38.p2"
 fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.28_GRCh38.p2/GCF_000001405.28_GRCh38.p2_genomic.fna.gz"
 report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.28_GRCh38.p2/GCF_000001405.28_GRCh38.p2_assembly_report.txt"
-load_fasta = false
+load_fasta = true
 
 [[assembly]]
 namespace = "GRCh38.p3"
 fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.29_GRCh38.p3/GCF_000001405.29_GRCh38.p3_genomic.fna.gz"
 report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.29_GRCh38.p3/GCF_000001405.29_GRCh38.p3_assembly_report.txt"
-load_fasta = false
+load_fasta = true
 
 [[assembly]]
 namespace = "GRCh38.p4"
 fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.30_GRCh38.p4/GCF_000001405.30_GRCh38.p4_genomic.fna.gz"
 report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.30_GRCh38.p4/GCF_000001405.30_GRCh38.p4_assembly_report.txt"
-load_fasta = false
+load_fasta = true
 
 [[assembly]]
 namespace = "GRCh38.p5"
 fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.31_GRCh38.p5/GCF_000001405.31_GRCh38.p5_genomic.fna.gz"
 report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.31_GRCh38.p5/GCF_000001405.31_GRCh38.p5_assembly_report.txt"
-load_fasta = false
+load_fasta = true
 
 [[assembly]]
 namespace = "GRCh38.p6"
 fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.32_GRCh38.p6/GCF_000001405.32_GRCh38.p6_genomic.fna.gz"
 report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.32_GRCh38.p6/GCF_000001405.32_GRCh38.p6_assembly_report.txt"
-load_fasta = false
+load_fasta = true
 
 [[assembly]]
 namespace = "GRCh38.p7"
 fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.33_GRCh38.p7/GCF_000001405.33_GRCh38.p7_genomic.fna.gz"
 report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.33_GRCh38.p7/GCF_000001405.33_GRCh38.p7_assembly_report.txt"
-load_fasta = false
+load_fasta = true
 
 [[assembly]]
 namespace = "GRCh38.p8"
 fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.34_GRCh38.p8/GCF_000001405.34_GRCh38.p8_genomic.fna.gz"
 report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.34_GRCh38.p8/GCF_000001405.34_GRCh38.p8_assembly_report.txt"
-load_fasta = false
+load_fasta = true
 
 [[assembly]]
 namespace = "GRCh38.p9"
 fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.35_GRCh38.p9/GCF_000001405.35_GRCh38.p9_genomic.fna.gz"
 report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.35_GRCh38.p9/GCF_000001405.35_GRCh38.p9_assembly_report.txt"
-load_fasta = false
+load_fasta = true
 
 [[assembly]]
 namespace = "GRCh38.p10"
 fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.36_GRCh38.p10/GCF_000001405.36_GRCh38.p10_genomic.fna.gz"
 report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.36_GRCh38.p10/GCF_000001405.36_GRCh38.p10_assembly_report.txt"
-load_fasta = false
+load_fasta = true
 
 [[assembly]]
 namespace = "GRCh38.p11"
 fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.37_GRCh38.p11/GCF_000001405.37_GRCh38.p11_genomic.fna.gz"
 report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.37_GRCh38.p11/GCF_000001405.37_GRCh38.p11_assembly_report.txt"
-load_fasta = false
+load_fasta = true
 
 [[assembly]]
 namespace = "GRCh38.p12"
 fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.38_GRCh38.p12/GCF_000001405.38_GRCh38.p12_genomic.fna.gz"
 report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.38_GRCh38.p12/GCF_000001405.38_GRCh38.p12_assembly_report.txt"
-load_fasta = false
+load_fasta = true
 
 [[assembly]]
 namespace = "GRCh37.p2"
 fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.14_GRCh37.p2/GCF_000001405.14_GRCh37.p2_genomic.fna.gz"
 report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.14_GRCh37.p2/GCF_000001405.14_GRCh37.p2_assembly_report.txt"
-load_fasta = false
+load_fasta = true
 
 [[assembly]]
 namespace = "GRCh37.p5"
 fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.17_GRCh37.p5/GCF_000001405.17_GRCh37.p5_genomic.fna.gz"
 report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.17_GRCh37.p5/GCF_000001405.17_GRCh37.p5_assembly_report.txt"
-load_fasta = false
+load_fasta = true
 
 [[assembly]]
 namespace = "GRCh37.p9"
 fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.21_GRCh37.p9/GCF_000001405.21_GRCh37.p9_genomic.fna.gz"
 report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.21_GRCh37.p9/GCF_000001405.21_GRCh37.p9_assembly_report.txt"
-load_fasta = false
+load_fasta = true
 
 [[assembly]]
 namespace = "GRCh37.p10"
 fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.22_GRCh37.p10/GCF_000001405.22_GRCh37.p10_genomic.fna.gz"
 report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.22_GRCh37.p10/GCF_000001405.22_GRCh37.p10_assembly_report.txt"
-load_fasta = false
+load_fasta = true
 
 [[assembly]]
 namespace = "GRCh37.p11"
