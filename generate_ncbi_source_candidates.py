@@ -17,7 +17,7 @@ import urllib.request
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable, Iterable
-from urllib.parse import urlsplit
+from urllib.parse import urlsplit, urlunsplit
 
 HOST = "ftp.ncbi.nlm.nih.gov"
 HTTPS = f"https://{HOST}"
@@ -66,6 +66,32 @@ class Candidate:
 
     def as_dict(self) -> dict[str, object]:
         return self.__dict__.copy()
+
+
+def normalize_directory(directory: str) -> str:
+    """Return an FTP path without trailing or repeated path separators."""
+    return re.sub(r"/{2,}", "/", directory.rstrip("/"))
+
+
+def normalize_url(url: str | None) -> str | None:
+    """Canonicalize separators in a URL path without changing its scheme."""
+    if url is None:
+        return None
+    parsed = urlsplit(url)
+    return urlunsplit((parsed.scheme, parsed.netloc,
+                       re.sub(r"/{2,}", "/", parsed.path),
+                       parsed.query, parsed.fragment))
+
+
+def normalize_candidate(candidate: Candidate) -> Candidate:
+    directory = (normalize_directory(candidate.annotation_run_directory)
+                 if candidate.annotation_run_directory else None)
+    return Candidate(**{
+        **candidate.as_dict(),
+        "annotation_run_directory": directory,
+        "url": normalize_url(candidate.url),
+        "readme_url": normalize_url(candidate.readme_url),
+    })
 
 
 def mirror_cache_path(cache_dir: Path, url: str) -> Path:
@@ -136,10 +162,12 @@ class FTPListings:
         self.ftp: ftplib.FTP | None = None
 
     def _cache_path(self, directory: str) -> Path:
-        url = f"ftp://{HOST}{directory.rstrip('/')}/.listing"
+        directory = normalize_directory(directory)
+        url = f"ftp://{HOST}{directory}/.listing"
         return mirror_cache_path(self.cache_dir, url)
 
     def list(self, directory: str) -> list[str]:
+        directory = normalize_directory(directory)
         cache = self._cache_path(directory)
         if cache.exists() and not self.refresh:
             print(f"listing cache hit: {directory}", file=sys.stderr)
@@ -166,8 +194,9 @@ def annotation_run_index(taxid: int, listing: Callable[[str], list[str]]) -> dic
     """Map accessions to annotation-run dirs in known NCBI one/two-level layout."""
     root = f"{FTP_ROOT}/{taxid}"
     runs: dict[str, list[str]] = {}
-    for entry in listing(root):
-        first = f"{root}/{entry}"
+    for raw_entry in listing(root):
+        entry = raw_entry.rstrip("/")
+        first = normalize_directory(f"{root}/{entry}")
         if ACCESSION_RE.search(entry):
             children = [entry]
             parent = root
@@ -180,10 +209,12 @@ def annotation_run_index(taxid: int, listing: Callable[[str], list[str]]) -> dic
             parent = first
         else:
             continue
-        for child in children:
+        for raw_child in children:
+            child = raw_child.rstrip("/")
             match = ACCESSION_RE.search(child)
             if match:
-                runs.setdefault(match.group(), []).append(f"{parent}/{child}")
+                runs.setdefault(match.group(), []).append(
+                    normalize_directory(f"{parent}/{child}"))
     return {key: sorted(set(value), key=run_sort_key) for key, value in runs.items()}
 
 
@@ -203,6 +234,7 @@ def assembly_sort_key(assembly: Assembly) -> tuple[object, ...]:
 
 def inspect_directory(assembly: Assembly, directory: str, listing: Callable[[str], list[str]],
                       source_kind: str) -> list[Candidate]:
+    directory = normalize_directory(directory)
     try:
         names = set(listing(directory))
     except ftplib.error_perm as exc:
@@ -234,6 +266,7 @@ def deduplicate_candidates(candidates: list[Candidate]) -> list[Candidate]:
     seen: set[str] = set()
     result: list[Candidate] = []
     for candidate in candidates:
+        candidate = normalize_candidate(candidate)
         if (candidate.discovery_status == "discovered" and candidate.url
                 and candidate.url in seen):
             candidate = Candidate(**{
@@ -264,9 +297,45 @@ def _q(value: str) -> str:
     return json.dumps(value, ensure_ascii=False)
 
 
+def _generic_family_name(assembly_name: str) -> tuple[str, str]:
+    raw = re.sub(r"\.p\d+$", "", assembly_name, flags=re.IGNORECASE)
+    label = re.sub(r"[^a-z0-9]+", "_", raw.lower()).strip("_") or "assembly"
+    return raw.casefold(), label
+
+
+def history_family_labels(candidates: list[Candidate]) -> dict[tuple[str, str], str]:
+    """Map (accession, assembly name) to stable, collision-free family labels."""
+    keys = {(c.accession, c.assembly_name) for c in candidates}
+    result: dict[tuple[str, str], str] = {}
+    generic: dict[str, dict[str, list[tuple[str, str]]]] = {}
+    for key in keys:
+        accession, name = key
+        lower = name.lower()
+        if re.match(r"^grch37(?:\.p\d+)?$", lower):
+            result[key] = "grch37"
+        elif re.match(r"^grch38(?:\.p\d+)?$", lower):
+            result[key] = "grch38"
+        elif accession.startswith("GCF_009914755.") or "t2t-chm13" in lower or "t2t_chm13" in lower:
+            result[key] = "t2t_chm13"
+        else:
+            identity, label = _generic_family_name(name)
+            generic.setdefault(label, {}).setdefault(identity, []).append(key)
+    for label, identities in generic.items():
+        collision = len(identities) > 1
+        for family_keys in identities.values():
+            suffix = ""
+            if collision:
+                anchor = min(accession for accession, _ in family_keys).lower()
+                suffix = "_" + re.sub(r"[^a-z0-9]+", "_", anchor).strip("_")
+            for key in family_keys:
+                result[key] = label + suffix
+    return result
+
+
 def emit_toml(assemblies: list[Assembly], candidates: list[Candidate], section: str) -> str:
     lines = ["# Generated NCBI source candidates; review before copying to sources.toml."]
-    discovered = [candidate for candidate in candidates if candidate.discovery_status == "discovered"]
+    discovered = [normalize_candidate(candidate) for candidate in candidates
+                  if candidate.discovery_status == "discovered"]
     if section in ("all", "assemblies"):
         by_accession: dict[str, dict[str, Candidate]] = {}
         for candidate in discovered:
@@ -286,20 +355,32 @@ def emit_toml(assemblies: list[Assembly], candidates: list[Candidate], section: 
                 load = False
             lines.extend([f"report_url = {_q(report.url or '')}", f"load_fasta = {str(load).lower()}"])
     if section in ("all", "history"):
-        for file_type, name in (("rna_fasta", "refseq_history_rna"),
-                                ("protein_fasta", "refseq_history_protein")):
-            urls = sorted({c.url for c in discovered if c.file_type == file_type and c.url},
-                          key=run_sort_key)
-            lines.extend(["", "[[seqset]]", f"name = {_q(name)}",
-                          'namespace = "refseq"', "urls = ["])
-            lines.extend(f"  {_q(url)}," for url in urls)
-            lines.append("]")
+        history = [c for c in discovered
+                   if c.file_type in ("rna_fasta", "protein_fasta")]
+        labels = history_family_labels(history)
+        family_order = {"grch37": 0, "grch38": 1, "t2t_chm13": 2}
+        families = sorted(set(labels.values()),
+                          key=lambda label: (family_order.get(label, 3), label))
+        for family in families:
+            for file_type, type_label in (("rna_fasta", "rna"),
+                                          ("protein_fasta", "protein")):
+                urls = sorted({c.url for c in history
+                               if labels[(c.accession, c.assembly_name)] == family
+                               and c.file_type == file_type and c.url}, key=run_sort_key)
+                if not urls:
+                    continue
+                lines.extend(["", "[[seqset]]",
+                              f"name = {_q(f'refseq_history_{family}_{type_label}')}",
+                              'namespace = "refseq"', "urls = ["])
+                lines.extend(f"  {_q(url)}," for url in urls)
+                lines.append("]")
     return "\n".join(lines) + "\n"
 
 
 def warn_unpaired(candidates: list[Candidate]) -> None:
     grouped: dict[tuple[str, str], set[str]] = {}
-    for candidate in candidates:
+    for unnormalized in candidates:
+        candidate = normalize_candidate(unnormalized)
         if candidate.discovery_status == "discovered" and candidate.file_type in ("rna_fasta", "protein_fasta"):
             key = (candidate.accession, candidate.annotation_run_directory or candidate.url.rsplit("/", 1)[0])
             grouped.setdefault(key, set()).add(candidate.file_type)
@@ -342,7 +423,7 @@ def main(argv: list[str] | None = None) -> int:
         for assembly in assemblies:
             directory = None
             if assembly.ftp_path:
-                directory = urlsplit(assembly.ftp_path).path
+                directory = normalize_directory(urlsplit(assembly.ftp_path).path)
             elif assembly.accession in REPORT_ONLY:
                 base = "/genomes/all/GCF/000/001/405"
                 directory = f"{base}/{assembly.accession}_{REPORT_ONLY[assembly.accession]}"

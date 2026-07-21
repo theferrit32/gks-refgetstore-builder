@@ -136,12 +136,77 @@ class CandidateTests(unittest.TestCase):
         text = gen.emit_toml([], deduplicated, "history")
         self.assertEqual(text.count(url), 1)
         parsed = tomllib.loads(text)
-        self.assertEqual(len(parsed["seqset"]), 2)
+        self.assertEqual(parsed["seqset"][0]["name"], "refseq_history_grch37_rna")
+        self.assertEqual(len(parsed["seqset"]), 1)
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "candidate.toml"
             path.write_text(text)
             _, seqsets = load_config(path)
-        self.assertEqual(len(seqsets), 2)
+        self.assertEqual(len(seqsets), 1)
+
+    def test_trailing_slashes_are_normalized_everywhere(self) -> None:
+        directory = "/genomes/all/GCF/000/001/405/GCF_000001405.23_GRCh37.p11//"
+        prefix = "GCF_000001405.23_GRCh37.p11"
+        names = [prefix + "_rna.fna.gz", "README.txt"]
+        listed = []
+
+        def listing(path):
+            listed.append(path)
+            return names
+
+        stderr = io.StringIO()
+        with redirect_stderr(stderr):
+            candidates = gen.inspect_directory(self.assembly, directory, listing, "annotation_run")
+            gen.warn_unpaired(candidates)
+        self.assertEqual(listed, [directory.rstrip("/").replace("//", "/")])
+        for candidate in candidates:
+            self.assertNotIn("//", (candidate.annotation_run_directory or "").lstrip("/"))
+            self.assertNotIn("//", (candidate.url or "").split("://")[-1])
+            self.assertNotIn("//", (candidate.readme_url or "").split("://")[-1])
+        self.assertNotIn("//GCF", stderr.getvalue())
+
+        dirty = gen.Candidate("annotation_run", self.assembly.accession,
+                              self.assembly.name, 9606, "/run//", "rna_fasta",
+                              "https://example.test/run//x.fna.gz",
+                              "https://example.test/run//README", "discovered")
+        clean = gen.deduplicate_candidates([dirty])[0]
+        self.assertEqual(clean.url, "https://example.test/run/x.fna.gz")
+        self.assertEqual(clean.annotation_run_directory, "/run")
+
+    def test_history_is_grouped_in_family_pairs_and_ordered(self) -> None:
+        def pair(accession, name, stem):
+            return [
+                gen.Candidate("assembly", accession, name, 9606, None, "rna_fasta",
+                              f"https://example.test/{stem}_rna.fna.gz", None, "discovered"),
+                gen.Candidate("assembly", accession, name, 9606, None, "protein_fasta",
+                              f"https://example.test/{stem}_protein.faa.gz", None, "discovered"),
+            ]
+
+        candidates = (pair("GCF_000001405.40", "GRCh38.p14", "38")
+                      + pair("GCF_009914755.1", "T2T-CHM13v2.0", "t2t")
+                      + pair("GCF_000001405.25", "GRCh37.p13", "37"))
+        parsed = tomllib.loads(gen.emit_toml([], candidates, "history"))
+        self.assertEqual([entry["name"] for entry in parsed["seqset"]], [
+            "refseq_history_grch37_rna", "refseq_history_grch37_protein",
+            "refseq_history_grch38_rna", "refseq_history_grch38_protein",
+            "refseq_history_t2t_chm13_rna", "refseq_history_t2t_chm13_protein",
+        ])
+
+    def test_arbitrary_family_labels_are_stable_and_collision_safe(self) -> None:
+        candidates = [
+            gen.Candidate("assembly", "GCF_222222222.1", "Foo-Bar.p2", 9606,
+                          None, "rna_fasta", "https://x/b", None, "discovered"),
+            gen.Candidate("assembly", "GCF_111111111.1", "Foo Bar.p1", 9606,
+                          None, "rna_fasta", "https://x/a", None, "discovered"),
+        ]
+        first = tomllib.loads(gen.emit_toml([], candidates, "history"))
+        second = tomllib.loads(gen.emit_toml([], list(reversed(candidates)), "history"))
+        names = [entry["name"] for entry in first["seqset"]]
+        self.assertEqual(names, [entry["name"] for entry in second["seqset"]])
+        self.assertEqual(names, [
+            "refseq_history_foo_bar_gcf_111111111_1_rna",
+            "refseq_history_foo_bar_gcf_222222222_1_rna",
+        ])
 
     def test_unpaired_warning(self) -> None:
         candidate = gen.Candidate("assembly", self.assembly.accession,
