@@ -109,6 +109,28 @@ class TestCandidates:
         assert assemblies[0].namespace == "GRCh37.p11"
         assert seqsets == []
 
+    def test_all_includes_current_refseq_seqsets(self, tmp_path: Path) -> None:
+        candidate = gen.Candidate(
+            "assembly", self.assembly.accession, self.assembly.name, 9606, None,
+            "assembly_report", "https://example.test/assembly_report.txt", None,
+            "discovered",
+        )
+        text = gen.emit_toml([self.assembly], [candidate], "all")
+        parsed = tomllib.loads(text)
+        assert [entry["name"] for entry in parsed["seqset"]] == [
+            "refseq_human_rna",
+            "refseq_human_protein",
+            "refseq_human_refseqgene",
+        ]
+        assert parsed["seqset"][0]["shard_range"] == [1, 15]
+        assert parsed["seqset"][2]["shard_range"] == [1, 9]
+        assert text.index("[[assembly]]") < text.index('name = "refseq_human_rna"')
+
+        path = tmp_path / "candidate.toml"
+        path.write_text(text)
+        _, seqsets = load_config(path)
+        assert len(seqsets) == 3
+
     def test_direct_rs_update_uses_assembly_filename_prefix(self) -> None:
         assembly = gen.Assembly("GCF_000001405.40", "GRCh38.p14", 9606,
                                 "reference", "2022", "latest", None)

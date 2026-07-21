@@ -32,14 +32,11 @@ header names. The only runtime dependency is `gtars`.
 - `gtars` (installed via `uv sync`).
 - Network access to `ftp.ncbi.nlm.nih.gov` and `ftp.ensembl.org` (or
   pre-populated cache dirs).
-- Disk (for the current authoritative manifest — 4 assemblies + RefSeq
-  mRNA/Prot + RefSeqGene + Ensembl current):
-  - ~3.5 GB for the 4 genomic FASTAs (`GRCh38`, `GRCh38.p14`, `GRCh37`,
-    `GRCh37.p13`; ~900 MB each).
-  - ~3–4 GB for the RefSeq mRNA + protein shards (15 + 15 files) and the 9
-    RefSeqGene shards.
-  - ~500 MB for the Ensembl cdna + ncrna + pep FASTAs.
-  - The encoded `store/` is ~5–6 GB; the `downloads/` cache is ~7 GB.
+- Disk: the default manifest includes 22 NCBI assembly releases, current
+  RefSeq and Ensembl files, and selected historical RefSeq/Ensembl archives.
+  Its cache and store therefore need substantially more capacity than a
+  current-only build. Use `gks-refgetstore fetch --dry-run` to enumerate the
+  selected files before provisioning storage.
 
 ## Setup
 
@@ -189,9 +186,9 @@ Each `[[assembly]]` block:
 | field | required | description |
 | --- | --- | --- |
 | `namespace` | yes | Sequence-alias namespace to populate (e.g. `GRCh38`, `GRCh38.p14`). Becomes the namespace of `GRCh38:chr1`-style aliases. |
-| `fasta_url` | yes | URL of NCBI `*_genomic.fna.gz`. gtars ingests `.gz` directly. |
+| `fasta_url` | when `load_fasta=true` | URL of NCBI `*_genomic.fna.gz`. gtars ingests `.gz` directly. |
 | `report_url` | yes | URL of the corresponding `*_assembly_report.txt`. |
-| `load_fasta` | no, default `true` | If false, aliases are added only for digests already present in the store (cheap patch fanout). |
+| `load_fasta` | no, default `true` | If false, do not ingest a FASTA; the assembly report adds aliases only for digests already in the store. Use this for a report-only release or a deliberate alias-only namespace. |
 | `fasta_path` | no | Local path overriding the downloaded FASTA (relative to repo root). |
 
 Each `[[seqset]]` block (flat FASTA where the header name is the accession):
@@ -234,39 +231,24 @@ Aliases for `sha512t24u:…` and `ga4gh:SQ.…` are intentionally NOT written �
 they are the raw digest with a prefix and are synthesized at query time by the
 consuming alias proxy.
 
-## Version-drift policy
+## Version coverage
 
-The store pins **one version** of each source:
+The manifest pins every source URL to a specific release. It includes:
 
-- **NCBI assemblies**: the named major assemblies and their latest patch —
-  `GRCh38`, `GRCh38.p14`, `GRCh37`, `GRCh37.p13` — each pinned by GCF accession
-  (e.g. `GCF_000001405.40` for GRCh38.p14).
-- **NCBI RefSeq transcripts/proteins**: the FTP shards publish only the
-  current version of each accession; older versions are not available.
-- **Ensembl**: pinned to a single release (currently **r113**, set in
-  `sources.toml`). Only the latest version of each ENST/ENSP in that
-  release is included.
+- **NCBI assemblies:** the original GRCh38 and GRCh37 releases, their listed
+  patch releases, and their matching assembly reports. GRCh37.p11 and p12 are
+  report-only because NCBI does not publish genomic FASTAs for them.
+- **NCBI RefSeq:** current mRNA, protein, and RefSeqGene shards, plus selected
+  official per-patch and annotation-release archives for older transcript and
+  protein versions.
+- **Ensembl:** current release **113** files and selected official historical
+  releases for older ENST/ENSP versions.
 
-This differs from seqrepo's accumulative model, which retains every version it
-has ever loaded. Historical/superseded versions are **out of scope by design**
-(see below); callers depending on an older transcript/protein version will get a
-`KeyError` on an accession this store has not loaded.
-
-### Historical / superseded versions — out of scope by policy
-
-`sources.toml` lists only **authoritative** sources: the documented, current
-distribution point for each data type (RefSeq `mRNA_Prot`, RefSeqGene, the named
-assemblies, the current Ensembl release). It deliberately does *not* scrape the
-FTP tree for prior-version files, so the store holds current versions only.
-
-Older versions **do** exist and are recoverable if ever needed — from complete
-official release archives (NCBI annotation releases, Ensembl per-release
-archives) or per-accession from an authoritative interface (NCBI E-utilities /
-INSDC by `accession.version`, which is immutable). Predicted `XM_`/`XR_` models
-are the hard tail: NCBI renumbers them wholesale per annotation release, so an
-old predicted accession is often absent from every current bulk file and
-recoverable only per-accession. Curated `NM_`/`NR_`/`NP_`/`NG_` accessions are
-stable.
+This is curated historical coverage, not a complete copy of every version ever
+published or loaded by seqrepo. A caller can still receive a `KeyError` for an
+older accession.version absent from the selected archives. Backfill such a
+version from an authoritative per-accession service such as NCBI E-utilities or
+INSDC instead of adding an undocumented bulk file.
 
 ### Verifying backwards-compatibility against a seqrepo snapshot
 

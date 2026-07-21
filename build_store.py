@@ -34,10 +34,17 @@ NA_VALUES = {"na", "", "<NA>"}
 @dataclass
 class AssemblyConfig:
     namespace: str
-    fasta_url: str
     report_url: str
+    fasta_url: str | None = None
     load_fasta: bool = True
     fasta_path: str | None = None
+
+    def __post_init__(self) -> None:
+        if self.load_fasta and not self.fasta_url:
+            raise ValueError(
+                f"assembly {self.namespace!r}: fasta_url is required when "
+                "load_fasta is true"
+            )
 
 
 @dataclass
@@ -212,6 +219,7 @@ def iter_source_urls(
             yield "seqset", s.name, url
     for a in assemblies:
         if a.load_fasta and not a.fasta_path:
+            assert a.fasta_url is not None
             yield "assembly_fasta", a.namespace, a.fasta_url
         yield "assembly_report", a.namespace, a.report_url
 
@@ -239,6 +247,7 @@ def resolve_fasta_source(
             logger.info("using local fasta override %s", local)
             return local
         logger.warning("fasta_path %s not found; falling back to download", local)
+    assert entry.fasta_url is not None
     return ensure_download(
         entry.fasta_url,
         mirror_cache_path(download_dir, entry.fasta_url),

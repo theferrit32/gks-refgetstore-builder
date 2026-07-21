@@ -1,14 +1,11 @@
 # Sequences to ingest into the custom vrs-python refgetstore archive.
 #
-# CURATION PRINCIPLE (2026-07-07): include only AUTHORITATIVE sources -- the
-# documented, well-known distribution point for a given version's data. Prior
-# (non-current) release files are fine when they are documented version-specific
-# products: NCBI annotation releases, per-patch assembly dirs + assembly_report
-# files, and Ensembl per-release archives all qualify. What is NOT allowed is
-# scraping the FTP tree for undocumented files that merely happen to contain
-# useful data (e.g. the historical knownrefseq GBFF, removed below). Historical
-# versions not covered by an authoritative bulk file should be backfilled
-# per-accession via eutils / INSDC. See SEQREPO_PARITY.md.
+# Source policy: every URL must be a documented, version-specific distribution
+# from its data provider. The manifest includes selected historical releases
+# where they preserve useful accession versions. Do not add undocumented FTP
+# artifacts merely because they contain otherwise unavailable sequences.
+# Versions absent from an official bulk release should be fetched per accession
+# from an authoritative service such as NCBI E-utilities or INSDC.
 #
 # Two entry kinds:
 #
@@ -27,9 +24,12 @@
 # Assembly fields
 #   namespace    Per-assembly alias namespace (e.g. "GRCh38.p14").
 #   fasta_url    URL of the genomic FASTA (.fna.gz supported directly by gtars).
+#                Required when load_fasta is true.
 #   report_url   URL of the NCBI assembly_report.txt.
-#   load_fasta   If true, ingest the FASTA. If false, reuse digests already
-#                present in the store (cheap patch fanout).
+#   load_fasta   If true, ingest the FASTA. If false, use the report to add
+#                aliases for sequences already present in the store. This
+#                supports report-only releases and deliberate alias-only
+#                namespaces; fasta_url is not needed or fetched in this mode.
 #   fasta_path   Optional local path override, relative to repo root.
 #
 # Seqset fields
@@ -38,30 +38,6 @@
 #   url_template URL with "{shard}" placeholder, or a plain URL if unsharded.
 #   shard_range  [min, max] inclusive integer range substituted into
 #                url_template. Omit for a single-file seqset.
-
-[[assembly]]
-namespace = "GRCh38"
-fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.26_GRCh38/GCF_000001405.26_GRCh38_genomic.fna.gz"
-report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.26_GRCh38/GCF_000001405.26_GRCh38_assembly_report.txt"
-load_fasta = true
-
-[[assembly]]
-namespace = "GRCh38.p14"
-fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_genomic.fna.gz"
-report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_assembly_report.txt"
-load_fasta = true
-
-[[assembly]]
-namespace = "GRCh37"
-fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.13_GRCh37/GCF_000001405.13_GRCh37_genomic.fna.gz"
-report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.13_GRCh37/GCF_000001405.13_GRCh37_assembly_report.txt"
-load_fasta = true
-
-[[assembly]]
-namespace = "GRCh37.p13"
-fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.25_GRCh37.p13/GCF_000001405.25_GRCh37.p13_genomic.fna.gz"
-report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.25_GRCh37.p13/GCF_000001405.25_GRCh37.p13_assembly_report.txt"
-load_fasta = true
 
 [[seqset]]
 name = "refseq_human_rna"
@@ -111,22 +87,12 @@ namespace = "ensembl"
 url_template = "https://ftp.ensembl.org/pub/release-113/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz"
 
 # ---------------------------------------------------------------------------
-# Historical RefSeq transcript/protein versions (backwards-compat with seqrepo)
+# Historical RefSeq transcript and protein versions
 # ---------------------------------------------------------------------------
-# seqrepo accumulates every accession.version it ever loaded; the current
-# mRNA_Prot shards above carry only current versions. NCBI ships past
-# annotations as bulk FASTAs in two places: per-patch assembly dirs
-# (GCF_000001405.<acc>_GRCh38.p<N>/, the pre-AR109 era) and the annotation-
-# release archive (annotation_releases/9606/<release>/). force=false dedups.
-#
-# This set is MEASURED, not guessed (see probe_source_coverage.py): it covers
-# ~83% of missing/superseded RNA and ~89% of protein accessions vs seqrepo
-# 2024-12-20. The per-patch dirs do most of the work (only distinct annotations
-# kept: orig/p2/p5/p7; p12==AR109 so dropped). Redundant snapshots measured to
-# add ~0 were dropped: GRCh37 105.* / RS_2024_09, and recent p14 RS_2023..2025.
-# Residual (~17% RNA, mostly old XR_; ~11% protein) is not in any bulk file ->
-# eutils backfill or accepted drift. Same-basename files disambiguated by the
-# download-cache URL hash.
+# The current mRNA_Prot shards contain only current accession versions. These
+# official per-patch and annotation-release archives retain selected older RNA
+# and protein versions for compatibility with clients that request them.
+# Identical sequences are deduplicated when the store is built.
 
 [[seqset]]
 name = "refseq_history_rna"
@@ -160,24 +126,26 @@ urls = [
   "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/110/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_protein.faa.gz",
 ]
 
-# NOTE (2026-07-07): a curated-history GBFF
-# (historical/GRCh38/current/...knownrefseq_rna.gbff.gz) was previously loaded
-# here as a format="gbff" seqset. It was REMOVED as non-authoritative: that
-# sequence file is not listed in its directory's README "Provided files"
-# (which enumerates only alignment + annotation outputs), i.e. it's an
-# undocumented artifact rather than a documented distribution of that version's
-# data. The replaced/suppressed NM_/NR_ versions it held should instead be
-# backfilled per-accession from an authoritative interface (eutils / INSDC by
-# accession.version). See SEQREPO_PARITY.md and sources.toml.bak.2026-07-07.
+# An undocumented knownrefseq GBFF file is intentionally excluded. Backfill a
+# missing accession.version through an authoritative per-accession service
+# rather than adding an undocumented bulk artifact.
 
 # ---------------------------------------------------------------------------
-# Patch-ladder assembly coverage
+# NCBI human reference assembly releases
 # ---------------------------------------------------------------------------
-# seqrepo exposes per-patch assembly namespaces (GRCh38.p1-p12, GRCh37 select
-# patches). Load each available genomic FASTA so retired FIX scaffolds not in
-# the p14/p13 full loads are present as well as the per-patch alias spellings.
-# GRCh37 p11/p12 publish a report but no genomic FASTA, so they remain
-# report-only and cannot contribute their retired scaffolds.
+# Releases are grouped in chronological order so a newly published patch can be
+# appended to its assembly's timeline. Each available genomic FASTA is loaded
+# to retain sequences, including retired FIX scaffolds, and its report adds the
+# aliases used by that release. GRCh37.p11 and GRCh37.p12 are report-only:
+# their configured NCBI genomic-FASTA URLs are unavailable, but their reports
+# are still published.
+
+# GRCh38: original release followed by patch releases.
+[[assembly]]
+namespace = "GRCh38"
+fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.26_GRCh38/GCF_000001405.26_GRCh38_genomic.fna.gz"
+report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.26_GRCh38/GCF_000001405.26_GRCh38_assembly_report.txt"
+load_fasta = true
 
 [[assembly]]
 namespace = "GRCh38.p1"
@@ -251,6 +219,23 @@ fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001
 report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.38_GRCh38.p12/GCF_000001405.38_GRCh38.p12_assembly_report.txt"
 load_fasta = true
 
+# GRCh38.p14 is the current configured GRCh38 patch release. The GRCh38.p13
+# annotation archives in refseq_history_rna and refseq_history_protein above
+# contribute transcript/protein aliases, not a GRCh38.p13 genomic assembly
+# namespace.
+[[assembly]]
+namespace = "GRCh38.p14"
+fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_genomic.fna.gz"
+report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_assembly_report.txt"
+load_fasta = true
+
+# GRCh37: original release followed by available patch releases.
+[[assembly]]
+namespace = "GRCh37"
+fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.13_GRCh37/GCF_000001405.13_GRCh37_genomic.fna.gz"
+report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.13_GRCh37/GCF_000001405.13_GRCh37_assembly_report.txt"
+load_fasta = true
+
 [[assembly]]
 namespace = "GRCh37.p2"
 fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.14_GRCh37.p2/GCF_000001405.14_GRCh37.p2_genomic.fna.gz"
@@ -277,26 +262,27 @@ load_fasta = true
 
 [[assembly]]
 namespace = "GRCh37.p11"
-fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.23_GRCh37.p11/GCF_000001405.23_GRCh37.p11_genomic.fna.gz"
 report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.23_GRCh37.p11/GCF_000001405.23_GRCh37.p11_assembly_report.txt"
 load_fasta = false
 
 [[assembly]]
 namespace = "GRCh37.p12"
-fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.24_GRCh37.p12/GCF_000001405.24_GRCh37.p12_genomic.fna.gz"
 report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.24_GRCh37.p12/GCF_000001405.24_GRCh37.p12_assembly_report.txt"
 load_fasta = false
 
+# GRCh37.p13 is the current GRCh37 patch release.
+[[assembly]]
+namespace = "GRCh37.p13"
+fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.25_GRCh37.p13/GCF_000001405.25_GRCh37.p13_genomic.fna.gz"
+report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.25_GRCh37.p13/GCF_000001405.25_GRCh37.p13_assembly_report.txt"
+load_fasta = true
+
 # ---------------------------------------------------------------------------
-# Historical Ensembl transcript/protein versions (backwards-compat with seqrepo)
+# Historical Ensembl transcript and protein versions
 # ---------------------------------------------------------------------------
-# Like the RefSeq history above: the single pinned release (r113) carries only
-# current ENST/ENSP versions, but seqrepo accumulated versions across many
-# releases. Ensembl archives every release at pub/release-N/, so a spanning set
-# of prior GRCh38 releases (plus r75, the last mainline GRCh37 release)
-# recovers superseded ENST.N/ENSP.N versions. Same-basename files across
-# releases are disambiguated by the download-cache URL hash. Tune the release
-# list from verify_seqrepo_equivalence.py residuals.
+# Release 113 provides current ENST/ENSP versions. These official Ensembl
+# archives retain selected older versions, including release 75 for GRCh37.
+# Identical sequences are deduplicated when the store is built.
 
 [[seqset]]
 name = "ensembl_history_cdna"

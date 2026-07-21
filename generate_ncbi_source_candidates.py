@@ -39,6 +39,14 @@ FILE_SUFFIXES = {
     "rna_fasta": "_rna.fna.gz",
     "protein_fasta": "_protein.faa.gz",
 }
+CURRENT_REFSEQ_SEQSETS = (
+    ("refseq_human_rna",
+     f"{HTTPS}/refseq/H_sapiens/mRNA_Prot/human.{{shard}}.rna.fna.gz", (1, 15)),
+    ("refseq_human_protein",
+     f"{HTTPS}/refseq/H_sapiens/mRNA_Prot/human.{{shard}}.protein.faa.gz", (1, 15)),
+    ("refseq_human_refseqgene",
+     f"{HTTPS}/refseq/H_sapiens/RefSeqGene/refseqgene.{{shard}}.genomic.fna.gz", (1, 9)),
+)
 
 
 @dataclass(frozen=True)
@@ -354,6 +362,12 @@ def emit_toml(assemblies: list[Assembly], candidates: list[Candidate], section: 
             else:
                 load = False
             lines.extend([f"report_url = {_q(report.url or '')}", f"load_fasta = {str(load).lower()}"])
+    if section == "all":
+        for name, template, shard_range in CURRENT_REFSEQ_SEQSETS:
+            lines.extend(["", "[[seqset]]", f"name = {_q(name)}",
+                          'namespace = "refseq"',
+                          f"url_template = {_q(template)}",
+                          f"shard_range = [{shard_range[0]}, {shard_range[1]}]"])
     if section in ("all", "history"):
         history = [c for c in discovered
                    if c.file_type in ("rna_fasta", "protein_fasta")]

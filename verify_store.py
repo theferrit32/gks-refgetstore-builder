@@ -33,8 +33,8 @@ FORBIDDEN_SEQ_NAMESPACES = {
     "MD5",
 }
 
-# (namespace, alias) -> expected sha512t24u, captured from seqrepo 2024-12-20
-# and the refgenie jungle store during earlier analysis in this session.
+# (namespace, alias) -> expected sha512t24u, captured from the 2024-12-20
+# seqrepo snapshot and refgenie jungle store.
 GROUND_TRUTH: dict[tuple[str, str], str] = {
     ("refseq", "NC_000001.11"): "Ya6Rs7DHhDeg7YaOSg1EoNi3U_nQ9SvO",
     ("refseq", "NC_000013.11"): "_0wi-qoDrvram155UmcSC-zA5ZK4fpLT",
@@ -146,8 +146,8 @@ def section_inventory(store: RefgetStore, r: Report) -> None:
         f"got {stats['n_collections']}",
     )
     n_seq = int(stats["n_sequences"])
-    # 941 observed on the first full build (Phase 1). Heavy dedup across
-    # GRCh38/p14 and GRCh37/p13 keeps this much lower than the naive sum.
+    # A full assembly build has at least 900 unique sequences; extensive
+    # deduplication across releases keeps this below the naive sum.
     r.check(
         "n_sequences >= 900",
         n_seq >= 900,
