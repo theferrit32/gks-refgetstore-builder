@@ -35,7 +35,9 @@ import urllib.request
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from build_store import iter_source_urls, load_config, mirror_cache_path  # noqa: E402
+from build_store import (apply_locked_sources, load_config, md5_file,
+                         mirror_cache_path, resolve_sources)  # noqa: E402
+from build_lock import load_lock, sha256_file  # noqa: E402
 
 CHUNK = 1 << 20  # 1 MiB
 
@@ -87,13 +89,15 @@ def run_fetch(args) -> int:
     produce a nonzero result; insufficient free disk space stops further fetches.
     """
     assemblies, seqsets = load_config(args.config)
-    sources = list(iter_source_urls(assemblies, seqsets))
+    lock = load_lock(args.lock) if args.locked_sources else None
+    sources = (apply_locked_sources(seqsets, lock) if lock is not None
+               else resolve_sources(assemblies, seqsets))
     if args.only:
         want = set(args.only)
-        sources = [s for s in sources if s[1] in want]
+        sources = [s for s in sources if s.owner in want]
     if args.kinds:
         kinds = set(args.kinds.split(","))
-        sources = [s for s in sources if s[0] in kinds]
+        sources = [s for s in sources if s.kind in kinds]
     if args.limit:
         sources = sources[: args.limit]
 
@@ -105,13 +109,30 @@ def run_fetch(args) -> int:
     aborted_for_disk_space = False
     total_bytes = 0
     failures: list[tuple[str, str]] = []
-    for i, (kind, owner, url) in enumerate(sources, 1):
+    locked_by_url = ({entry["url"]: entry for entry in lock.get("sources", [])}
+                     if lock else {})
+    for i, source in enumerate(sources, 1):
+        kind, owner, url = source.kind, source.owner, source.url
         target = mirror_cache_path(args.cache_dir, url)
         rel = target.relative_to(args.cache_dir)
-        if target.exists() and target.stat().st_size > 0:
-            skipped += 1
-            print(f"[{i}/{len(sources)}] skip  {owner}  {rel}")
+        if args.locked_sources:
+            locked = locked_by_url[url]
+            if (not target.exists() or target.stat().st_size == 0
+                    or sha256_file(target) != locked.get("sha256")):
+                failed += 1
+                failures.append((url, "locked cache file missing or SHA-256 mismatch"))
+                print(f"[{i}/{len(sources)}] FAIL  {owner}  {rel}")
+            else:
+                skipped += 1
+                print(f"[{i}/{len(sources)}] LOCK  {owner}  {rel}")
             continue
+        if target.exists() and target.stat().st_size > 0:
+            if source.upstream_md5 and md5_file(target) != source.upstream_md5:
+                print(f"[{i}/{len(sources)}] stale {owner}  {rel}")
+            else:
+                skipped += 1
+                print(f"[{i}/{len(sources)}] skip  {owner}  {rel}")
+                continue
         if args.dry_run:
             print(f"[{i}/{len(sources)}] FETCH {owner}  {rel}")
             continue
@@ -123,6 +144,9 @@ def run_fetch(args) -> int:
         print(f"[{i}/{len(sources)}] get   {owner}  {rel}", flush=True)
         try:
             n = download(url, target, args.timeout, args.retries)
+            if source.upstream_md5 and md5_file(target) != source.upstream_md5:
+                target.unlink(missing_ok=True)
+                raise RuntimeError("NCBI MD5 mismatch")
             fetched += 1
             total_bytes += n
             print(f"           {human(n)}  (cache free {free_gb(args.cache_dir):.1f}GB)")

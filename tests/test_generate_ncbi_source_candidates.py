@@ -122,8 +122,10 @@ class TestCandidates:
             "refseq_human_protein",
             "refseq_human_refseqgene",
         ]
-        assert parsed["seqset"][0]["shard_range"] == [1, 15]
-        assert parsed["seqset"][2]["shard_range"] == [1, 9]
+        assert parsed["seqset"][0]["url_pattern"].endswith("human.*.rna.fna.gz")
+        assert parsed["seqset"][2]["checksum_manifest_url"].endswith(
+            "refseqgene.files.installed"
+        )
         assert text.index("[[assembly]]") < text.index('name = "refseq_human_rna"')
 
         path = tmp_path / "candidate.toml"

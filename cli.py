@@ -48,12 +48,14 @@ def _add_build(sub: argparse._SubParsersAction) -> None:
     p.add_argument("--no-lock", action="store_true",
                    help="don't write the lock (the pre-flight check still runs)")
     p.add_argument("--lock-check-mode", choices=["strict", "subset", "ignore"],
-                   default="subset",
+                   default="strict",
                    help="pre-flight check of to-be-ingested files vs the lock: "
-                        "subset (default)=shared files unchanged; strict=also "
-                        "require matching file sets; ignore=skip")
+                        "strict (default)=stop on membership or content drift; "
+                        "ignore=skip")
     p.add_argument("--force-lock", action="store_true",
                    help="write the lock even if a discrepancy would suppress it")
+    p.add_argument("--locked-sources", action="store_true",
+                   help="use concrete URLs and SHA-256 values from --lock; no discovery")
     p.set_defaults(func=build_store.run_build)
 
 
@@ -77,6 +79,9 @@ def _add_fetch(sub: argparse._SubParsersAction) -> None:
     p = sub.add_parser("fetch", help="pre-populate the download cache")
     p.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
     p.add_argument("--cache-dir", type=Path, default=DEFAULT_CACHE)
+    p.add_argument("--lock", type=Path, default=DEFAULT_LOCK)
+    p.add_argument("--locked-sources", action="store_true",
+                   help="verify and use cached concrete sources from --lock; no network")
     p.add_argument("--only", nargs="*", default=None,
                    help="only fetch sources whose owner matches")
     p.add_argument("--kinds", default=None,

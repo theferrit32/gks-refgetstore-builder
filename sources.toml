@@ -38,97 +38,10 @@
 #   url_template URL with "{shard}" placeholder, or a plain URL if unsharded.
 #   shard_range  [min, max] inclusive integer range substituted into
 #                url_template. Omit for a single-file seqset.
-
-[[seqset]]
-name = "refseq_human_rna"
-namespace = "refseq"
-url_template = "https://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.{shard}.rna.fna.gz"
-shard_range = [1, 15]
-
-[[seqset]]
-name = "refseq_human_protein"
-namespace = "refseq"
-url_template = "https://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.{shard}.protein.faa.gz"
-shard_range = [1, 15]
-
-# NCBI RefSeqGene genomic sequences (NG_ accessions). These are gene-region
-# reference sequences NOT present in the mRNA_Prot shards above; seqrepo's NCBI
-# namespace includes them, so they are required for backwards-compatibility.
-[[seqset]]
-name = "refseq_human_refseqgene"
-namespace = "refseq"
-url_template = "https://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/RefSeqGene/refseqgene.{shard}.genomic.fna.gz"
-shard_range = [1, 9]
-
-# Ensembl human GRCh38 transcripts + proteins, pinned to release 113
-# (October 2024). Bump the release number in all three URLs to update.
-# Archive index: https://www.ensembl.org/info/website/archives/
-# ENST.N / ENSP.N accessions are content-addressable, so the digests are
-# stable across releases; only the version suffixes change.
-#
-# cdna/ ships protein-coding transcripts; ncrna/ ships non-coding
-# transcripts (disjoint ENST space). cds/ is intentionally NOT loaded —
-# it reuses the same ENST accessions as cdna/ but with UTRs stripped,
-# which would collide in the bulk alias merge.
-
-[[seqset]]
-name = "ensembl_human_cdna"
-namespace = "ensembl"
-url_template = "https://ftp.ensembl.org/pub/release-113/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz"
-
-[[seqset]]
-name = "ensembl_human_ncrna"
-namespace = "ensembl"
-url_template = "https://ftp.ensembl.org/pub/release-113/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz"
-
-[[seqset]]
-name = "ensembl_human_pep"
-namespace = "ensembl"
-url_template = "https://ftp.ensembl.org/pub/release-113/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz"
-
-# ---------------------------------------------------------------------------
-# Historical RefSeq transcript and protein versions
-# ---------------------------------------------------------------------------
-# The current mRNA_Prot shards contain only current accession versions. These
-# official per-patch and annotation-release archives retain selected older RNA
-# and protein versions for compatibility with clients that request them.
-# Identical sequences are deduplicated when the store is built.
-
-[[seqset]]
-name = "refseq_history_rna"
-namespace = "refseq"
-urls = [
-  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.26_GRCh38/GCF_000001405.26_GRCh38_rna.fna.gz",
-  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.28_GRCh38.p2/GCF_000001405.28_GRCh38.p2_rna.fna.gz",
-  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.31_GRCh38.p5/GCF_000001405.31_GRCh38.p5_rna.fna.gz",
-  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.33_GRCh38.p7/GCF_000001405.33_GRCh38.p7_rna.fna.gz",
-  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109/GCF_000001405.38_GRCh38.p12/GCF_000001405.38_GRCh38.p12_rna.fna.gz",
-  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20190607/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_rna.fna.gz",
-  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20191205/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_rna.fna.gz",
-  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20201120/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_rna.fna.gz",
-  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20211119/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_rna.fna.gz",
-  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/110/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_rna.fna.gz",
-]
-
-[[seqset]]
-name = "refseq_history_protein"
-namespace = "refseq"
-urls = [
-  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.26_GRCh38/GCF_000001405.26_GRCh38_protein.faa.gz",
-  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.28_GRCh38.p2/GCF_000001405.28_GRCh38.p2_protein.faa.gz",
-  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.31_GRCh38.p5/GCF_000001405.31_GRCh38.p5_protein.faa.gz",
-  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.33_GRCh38.p7/GCF_000001405.33_GRCh38.p7_protein.faa.gz",
-  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109/GCF_000001405.38_GRCh38.p12/GCF_000001405.38_GRCh38.p12_protein.faa.gz",
-  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20190607/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_protein.faa.gz",
-  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20191205/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_protein.faa.gz",
-  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20201120/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_protein.faa.gz",
-  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20211119/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_protein.faa.gz",
-  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/110/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_protein.faa.gz",
-]
-
-# An undocumented knownrefseq GBFF file is intentionally excluded. Backfill a
-# missing accession.version through an authoritative per-accession service
-# rather than adding an undocumented bulk artifact.
+#   urls         Explicit URL list (mutually exclusive with the other modes).
+#   url_pattern  HTTPS URL with a glob in its basename. Requires the companion
+#                checksum_manifest_url in the same directory.
+#   checksum_manifest_url  NCBI *.files.installed file used for discovery + MD5.
 
 # ---------------------------------------------------------------------------
 # NCBI human reference assembly releases
@@ -277,6 +190,97 @@ fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001
 report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.25_GRCh37.p13/GCF_000001405.25_GRCh37.p13_assembly_report.txt"
 load_fasta = true
 
+[[seqset]]
+name = "refseq_human_rna"
+namespace = "refseq"
+url_pattern = "https://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.*.rna.fna.gz"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.files.installed"
+
+[[seqset]]
+name = "refseq_human_protein"
+namespace = "refseq"
+url_pattern = "https://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.*.protein.faa.gz"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.files.installed"
+
+# NCBI RefSeqGene genomic sequences (NG_ accessions). These are gene-region
+# reference sequences NOT present in the mRNA_Prot shards above; seqrepo's NCBI
+# namespace includes them, so they are required for backwards-compatibility.
+[[seqset]]
+name = "refseq_human_refseqgene"
+namespace = "refseq"
+url_pattern = "https://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/RefSeqGene/refseqgene.*.genomic.fna.gz"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/RefSeqGene/refseqgene.files.installed"
+
+# ---------------------------------------------------------------------------
+# Historical RefSeq transcript and protein versions
+# ---------------------------------------------------------------------------
+# The current mRNA_Prot shards contain only current accession versions. These
+# official per-patch and annotation-release archives retain selected older RNA
+# and protein versions for compatibility with clients that request them.
+# Identical sequences are deduplicated when the store is built.
+
+[[seqset]]
+name = "refseq_history_grch38_rna"
+namespace = "refseq"
+urls = [
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.26_GRCh38/GCF_000001405.26_GRCh38_rna.fna.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.28_GRCh38.p2/GCF_000001405.28_GRCh38.p2_rna.fna.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.31_GRCh38.p5/GCF_000001405.31_GRCh38.p5_rna.fna.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.33_GRCh38.p7/GCF_000001405.33_GRCh38.p7_rna.fna.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109/GCF_000001405.38_GRCh38.p12/GCF_000001405.38_GRCh38.p12_rna.fna.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20190607/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_rna.fna.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20191205/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_rna.fna.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20201120/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_rna.fna.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20211119/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_rna.fna.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/110/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_rna.fna.gz",
+]
+
+[[seqset]]
+name = "refseq_history_grch38_protein"
+namespace = "refseq"
+urls = [
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.26_GRCh38/GCF_000001405.26_GRCh38_protein.faa.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.28_GRCh38.p2/GCF_000001405.28_GRCh38.p2_protein.faa.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.31_GRCh38.p5/GCF_000001405.31_GRCh38.p5_protein.faa.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.33_GRCh38.p7/GCF_000001405.33_GRCh38.p7_protein.faa.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109/GCF_000001405.38_GRCh38.p12/GCF_000001405.38_GRCh38.p12_protein.faa.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20190607/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_protein.faa.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20191205/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_protein.faa.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20201120/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_protein.faa.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20211119/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_protein.faa.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/110/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_protein.faa.gz",
+]
+
+# An undocumented knownrefseq GBFF file is intentionally excluded. Backfill a
+# missing accession.version through an authoritative per-accession service
+# rather than adding an undocumented bulk artifact.
+
+# Ensembl human GRCh38 transcripts + proteins, pinned to release 113
+# (October 2024). Bump the release number in all three URLs to update.
+# Archive index: https://www.ensembl.org/info/website/archives/
+# ENST.N / ENSP.N accessions are content-addressable, so the digests are
+# stable across releases; only the version suffixes change.
+#
+# cdna/ ships protein-coding transcripts; ncrna/ ships non-coding
+# transcripts (disjoint ENST space). cds/ is intentionally NOT loaded —
+# it reuses the same ENST accessions as cdna/ but with UTRs stripped,
+# which would collide in the bulk alias merge.
+
+[[seqset]]
+name = "ensembl_human_cdna"
+namespace = "ensembl"
+url_template = "https://ftp.ensembl.org/pub/release-113/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz"
+
+[[seqset]]
+name = "ensembl_human_ncrna"
+namespace = "ensembl"
+url_template = "https://ftp.ensembl.org/pub/release-113/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz"
+
+[[seqset]]
+name = "ensembl_human_pep"
+namespace = "ensembl"
+url_template = "https://ftp.ensembl.org/pub/release-113/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz"
+
 # ---------------------------------------------------------------------------
 # Historical Ensembl transcript and protein versions
 # ---------------------------------------------------------------------------
@@ -288,6 +292,7 @@ load_fasta = true
 name = "ensembl_history_cdna"
 namespace = "ensembl"
 urls = [
+  "https://ftp.ensembl.org/pub/release-75/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh37.75.cdna.all.fa.gz",
   "https://ftp.ensembl.org/pub/release-76/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
   "https://ftp.ensembl.org/pub/release-85/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
   "https://ftp.ensembl.org/pub/release-90/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
@@ -296,7 +301,6 @@ urls = [
   "https://ftp.ensembl.org/pub/release-105/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
   "https://ftp.ensembl.org/pub/release-110/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
   "https://ftp.ensembl.org/pub/release-112/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
-  "https://ftp.ensembl.org/pub/release-75/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh37.75.cdna.all.fa.gz",
 ]
 
 [[seqset]]
@@ -317,6 +321,7 @@ urls = [
 name = "ensembl_history_pep"
 namespace = "ensembl"
 urls = [
+  "https://ftp.ensembl.org/pub/release-75/fasta/homo_sapiens/pep/Homo_sapiens.GRCh37.75.pep.all.fa.gz",
   "https://ftp.ensembl.org/pub/release-76/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
   "https://ftp.ensembl.org/pub/release-85/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
   "https://ftp.ensembl.org/pub/release-90/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
@@ -325,5 +330,4 @@ urls = [
   "https://ftp.ensembl.org/pub/release-105/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
   "https://ftp.ensembl.org/pub/release-110/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
   "https://ftp.ensembl.org/pub/release-112/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
-  "https://ftp.ensembl.org/pub/release-75/fasta/homo_sapiens/pep/Homo_sapiens.GRCh37.75.pep.all.fa.gz",
 ]

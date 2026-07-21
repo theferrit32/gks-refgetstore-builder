@@ -14,10 +14,10 @@ Two roles:
     `url -> collection_digest` is all `provenance.py` needs to answer
     `file -> digests` / `digest -> files` on demand (no giant table stored).
 
-NOTE on "lock" semantics: some sources are **mutable upstream** (current RefSeq
-shards, current Ensembl release), so this is a record of a build, not a hard pin
-future fetches must match — re-fetching a mutable source and finding it changed
-is expected drift, not corruption. The `mutable` flag marks these.
+Some sources are mutable upstream. Live builds treat any URL, provider-MD5, or
+cached-SHA drift as fatal before ingestion unless ``--force-lock`` explicitly
+accepts a new baseline. ``--locked-sources`` instead performs no discovery and
+requires the exact cached SHA-256 bytes recorded here.
 """
 
 from __future__ import annotations
@@ -34,9 +34,11 @@ from pathlib import Path
 
 # build_store imports this module lazily (inside run_build) to avoid a circular
 # import, so importing from it at module load is safe here.
-from build_store import iter_source_urls, load_config, mirror_cache_path
+from build_store import (ResolvedSource, load_config, md5_file, mirror_cache_path,
+                         resolve_sources)
 
-SCHEMA = "gks-refgetstore-build-lock/1"
+SCHEMA = "gks-refgetstore-build-lock/2"
+V1_SCHEMA = "gks-refgetstore-build-lock/1"
 CHUNK = 1 << 20
 
 
@@ -125,7 +127,7 @@ def _rel(download_dir: Path, cache_path: Path) -> str:
 
 
 def source_record(
-    kind: str, owner: str, url: str, download_dir: Path,
+    source: ResolvedSource, download_dir: Path,
     collection_by_cachepath: dict[str, dict], hash_files: bool = True,
 ) -> dict:
     """Build the lock record for one manifest-referenced remote source.
@@ -165,10 +167,12 @@ def source_record(
         Collection provenance is populated independently when supplied by the
         build.
     """
+    kind, owner, url = source.kind, source.owner, source.url
     cache_path = mirror_cache_path(download_dir, url)
     rec: dict = {
         "kind": kind, "owner": owner, "url": url,
         "cache_path": _rel(download_dir, cache_path), "mutable": is_mutable(url),
+        "upstream_md5": source.upstream_md5,
     }
     if cache_path.exists() and cache_path.stat().st_size > 0:
         rec["bytes"] = cache_path.stat().st_size
@@ -209,16 +213,15 @@ def build_lock_dict(
     *,
     config_path: Path,
     download_dir: Path,
-    assemblies: list,
-    seqsets: list,
+    resolved_sources: list[ResolvedSource],
     collection_by_cachepath: dict[str, dict],
     store,
     hash_files: bool = True,
 ) -> dict:
     """Full-build lock: one entry per source in the whole manifest (replace)."""
     sources = [
-        source_record(k, o, u, download_dir, collection_by_cachepath, hash_files)
-        for k, o, u in iter_source_urls(assemblies, seqsets)
+        source_record(source, download_dir, collection_by_cachepath, hash_files)
+        for source in resolved_sources
     ]
     return {"schema": SCHEMA, "build": _build_meta(config_path, store), "sources": sources}
 
@@ -228,20 +231,21 @@ def merge_into_lock(
     *,
     config_path: Path,
     download_dir: Path,
-    touched_sources: list[tuple[str, str, str]],
+    touched_sources: list[ResolvedSource],
     collection_by_cachepath: dict[str, dict],
     store,
     hash_files: bool = True,
 ) -> dict:
-    """Partial-build lock (add-to): upsert only the touched sources' entries into
-    an existing lock, preserving all others. Falls back to a fresh lock of just
-    the touched sources when no existing lock is present."""
+    """Replace touched owner scopes while preserving every untouched scope."""
     by_rel: dict[str, dict] = {}
+    touched_scopes = {(source.kind, source.owner) for source in touched_sources}
     if existing_lock:
         for s in existing_lock.get("sources", []):
+            if (s.get("kind"), s.get("owner")) in touched_scopes:
+                continue
             by_rel[s["cache_path"]] = s
-    for k, o, u in touched_sources:
-        rec = source_record(k, o, u, download_dir, collection_by_cachepath, hash_files)
+    for source in touched_sources:
+        rec = source_record(source, download_dir, collection_by_cachepath, hash_files)
         by_rel[rec["cache_path"]] = rec
     sources = sorted(by_rel.values(), key=lambda r: (r.get("kind", ""), r["cache_path"]))
     return {"schema": SCHEMA, "build": _build_meta(config_path, store), "sources": sources}
@@ -255,10 +259,12 @@ class LockCheck:
     new: list[str] = field(default_factory=list)              # present, not in lock (no baseline)
     missing: list[str] = field(default_factory=list)          # not in cache
     only_in_lock: list[str] = field(default_factory=list)     # in lock, not in this build
+    upstream_changed: list[tuple[str, str | None, str | None]] = field(default_factory=list)
+    legacy_schema: bool = False
 
     @property
     def drift(self) -> bool:
-        return bool(self.changed)
+        return bool(self.changed or self.upstream_changed or self.set_differs or self.legacy_schema)
 
     @property
     def set_differs(self) -> bool:
@@ -291,12 +297,33 @@ def evaluate_cache_vs_lock(build_files: list[tuple[str, Path]], lock: dict) -> L
     return res
 
 
+def evaluate_sources_vs_lock(sources: list[ResolvedSource], lock: dict) -> LockCheck:
+    """Classify URL membership and provider checksums independent of cache state."""
+    result = LockCheck(legacy_schema=lock.get("schema") != SCHEMA)
+    scope = {(source.kind, source.owner) for source in sources}
+    locked = {entry.get("url"): entry for entry in lock.get("sources", [])
+              if (entry.get("kind"), entry.get("owner")) in scope}
+    live = {source.url: source for source in sources}
+    result.new = sorted(set(live) - set(locked))
+    result.only_in_lock = sorted(set(locked) - set(live))
+    for url in sorted(set(live) & set(locked)):
+        old_md5 = locked[url].get("upstream_md5")
+        new_md5 = live[url].upstream_md5
+        if old_md5 != new_md5:
+            result.upstream_changed.append((url, old_md5, new_md5))
+    return result
+
+
 def write_lock(path: Path, lock: dict) -> None:
     path.write_text(json.dumps(lock, indent=2) + "\n", encoding="utf-8")
 
 
 def load_lock(path: Path) -> dict:
-    return json.loads(Path(path).read_text(encoding="utf-8"))
+    lock = json.loads(Path(path).read_text(encoding="utf-8"))
+    schema = lock.get("schema")
+    if schema not in (SCHEMA, V1_SCHEMA):
+        raise ValueError(f"unsupported build lock schema: {schema!r}")
+    return lock
 
 
 # --------------------------------------------------------------------------- verify
@@ -334,15 +361,17 @@ def _verify_integrity(args) -> int:
     """Check (A): each manifest file present + (for .gz) gzip-intact; optionally
     compare local size to the server's Content-Length."""
     assemblies, seqsets = load_config(args.config)
-    sources = list(iter_source_urls(assemblies, seqsets))
+    sources = resolve_sources(assemblies, seqsets)
     if args.limit:
         sources = sources[: args.limit]
 
     missing: list[str] = []
     corrupt: list[str] = []
     size_mismatch: list[str] = []
+    checksum_mismatch: list[str] = []
     ok = 0
-    for i, (kind, owner, url) in enumerate(sources, 1):
+    for i, source in enumerate(sources, 1):
+        url = source.url
         target = mirror_cache_path(args.cache_dir, url)
         rel = _rel(args.cache_dir, target)
         if not target.exists() or target.stat().st_size == 0:
@@ -356,6 +385,9 @@ def _verify_integrity(args) -> int:
             if not good:
                 problems.append(f"gzip: {msg}")
                 corrupt.append(rel)
+        if source.upstream_md5 and md5_file(target) != source.upstream_md5:
+            problems.append("provider MD5 mismatch")
+            checksum_mismatch.append(rel)
         if args.check_remote:
             rsize = remote_size(url, args.timeout)
             if rsize is None:
@@ -370,14 +402,16 @@ def _verify_integrity(args) -> int:
             ok += 1
 
     print(f"\nchecked={len(sources)} ok={ok} missing={len(missing)} "
-          f"corrupt={len(corrupt)} size_mismatch={len(size_mismatch)}", file=sys.stderr)
+          f"corrupt={len(corrupt)} md5_mismatch={len(checksum_mismatch)} "
+          f"size_mismatch={len(size_mismatch)}", file=sys.stderr)
     for label, items in (("MISSING", missing), ("CORRUPT", corrupt),
+                         ("MD5 MISMATCH", checksum_mismatch),
                          ("SIZE MISMATCH", size_mismatch)):
         if items:
             print(f"{label}:", file=sys.stderr)
             for r in items:
                 print(f"  {r}", file=sys.stderr)
-    return 1 if (missing or corrupt or size_mismatch) else 0
+    return 1 if (missing or corrupt or checksum_mismatch or size_mismatch) else 0
 
 
 def _verify_against_lock(args) -> int:
@@ -385,13 +419,14 @@ def _verify_against_lock(args) -> int:
     manifest-driven, using the shared evaluator."""
     lock = load_lock(args.lock)
     assemblies, seqsets = load_config(args.config)
-    sources = list(iter_source_urls(assemblies, seqsets))
+    sources = resolve_sources(assemblies, seqsets)
     if args.limit:
         sources = sources[: args.limit]
 
     build_files: list[tuple[str, Path]] = []
     rel_to_path: dict[str, Path] = {}
-    for _, _, url in sources:
+    for source in sources:
+        url = source.url
         target = mirror_cache_path(args.cache_dir, url)
         rel = _rel(args.cache_dir, target)
         build_files.append((rel, target))
@@ -457,7 +492,7 @@ def run_lock(args) -> int:
     store = RefgetStore.open_local(str(args.store_dir))
     lock = build_lock_dict(
         config_path=args.config, download_dir=args.cache_dir,
-        assemblies=assemblies, seqsets=seqsets,
+        resolved_sources=resolve_sources(assemblies, seqsets),
         collection_by_cachepath=collection_by_cachepath, store=store,
     )
     fasta_sources = [s for s in lock["sources"] if s["kind"] != "assembly_report"]

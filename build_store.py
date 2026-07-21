@@ -9,14 +9,17 @@ reports. See README.md for details.
 from __future__ import annotations
 
 import gzip
+import fnmatch
+import hashlib
 import logging
+import re
 import tempfile
 import tomllib
 import urllib.request
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Iterator
-from urllib.parse import urlsplit
+from typing import Callable, Iterator
+from urllib.parse import urljoin, urlsplit
 
 from gtars.refget import RefgetStore
 
@@ -61,17 +64,41 @@ class SeqsetConfig:
     url_template: str | None = None
     shard_range: list[int] | None = None
     urls: list[str] | None = None
+    url_pattern: str | None = None
+    checksum_manifest_url: str | None = None
     format: str = "fasta"
+    resolved_sources: list["ResolvedSource"] | None = field(default=None, init=False)
 
     def __post_init__(self) -> None:
-        if (self.url_template is None) == (self.urls is None):
+        modes = sum(value is not None for value in
+                    (self.url_template, self.urls, self.url_pattern))
+        if modes != 1:
             raise ValueError(
-                f"seqset {self.name!r}: set exactly one of url_template or urls"
+                f"seqset {self.name!r}: set exactly one of url_template, urls, "
+                "or url_pattern"
             )
-        if self.urls is not None and self.shard_range is not None:
+        if self.shard_range is not None and self.url_template is None:
             raise ValueError(
-                f"seqset {self.name!r}: shard_range is not valid with urls"
+                f"seqset {self.name!r}: shard_range is only valid with url_template"
             )
+        if (self.url_pattern is None) != (self.checksum_manifest_url is None):
+            raise ValueError(
+                f"seqset {self.name!r}: url_pattern and checksum_manifest_url "
+                "must be set together"
+            )
+        if self.url_pattern is not None:
+            pattern = urlsplit(self.url_pattern)
+            manifest = urlsplit(self.checksum_manifest_url or "")
+            if pattern.scheme != "https" or manifest.scheme != "https":
+                raise ValueError(f"seqset {self.name!r}: pattern sources require HTTPS")
+            if not any(c in Path(pattern.path).name for c in "*?["):
+                raise ValueError(f"seqset {self.name!r}: url_pattern basename needs a glob")
+            if (pattern.scheme, pattern.netloc, str(Path(pattern.path).parent)) != (
+                manifest.scheme, manifest.netloc, str(Path(manifest.path).parent)
+            ):
+                raise ValueError(
+                    f"seqset {self.name!r}: pattern and checksum manifest must share a directory"
+                )
         if self.format not in ("fasta", "gbff"):
             raise ValueError(
                 f"seqset {self.name!r}: format must be 'fasta' or 'gbff', "
@@ -80,6 +107,12 @@ class SeqsetConfig:
 
     def iter_shard_urls(self) -> Iterator[tuple[str, str]]:
         """Yield (shard_label, url) pairs. Shard label is "" for unsharded."""
+        if self.resolved_sources is not None:
+            for i, source in enumerate(self.resolved_sources, 1):
+                yield str(i), source.url
+            return
+        if self.url_pattern is not None:
+            raise RuntimeError(f"seqset {self.name!r}: pattern source has not been resolved")
         if self.urls is not None:
             for i, url in enumerate(self.urls, 1):
                 yield str(i), url
@@ -90,6 +123,107 @@ class SeqsetConfig:
         lo, hi = self.shard_range
         for i in range(lo, hi + 1):
             yield str(i), self.url_template.replace("{shard}", str(i))
+
+
+@dataclass(frozen=True)
+class ResolvedSource:
+    kind: str
+    owner: str
+    url: str
+    upstream_md5: str | None = None
+
+
+_MD5_RECORD = re.compile(r"^([0-9A-Fa-f]{32})[ \t]+([^\s]+)$")
+
+
+def parse_checksum_manifest(text: str) -> dict[str, str]:
+    """Parse strict NCBI ``MD5 filename`` records keyed by safe basenames."""
+    records: dict[str, str] = {}
+    for line_number, raw in enumerate(text.splitlines(), 1):
+        match = _MD5_RECORD.fullmatch(raw)
+        if not match:
+            raise ValueError(f"malformed checksum manifest line {line_number}: {raw!r}")
+        md5, filename = match.groups()
+        if (filename in (".", "..") or Path(filename).name != filename
+                or "\\" in filename or any(char in filename for char in "*?[]")):
+            raise ValueError(f"unsafe checksum manifest filename on line {line_number}: {filename!r}")
+        if filename in records:
+            raise ValueError(f"duplicate checksum manifest filename: {filename!r}")
+        records[filename] = md5.lower()
+    return records
+
+
+def natural_sort_key(value: str) -> tuple:
+    return tuple((1, int(part)) if part.isdigit() else (0, part.casefold())
+                 for part in re.split(r"(\d+)", value))
+
+
+def _fetch_text(url: str) -> str:
+    request = urllib.request.Request(url, headers={"User-Agent": "gks-refgetstore-builder"})
+    with urllib.request.urlopen(request, timeout=60) as response:  # noqa: S310
+        return response.read().decode("utf-8")
+
+
+def resolve_sources(
+    assemblies: list[AssemblyConfig],
+    seqsets: list[SeqsetConfig],
+    fetch_text: Callable[[str], str] | None = None,
+) -> list[ResolvedSource]:
+    """Resolve every config entry once, sharing fetched manifests by URL."""
+    manifest_cache: dict[str, dict[str, str]] = {}
+    fetch_text = fetch_text or _fetch_text
+    resolved: list[ResolvedSource] = []
+    for seqset in seqsets:
+        seq_sources: list[ResolvedSource] = []
+        if seqset.url_pattern is not None:
+            manifest_url = seqset.checksum_manifest_url
+            assert manifest_url is not None
+            if manifest_url not in manifest_cache:
+                manifest_cache[manifest_url] = parse_checksum_manifest(fetch_text(manifest_url))
+            basename_pattern = Path(urlsplit(seqset.url_pattern).path).name
+            matches = [(name, md5) for name, md5 in manifest_cache[manifest_url].items()
+                       if fnmatch.fnmatchcase(name, basename_pattern)]
+            if not matches:
+                raise ValueError(f"seqset {seqset.name!r}: url_pattern matched no manifest files")
+            base = seqset.url_pattern.rsplit("/", 1)[0] + "/"
+            for name, md5 in sorted(matches, key=lambda item: natural_sort_key(item[0])):
+                seq_sources.append(ResolvedSource("seqset", seqset.name,
+                                                  urljoin(base, name), md5))
+        else:
+            for _, url in seqset.iter_shard_urls():
+                seq_sources.append(ResolvedSource("seqset", seqset.name, url))
+        seqset.resolved_sources = seq_sources
+        resolved.extend(seq_sources)
+    for assembly in assemblies:
+        if assembly.load_fasta and not assembly.fasta_path:
+            assert assembly.fasta_url is not None
+            resolved.append(ResolvedSource("assembly_fasta", assembly.namespace,
+                                           assembly.fasta_url))
+        resolved.append(ResolvedSource("assembly_report", assembly.namespace,
+                                       assembly.report_url))
+    urls = [source.url for source in resolved]
+    if len(urls) != len(set(urls)):
+        duplicate = next(url for url in urls if urls.count(url) > 1)
+        raise ValueError(f"duplicate resolved source URL: {duplicate}")
+    return resolved
+
+
+def apply_locked_sources(seqsets: list[SeqsetConfig], lock: dict) -> list[ResolvedSource]:
+    """Use concrete v2 lock entries without performing live discovery."""
+    if lock.get("schema") != "gks-refgetstore-build-lock/2":
+        raise ValueError("--locked-sources requires a v2 build lock")
+    sources = [ResolvedSource(s["kind"], s["owner"], s["url"], s.get("upstream_md5"))
+               for s in lock.get("sources", [])]
+    by_owner: dict[str, list[ResolvedSource]] = {}
+    for source in sources:
+        if source.kind == "seqset":
+            by_owner.setdefault(source.owner, []).append(source)
+    for seqset in seqsets:
+        locked = by_owner.get(seqset.name, [])
+        if not locked:
+            raise ValueError(f"lock has no concrete sources for seqset {seqset.name!r}")
+        seqset.resolved_sources = locked
+    return sources
 
 
 @dataclass
@@ -224,16 +358,37 @@ def iter_source_urls(
         yield "assembly_report", a.namespace, a.report_url
 
 
-def ensure_download(url: str, target: Path, force: bool) -> Path:
+def md5_file(path: Path) -> str:
+    digest = hashlib.md5()  # noqa: S324 - required provider checksum algorithm
+    with path.open("rb") as stream:
+        while chunk := stream.read(1 << 20):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def ensure_download(url: str, target: Path, force: bool,
+                    expected_md5: str | None = None) -> Path:
     target.parent.mkdir(parents=True, exist_ok=True)
     if target.exists() and not force:
-        logger.info("using cached %s", target)
-        return target
+        if expected_md5 is None or md5_file(target) == expected_md5:
+            logger.info("using cached %s", target)
+            return target
+        logger.warning("cached provider checksum mismatch; re-downloading %s", target)
     logger.info("downloading %s -> %s", url, target)
     tmp = target.with_suffix(target.suffix + ".part")
     urllib.request.urlretrieve(url, tmp)  # noqa: S310
+    if expected_md5 is not None and md5_file(tmp) != expected_md5:
+        tmp.unlink(missing_ok=True)
+        raise ValueError(f"NCBI MD5 mismatch for {url}")
     tmp.replace(target)
     return target
+
+
+def require_prepared_source(path: Path) -> Path:
+    """Return a nonempty source prepared by preflight; never access the network."""
+    if not path.exists() or path.stat().st_size == 0:
+        raise FileNotFoundError(f"prepared source is missing or empty: {path}")
+    return path
 
 
 def resolve_fasta_source(
@@ -425,7 +580,6 @@ def process_assembly(
     store: RefgetStore,
     entry: AssemblyConfig,
     download_dir: Path,
-    force_download: bool,
     global_name_map_cache: dict[str, dict[str, str]],
     provenance: dict[str, dict] | None = None,
 ) -> AssemblyStats:
@@ -435,7 +589,6 @@ def process_assembly(
         store: On-disk RefgetStore to update.
         entry: Manifest assembly configuration and source URLs.
         download_dir: Root of the mirrored source cache.
-        force_download: Re-fetch cached source files when true.
         global_name_map_cache: Reusable fallback map for report-only assemblies.
         provenance: Optional cache-path-to-collection metadata for the build lock.
 
@@ -444,8 +597,20 @@ def process_assembly(
     """
     stats = AssemblyStats(namespace=entry.namespace)
     logger.info("=== %s ===", entry.namespace)
-    fasta_path = resolve_fasta_source(entry, download_dir, force_download)
-    report_path = resolve_report_source(entry, download_dir, force_download)
+    fasta_path: Path | None = None
+    if entry.load_fasta:
+        if entry.fasta_path:
+            local = (REPO_ROOT / entry.fasta_path).resolve()
+            if local.exists():
+                fasta_path = local
+        if fasta_path is None:
+            assert entry.fasta_url is not None
+            fasta_path = require_prepared_source(
+                mirror_cache_path(download_dir, entry.fasta_url)
+            )
+    report_path = require_prepared_source(
+        mirror_cache_path(download_dir, entry.report_url)
+    )
 
     name_to_digest: dict[str, str]
     coll_digest: str | None = None
@@ -497,13 +662,13 @@ def process_seqset(
     store: RefgetStore,
     entry: SeqsetConfig,
     download_dir: Path,
-    force_download: bool,
     provenance: dict[str, dict] | None = None,
+    refresh_derived: bool = False,
 ) -> SeqsetStats:
     """Ingest a flat/sharded seqset and alias every header name.
 
     For each shard FASTA:
-      1. Download (cached).
+      1. Open the source prepared and validated by build preflight.
       2. ``add_sequence_collection_from_fasta`` -> collection digest.
       3. Walk collection level-2 contents; collect ``(name, digest)`` pairs.
 
@@ -530,15 +695,15 @@ def process_seqset(
             f" ({Path(url).name})" if shard_label else "",
         )
         try:
-            fasta_path = ensure_download(url, target, force_download)
+            fasta_path = require_prepared_source(target)
         except Exception as exc:  # noqa: BLE001
-            logger.warning("download failed for %s: %s", url, exc)
+            logger.warning("prepared source unavailable for %s: %s", url, exc)
             stats.warnings += 1
             continue
 
         if entry.format == "gbff":
             try:
-                fasta_path = resolve_gbff_fasta(fasta_path, force_download)
+                fasta_path = resolve_gbff_fasta(fasta_path, refresh_derived)
             except Exception as exc:  # noqa: BLE001
                 logger.warning("gbff conversion failed for %s: %s", fasta_path, exc)
                 stats.warnings += 1
@@ -719,13 +884,17 @@ def run_build(args) -> int:
         args.config,
     )
 
-    args.store_dir.mkdir(parents=True, exist_ok=True)
     args.cache_dir.mkdir(parents=True, exist_ok=True)
 
-    store = RefgetStore.on_disk(str(args.store_dir))
-    logger.info("opened store at %s (mode=%s)", args.store_dir, store.storage_mode)
-
     import build_lock  # lazy: avoids a circular import at module load
+
+    existing_lock = build_lock.load_lock(args.lock) if args.lock.exists() else None
+    if args.locked_sources:
+        if existing_lock is None:
+            raise SystemExit("--locked-sources requires an existing --lock")
+        all_sources = apply_locked_sources(seqsets, existing_lock)
+    else:
+        all_sources = resolve_sources(assemblies, seqsets)
 
     # If the user passes --assembly or --seqset, they implicitly only want
     # that kind — otherwise we run both.
@@ -740,25 +909,57 @@ def run_build(args) -> int:
     )
     # The concrete files this run will touch (used for both the pre-flight check
     # and the partial add-to merge).
-    run_sources = list(iter_source_urls(sel_assemblies, sel_seqsets))
+    assembly_owners = {entry.namespace for entry in sel_assemblies}
+    seqset_owners = {entry.name for entry in sel_seqsets}
+    run_sources = [source for source in all_sources
+                   if (source.kind.startswith("assembly_") and source.owner in assembly_owners)
+                   or (source.kind == "seqset" and source.owner in seqset_owners)]
 
-    # ---- pre-flight lock check (before ingesting anything) ----
-    existing_lock = build_lock.load_lock(args.lock) if args.lock.exists() else None
+    # Materialize and validate every input before opening or mutating the store.
+    locked_by_url = ({entry["url"]: entry for entry in existing_lock.get("sources", [])}
+                     if existing_lock else {})
+    for source in run_sources:
+        target = mirror_cache_path(args.cache_dir, source.url)
+        if args.locked_sources:
+            locked = locked_by_url.get(source.url)
+            if not locked or not target.exists() or target.stat().st_size == 0:
+                raise SystemExit(f"locked source missing from cache: {source.url}")
+            if build_lock.sha256_file(target) != locked.get("sha256"):
+                raise SystemExit(f"locked source SHA-256 mismatch: {source.url}")
+        else:
+            ensure_download(source.url, target, args.force_download, source.upstream_md5)
+
     check: build_lock.LockCheck | None = None
-    if existing_lock is None:
-        logger.info("no existing lock at %s; skipping pre-flight check", args.lock)
-    elif args.lock_check_mode == "ignore":
-        logger.info("lock-check-mode=ignore; skipping pre-flight check")
-    else:
-        build_files = [
-            (
-                str(mirror_cache_path(args.cache_dir, url).relative_to(args.cache_dir)),
-                mirror_cache_path(args.cache_dir, url),
-            )
-            for _, _, url in run_sources
-        ]
+    membership_check: build_lock.LockCheck | None = None
+    if existing_lock is not None and args.lock_check_mode != "ignore":
+        membership_check = build_lock.evaluate_sources_vs_lock(run_sources, existing_lock)
+        build_files = [(str(mirror_cache_path(args.cache_dir, source.url)
+                            .relative_to(args.cache_dir)),
+                        mirror_cache_path(args.cache_dir, source.url))
+                       for source in run_sources]
         check = build_lock.evaluate_cache_vs_lock(build_files, existing_lock)
-        report_lock_check(check, args.lock_check_mode)
+        fatal = (membership_check.drift or check.changed or check.new or check.missing)
+        if fatal and not args.force_lock:
+            details = []
+            if membership_check.legacy_schema:
+                details.append("existing lock is v1")
+            if membership_check.set_differs:
+                details.append("resolved URL membership changed")
+            if membership_check.upstream_changed:
+                details.append("upstream MD5 changed")
+            if check.changed:
+                details.append("cached SHA-256 changed")
+            if check.new:
+                details.append("lock has no cached SHA-256 baseline")
+            if check.missing:
+                details.append("resolved input is missing from cache")
+            raise SystemExit(
+                "source drift detected before ingestion: " + "; ".join(details)
+            )
+
+    args.store_dir.mkdir(parents=True, exist_ok=True)
+    store = RefgetStore.on_disk(str(args.store_dir))
+    logger.info("opened store at %s (mode=%s)", args.store_dir, store.storage_mode)
 
     all_stats: list[AssemblyStats] = []
     seqset_stats: list[SeqsetStats] = []
@@ -768,14 +969,14 @@ def run_build(args) -> int:
     for entry in sel_assemblies:
         all_stats.append(
             process_assembly(
-                store, entry, args.cache_dir, args.force_download,
-                global_name_map_cache, provenance,
+                store, entry, args.cache_dir, global_name_map_cache, provenance,
             )
         )
     for entry in sel_seqsets:
         seqset_stats.append(
             process_seqset(
-                store, entry, args.cache_dir, args.force_download, provenance,
+                store, entry, args.cache_dir, provenance,
+                refresh_derived=args.force_download,
             )
         )
 
@@ -793,30 +994,13 @@ def run_build(args) -> int:
     # The write gate keys on CONTENT DRIFT (never silently overwrite a good hash);
     # under strict, a differing file SET also suppresses the write. Both are
     # overridable with --force-lock.
-    suppress = False
-    if check is not None and not args.force_lock:
-        if check.drift:
-            suppress = True
-            logger.warning(
-                "content drift vs lock on %d file(s); NOT writing lock "
-                "(use --force-lock to re-baseline)", len(check.changed),
-            )
-        elif args.lock_check_mode == "strict" and check.set_differs:
-            suppress = True
-            logger.warning(
-                "strict: build file set differs from lock; NOT writing lock "
-                "(use --lock-check-mode subset, or --force-lock to re-baseline)",
-            )
-
     if args.no_lock:
         logger.info("skipping build-lock write (--no-lock)")
-    elif suppress:
-        logger.warning("build-lock NOT updated; preserving %s", args.lock)
     elif full_build:
         logger.info("writing build-lock (hashing cache) -> %s", args.lock)
         lock = build_lock.build_lock_dict(
             config_path=args.config, download_dir=args.cache_dir,
-            assemblies=assemblies, seqsets=seqsets,
+            resolved_sources=all_sources,
             collection_by_cachepath=provenance, store=store,
         )
         build_lock.write_lock(args.lock, lock)

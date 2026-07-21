@@ -84,9 +84,11 @@ is fetched on demand. Writes/refreshes the build lock at the end (see
     --skip-assemblies / --skip-seqsets
     --force-download       re-fetch even if cached
     --lock PATH            build-lock to check against + write (default ./build.lock.json)
-    --lock-check-mode {strict,subset,ignore}   pre-flight check vs the lock (default subset)
+    --lock-check-mode {strict,subset,ignore}   pre-flight check vs the lock (default strict)
     --no-lock              don't write the lock (the pre-flight check still runs)
-    --force-lock           write the lock even if a discrepancy would suppress it
+    --force-lock           accept current inputs and write a new lock baseline
+    --locked-sources       use the lock's concrete URLs and cached SHA-256 bytes;
+                           perform no live pattern resolution
 
 Building into an existing store **appends** (dedup by digest); to rebuild from
 scratch, delete the store dir first.
@@ -97,6 +99,7 @@ scratch, delete the store dir first.
     gks-refgetstore fetch --dry-run      # list what would be pulled
     gks-refgetstore fetch --only ensembl_human_cdna   # just one source's files
     gks-refgetstore fetch --kinds assembly_report     # just the small reports
+    gks-refgetstore fetch --locked-sources            # offline lock/cache check
 
 Idempotent (skips files already cached), atomic, disk-guarded
 (`--min-free-gb`). Useful to warm the cache before a long build, or offline.
@@ -137,7 +140,8 @@ for a build that already ran.
 ## Build lock & cache verification
 
 A full build writes **`build.lock.json`** — a provenance record of exactly what
-that build consumed: every source's URL, cached path, byte length, `sha256`, and
+that build consumed: every source's URL, provider MD5 (when supplied), cached
+path, byte length, `sha256`, and
 the collection digest it produced, plus build metadata (timestamp, git commit,
 gtars version, `sources.toml` hash, store counts). It is small and committed.
 
@@ -151,10 +155,12 @@ build; `verify` handles the interim gap gracefully.)
 
 **Two uses:**
 
-1. **Reproducibility / drift detection** — `build`'s pre-flight check and the
-   `verify --lock` command both compare the cache against the pinned hashes. The
-   write is gated on *content drift*: a build never silently overwrites a
-   known-good lock hash with a changed one.
+1. **Reproducibility / drift detection** — a live build resolves dynamic feeds,
+   downloads and validates all inputs, then compares URL membership, upstream
+   MD5 values, and cached SHA-256 values before opening the store. Any change is
+   fatal unless `--force-lock` explicitly accepts a new baseline. NCBI's MD5
+   verifies provider delivery; the lock's SHA-256 identifies the exact bytes
+   consumed by the build.
 2. **Provenance** — because each ingested file becomes exactly one collection and
    the store records collection membership, the lock's `url → collection_digest`
    is enough to answer file↔digest questions on demand:
@@ -163,21 +169,36 @@ build; `verify` handles the interim gap gracefully.)
        uv run python provenance.py --digest <sha512t24u> # source file(s) for a digest
        uv run python provenance.py --list                # all sources + collections
 
-**`--lock-check-mode`** (on `build`) controls the pre-flight gate:
+**Recommended workflows:**
+
+    # Live discovery with strict drift detection (default)
+    gks-refgetstore build
+
+    # Review a legitimate upstream change, then explicitly rebaseline
+    gks-refgetstore build --force-lock
+
+    # Rebuild offline from exactly the locked, already-cached bytes
+    gks-refgetstore build --locked-sources
+
+The first build after introducing dynamic sources encounters the readable v1
+lock and requires `--force-lock` to establish the v2 URL/MD5 baseline.
+
+**`--lock-check-mode`** controls whether a live build compares against a lock:
 
 | mode | requires | on discrepancy |
 | --- | --- | --- |
-| `subset` (default) | shared files unchanged (no content drift) | drift → warn + don't write the lock |
-| `strict` | shared files unchanged **and** identical file set | drift or set change → warn + don't write |
+| `strict` (default) | URL membership, upstream MD5, and cached SHA-256 match | discrepancy stops before ingestion |
+| `subset` | retained for CLI compatibility; source drift is still fatal | discrepancy stops before ingestion |
 | `ignore` | — | no check |
 
-`--force-lock` overrides the write suppression (a deliberate re-baseline, e.g.
-after a "current" source legitimately updated upstream).
+`--force-lock` is the explicit re-baseline operation. `--locked-sources` is
+stricter and offline: it performs no manifest request, requires a v2 lock, and
+rejects missing or SHA-256-mismatched cached files.
 
 **Reproducible rebuild from a validated cache:**
 
-    gks-refgetstore verify --lock build.lock.json   # confirm cache matches the lock
-    rm -rf ./store && gks-refgetstore build          # rebuild from the validated cache
+    gks-refgetstore fetch --locked-sources          # confirm every locked cache file
+    gks-refgetstore build --locked-sources          # rebuild with no live resolution
 
 ## Config reference
 
@@ -199,12 +220,31 @@ Each `[[seqset]]` block (flat FASTA where the header name is the accession):
 | `namespace` | yes | Alias namespace for every ingested sequence (e.g. `refseq`, `ensembl`). |
 | `url_template` | one of | URL with `{shard}` placeholder, or plain URL if unsharded. |
 | `urls` | one of | Explicit list of URLs (alternative to `url_template`; not valid with `shard_range`). |
+| `url_pattern` | one of | HTTPS URL whose basename contains a glob; requires `checksum_manifest_url`. |
+| `checksum_manifest_url` | with `url_pattern` | HTTPS NCBI `*.files.installed` URL in the same directory. |
 | `shard_range` | no | `[min, max]` inclusive substituted into `{shard}` in `url_template`. |
 | `format` | no, default `fasta` | `fasta`, or `gbff` to convert a GenBank flat file to FASTA before ingest. |
 
-Exactly one of `url_template` or `urls` is required. The same schema handles
-the NCBI RefSeq mRNA/Prot shards (sharded via `{shard}`) and the Ensembl
-cdna / ncrna / pep releases (single-file, `shard_range` omitted).
+Exactly one of `url_template`, `urls`, or `url_pattern` is required.
+`shard_range` is valid only with `url_template`; `checksum_manifest_url` is
+valid and required only with `url_pattern`. Pattern matching is local to safe
+manifest basenames. Records must be strict `MD5 filename` lines; malformed,
+duplicate, path-like, or empty results are errors. Matches are naturally sorted
+(`2` before `10`) and each shared manifest is fetched only once per command.
+
+For example, the mutable current RNA feed uses:
+
+```toml
+url_pattern = "https://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.*.rna.fna.gz"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.files.installed"
+```
+
+NCBI documents `*.files.installed` as the installed file list with MD5 values
+in the [species-specific RefSeq README](https://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/README).
+The [RefSeqGene README](https://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/RefSeqGene/README.txt)
+describes its numbered subsets and frequent updates. Current RefSeq feeds are
+therefore intentionally dynamic; historical RefSeq releases, assemblies, and
+Ensembl releases remain explicit URLs.
 
 ## What gets written
 
@@ -233,7 +273,8 @@ consuming alias proxy.
 
 ## Version coverage
 
-The manifest pins every source URL to a specific release. It includes:
+The manifest keeps release-specific sources explicit while discovering the
+membership of mutable current RefSeq feeds from official checksum manifests. It includes:
 
 - **NCBI assemblies:** the original GRCh38 and GRCh37 releases, their listed
   patch releases, and their matching assembly reports. GRCh37.p11 and p12 are

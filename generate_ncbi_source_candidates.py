@@ -41,11 +41,14 @@ FILE_SUFFIXES = {
 }
 CURRENT_REFSEQ_SEQSETS = (
     ("refseq_human_rna",
-     f"{HTTPS}/refseq/H_sapiens/mRNA_Prot/human.{{shard}}.rna.fna.gz", (1, 15)),
+     f"{HTTPS}/refseq/H_sapiens/mRNA_Prot/human.*.rna.fna.gz",
+     f"{HTTPS}/refseq/H_sapiens/mRNA_Prot/human.files.installed"),
     ("refseq_human_protein",
-     f"{HTTPS}/refseq/H_sapiens/mRNA_Prot/human.{{shard}}.protein.faa.gz", (1, 15)),
+     f"{HTTPS}/refseq/H_sapiens/mRNA_Prot/human.*.protein.faa.gz",
+     f"{HTTPS}/refseq/H_sapiens/mRNA_Prot/human.files.installed"),
     ("refseq_human_refseqgene",
-     f"{HTTPS}/refseq/H_sapiens/RefSeqGene/refseqgene.{{shard}}.genomic.fna.gz", (1, 9)),
+     f"{HTTPS}/refseq/H_sapiens/RefSeqGene/refseqgene.*.genomic.fna.gz",
+     f"{HTTPS}/refseq/H_sapiens/RefSeqGene/refseqgene.files.installed"),
 )
 
 
@@ -363,11 +366,11 @@ def emit_toml(assemblies: list[Assembly], candidates: list[Candidate], section: 
                 load = False
             lines.extend([f"report_url = {_q(report.url or '')}", f"load_fasta = {str(load).lower()}"])
     if section == "all":
-        for name, template, shard_range in CURRENT_REFSEQ_SEQSETS:
+        for name, pattern, manifest in CURRENT_REFSEQ_SEQSETS:
             lines.extend(["", "[[seqset]]", f"name = {_q(name)}",
                           'namespace = "refseq"',
-                          f"url_template = {_q(template)}",
-                          f"shard_range = [{shard_range[0]}, {shard_range[1]}]"])
+                          f"url_pattern = {_q(pattern)}",
+                          f"checksum_manifest_url = {_q(manifest)}"])
     if section in ("all", "history"):
         history = [c for c in discovered
                    if c.file_type in ("rna_fasta", "protein_fasta")]
