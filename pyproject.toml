@@ -11,6 +11,11 @@ dependencies = [
     "gtars>=0.8.0",
 ]
 
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+]
+
 [project.scripts]
 gks-refgetstore = "cli:main"
 
@@ -27,3 +32,6 @@ include = [
     "generate_ncbi_source_candidates.py",
     "sources.toml",
 ]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
