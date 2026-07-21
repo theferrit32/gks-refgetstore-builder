@@ -15,20 +15,13 @@ import sys
 from pathlib import Path
 
 from gtars.refget import RefgetStore
+from build_store import load_config, mirror_cache_path
 
 HERE = Path(__file__).resolve().parent
 STORE_PATH = HERE / "store"
 DOWNLOAD_DIR = HERE / "downloads"
+CONFIG_PATH = HERE / "sources.toml"
 
-EXPECTED_SEQ_NAMESPACES = {
-    "GRCh38",
-    "GRCh38.p14",
-    "GRCh37",
-    "GRCh37.p13",
-    "refseq",
-    "insdc",
-    "ensembl",
-}
 EXPECTED_COLL_NAMESPACES = {"refseq", "insdc"}
 FORBIDDEN_SEQ_NAMESPACES = {
     "sha512t24u",
@@ -130,6 +123,17 @@ def parse_assembly_report(
     return refseq_accn, genbank_accn, rows
 
 
+def expected_sequence_namespaces() -> set[str]:
+    """Return the alias namespaces produced by the current source manifest."""
+    assemblies, seqsets = load_config(CONFIG_PATH)
+    return {
+        *(entry.namespace for entry in assemblies),
+        *(entry.namespace for entry in seqsets),
+        "refseq",
+        "insdc",
+    }
+
+
 def section_inventory(store: RefgetStore, r: Report) -> None:
     print("\n[A] Store inventory")
     stats = store.stats()
@@ -150,10 +154,11 @@ def section_inventory(store: RefgetStore, r: Report) -> None:
         f"got {n_seq}",
     )
     seq_ns = set(store.list_sequence_alias_namespaces())
+    expected_seq_namespaces = expected_sequence_namespaces()
     r.check(
         "sequence namespaces == expected set",
-        seq_ns == EXPECTED_SEQ_NAMESPACES,
-        f"got {sorted(seq_ns)}",
+        seq_ns == expected_seq_namespaces,
+        f"expected {sorted(expected_seq_namespaces)}, got {sorted(seq_ns)}",
     )
     coll_ns = set(store.list_collection_alias_namespaces())
     r.check(
@@ -214,8 +219,11 @@ def section_coverage(store: RefgetStore, r: Report) -> None:
     are excluded because the RefSeq genomic FASTA does not contain their bytes.
     """
     print("\n[D] Assembly report coverage")
+    assemblies, _ = load_config(CONFIG_PATH)
+    assemblies_by_namespace = {entry.namespace: entry for entry in assemblies}
     for namespace in ("GRCh38", "GRCh38.p14", "GRCh37", "GRCh37.p13"):
-        report_path = DOWNLOAD_DIR / f"{namespace}.assembly_report.txt"
+        entry = assemblies_by_namespace[namespace]
+        report_path = mirror_cache_path(DOWNLOAD_DIR, entry.report_url)
         if not report_path.exists():
             r.check(f"{namespace} report present", False, f"{report_path} missing")
             continue

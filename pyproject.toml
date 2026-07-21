@@ -24,4 +24,5 @@ include = [
     "build_store.py",
     "build_lock.py",
     "fetch_sources.py",
+    "sources.toml",
 ]

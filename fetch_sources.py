@@ -102,6 +102,7 @@ def run_fetch(args) -> int:
           f"free={free_gb(args.cache_dir):.1f}GB", file=sys.stderr)
 
     fetched = skipped = failed = 0
+    aborted_for_disk_space = False
     total_bytes = 0
     failures: list[tuple[str, str]] = []
     for i, (kind, owner, url) in enumerate(sources, 1):
@@ -117,6 +118,7 @@ def run_fetch(args) -> int:
         if free_gb(args.cache_dir) < args.min_free_gb:
             print(f"ABORT: free disk {free_gb(args.cache_dir):.1f}GB below "
                   f"--min-free-gb {args.min_free_gb}", file=sys.stderr)
+            aborted_for_disk_space = True
             break
         print(f"[{i}/{len(sources)}] get   {owner}  {rel}", flush=True)
         try:
@@ -135,4 +137,4 @@ def run_fetch(args) -> int:
         print("failures:", file=sys.stderr)
         for url, exc in failures:
             print(f"  {url}\n    {exc}", file=sys.stderr)
-    return 1 if failed else 0
+    return 1 if failed or aborted_for_disk_space else 0
