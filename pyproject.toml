@@ -24,5 +24,6 @@ include = [
     "build_store.py",
     "build_lock.py",
     "fetch_sources.py",
+    "generate_ncbi_source_candidates.py",
     "sources.toml",
 ]
