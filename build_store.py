@@ -259,6 +259,17 @@ class SeqsetStats:
     warnings: int = 0
 
 
+@dataclass
+class DeferredAssemblyReport:
+    """Assembly state retained until all configured sequences are ingested."""
+
+    entry: AssemblyConfig
+    report_path: Path
+    stats: AssemblyStats
+    collection_digest: str | None = None
+    report: AssemblyReport | None = None
+
+
 def load_config(
     path: Path,
 ) -> tuple[list[AssemblyConfig], list[SeqsetConfig]]:
@@ -472,18 +483,19 @@ def build_name_to_digest_map(
     return out
 
 
-def build_global_name_to_digest_map(store: RefgetStore) -> dict[str, str]:
-    """Fallback map built by scanning every sequence in the store.
-
-    Used when `load_fasta=false` so we can still resolve refseq accessions to
-    a digest without having just ingested this assembly's collection. Names
-    are globally unique-ish (seqrepo jungle store: 1224 collisions in 580k);
-    we keep the first digest we see for each name.
-    """
+def build_targeted_name_to_digest_map(
+    store: RefgetStore, required_names: set[str]
+) -> dict[str, str]:
+    """Scan the completed store once, retaining only requested sequence names."""
     out: dict[str, str] = {}
+    if not required_names:
+        return out
     for record in store.iter_sequences():
         md = record.metadata
-        out.setdefault(md.name, md.sha512t24u)
+        if md.name in required_names:
+            out.setdefault(md.name, md.sha512t24u)
+            if len(out) == len(required_names):
+                break
     return out
 
 
@@ -508,6 +520,7 @@ def add_aliases_for_row(
     namespace: str,
     name_to_digest: dict[str, str],
     stats: AssemblyStats,
+    collection_scoped: bool = True,
 ) -> None:
     """Add supported aliases from one NCBI assembly-report row.
 
@@ -518,7 +531,7 @@ def add_aliases_for_row(
         name_to_digest: RefSeq accession-to-digest mapping for the source FASTA.
         stats: Mutable assembly counters updated for aliases, skips, and warnings.
 
-    GenBank-only rows and rows absent from the FASTA are skipped. Resolved rows
+    GenBank-only rows and rows absent from the store are skipped. Resolved rows
     receive assembly-scoped aliases plus global ``refseq`` and ``insdc`` aliases.
     """
     refseq_ac = row.get("RefSeq-Accn", "").strip()
@@ -537,10 +550,14 @@ def add_aliases_for_row(
     digest = name_to_digest.get(refseq_ac)
     if digest is None:
         stats.warnings += 1
+        source_description = (
+            "associated FASTA collection" if collection_scoped else "completed store"
+        )
         logger.warning(
-            "no digest for %s in namespace %s (FASTA does not contain it)",
+            "no digest for %s in namespace %s (%s does not contain it)",
             refseq_ac,
             namespace,
+            source_description,
         )
         return
 
@@ -576,24 +593,22 @@ def add_collection_aliases(
         stats.collection_aliases_added += 1
 
 
-def process_assembly(
+def ingest_assembly(
     store: RefgetStore,
     entry: AssemblyConfig,
     download_dir: Path,
-    global_name_map_cache: dict[str, dict[str, str]],
     provenance: dict[str, dict] | None = None,
-) -> AssemblyStats:
-    """Ingest one assembly and materialize its assembly-report aliases.
+) -> DeferredAssemblyReport:
+    """Ingest an assembly FASTA and retain its report for deferred application.
 
     Args:
         store: On-disk RefgetStore to update.
         entry: Manifest assembly configuration and source URLs.
         download_dir: Root of the mirrored source cache.
-        global_name_map_cache: Reusable fallback map for report-only assemblies.
         provenance: Optional cache-path-to-collection metadata for the build lock.
 
-    A full assembly FASTA produces a collection and provenance record. A
-    report-only entry resolves aliases against the existing store instead.
+    A full assembly FASTA produces a collection and provenance record. Reports
+    are deliberately left untouched until every selected source is ingested.
     """
     stats = AssemblyStats(namespace=entry.namespace)
     logger.info("=== %s ===", entry.namespace)
@@ -612,7 +627,6 @@ def process_assembly(
         mirror_cache_path(download_dir, entry.report_url)
     )
 
-    name_to_digest: dict[str, str]
     coll_digest: str | None = None
     if fasta_path is not None:
         logger.info("ingesting %s", fasta_path)
@@ -630,17 +644,15 @@ def process_assembly(
             "new" if was_new else "existing",
             coll_meta.n_sequences,
         )
-        name_to_digest = build_name_to_digest_map(store, coll_digest)
-    else:
-        logger.info("load_fasta=false; using global name map")
-        cached = global_name_map_cache.get("_global")
-        if cached is None:
-            cached = build_global_name_to_digest_map(store)
-            global_name_map_cache["_global"] = cached
-        name_to_digest = cached
+    return DeferredAssemblyReport(entry, report_path, stats, coll_digest)
 
-    logger.info("parsing %s", report_path)
-    report = parse_assembly_report(report_path)
+
+def parse_deferred_assembly_report(context: DeferredAssemblyReport) -> None:
+    """Parse a deferred report after all sequence ingestion has completed."""
+    logger.info("parsing %s", context.report_path)
+    report = parse_assembly_report(context.report_path)
+    context.report = report
+    stats = context.stats
     stats.rows_total = len(report.rows)
     logger.info(
         "report: %d rows, refseq=%s genbank=%s",
@@ -649,11 +661,49 @@ def process_assembly(
         report.genbank_assembly_accession,
     )
 
-    for row in report.rows:
-        add_aliases_for_row(store, row, entry.namespace, name_to_digest, stats)
 
-    if coll_digest is not None:
-        add_collection_aliases(store, report, coll_digest, stats)
+def required_report_only_accessions(
+    contexts: list[DeferredAssemblyReport],
+) -> set[str]:
+    """Return RefSeq accessions needed by parsed report-only assemblies."""
+    required: set[str] = set()
+    for context in contexts:
+        if context.collection_digest is not None:
+            continue
+        assert context.report is not None
+        for row in context.report.rows:
+            refseq_ac = row.get("RefSeq-Accn", "").strip()
+            if refseq_ac.lower() not in NA_VALUES:
+                required.add(refseq_ac)
+    return required
+
+
+def apply_assembly_report(
+    store: RefgetStore,
+    context: DeferredAssemblyReport,
+    report_only_name_to_digest: dict[str, str],
+) -> AssemblyStats:
+    """Apply one parsed report, preserving collection-scoped resolution."""
+    report = context.report
+    assert report is not None
+    stats = context.stats
+    if context.collection_digest is not None:
+        name_to_digest = build_name_to_digest_map(store, context.collection_digest)
+    else:
+        name_to_digest = report_only_name_to_digest
+
+    for row in report.rows:
+        add_aliases_for_row(
+            store,
+            row,
+            context.entry.namespace,
+            name_to_digest,
+            stats,
+            collection_scoped=context.collection_digest is not None,
+        )
+
+    if context.collection_digest is not None:
+        add_collection_aliases(store, report, context.collection_digest, stats)
 
     return stats
 
@@ -963,14 +1013,13 @@ def run_build(args) -> int:
 
     all_stats: list[AssemblyStats] = []
     seqset_stats: list[SeqsetStats] = []
-    global_name_map_cache: dict[str, dict[str, str]] = {}
     provenance: dict[str, dict] = {}
+    deferred_reports: list[DeferredAssemblyReport] = []
 
+    # Phase 1: make every selected sequence available before applying reports.
     for entry in sel_assemblies:
-        all_stats.append(
-            process_assembly(
-                store, entry, args.cache_dir, global_name_map_cache, provenance,
-            )
+        deferred_reports.append(
+            ingest_assembly(store, entry, args.cache_dir, provenance)
         )
     for entry in sel_seqsets:
         seqset_stats.append(
@@ -978,6 +1027,22 @@ def run_build(args) -> int:
                 store, entry, args.cache_dir, provenance,
                 refresh_derived=args.force_download,
             )
+        )
+
+    # Phase 2: apply reports only after every sequence source is ingested.
+    # Report-only patch releases may reference exact accessions supplied by a
+    # later assembly FASTA. For example, the GRCh37.p11/p12 reports reference
+    # NW_003871055.3, whose sequence is supplied by the later GRCh37.p13 FASTA;
+    # applying those reports in manifest order would omit their scoped aliases.
+    for context in deferred_reports:
+        parse_deferred_assembly_report(context)
+    required_names = required_report_only_accessions(deferred_reports)
+    report_only_name_to_digest = build_targeted_name_to_digest_map(
+        store, required_names
+    )
+    for context in deferred_reports:
+        all_stats.append(
+            apply_assembly_report(store, context, report_only_name_to_digest)
         )
 
     logger.info("persisting store to %s", args.store_dir)

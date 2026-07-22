@@ -425,7 +425,7 @@ def section_ensembl(store: RefgetStore, r: Report) -> None:
     )
 
 
-KNOWN_DIVERGENT_PATH = HERE / "ensembl_known_divergent.txt"
+KNOWN_DIVERGENT_PATH = HERE / "seqrepo_equivalence" / "ensembl_known_divergent.txt"
 
 
 def section_known_divergent(store: RefgetStore, r: Report) -> None:
