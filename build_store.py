@@ -483,19 +483,23 @@ def build_name_to_digest_map(
     return out
 
 
-def build_targeted_name_to_digest_map(
+def build_indexed_name_to_digest_map(
     store: RefgetStore, required_names: set[str]
 ) -> dict[str, str]:
-    """Scan the completed store once, retaining only requested sequence names."""
+    """Resolve requested RefSeq accessions through the store's alias index."""
     out: dict[str, str] = {}
-    if not required_names:
-        return out
-    for record in store.iter_sequences():
-        md = record.metadata
-        if md.name in required_names:
-            out.setdefault(md.name, md.sha512t24u)
-            if len(out) == len(required_names):
-                break
+    for name in required_names:
+        try:
+            metadata = store.get_sequence_metadata_by_alias("refseq", name)
+        except KeyError:
+            metadata = None
+        if metadata is not None:
+            out[name] = metadata.sha512t24u
+    logger.info(
+        "report-only indexed lookup: resolved %d/%d RefSeq accessions",
+        len(out),
+        len(required_names),
+    )
     return out
 
 
@@ -1036,14 +1040,30 @@ def run_build(args) -> int:
     # applying those reports in manifest order would omit their scoped aliases.
     for context in deferred_reports:
         parse_deferred_assembly_report(context)
-    required_names = required_report_only_accessions(deferred_reports)
-    report_only_name_to_digest = build_targeted_name_to_digest_map(
+    collection_reports = [
+        context for context in deferred_reports
+        if context.collection_digest is not None
+    ]
+    report_only_reports = [
+        context for context in deferred_reports
+        if context.collection_digest is None
+    ]
+
+    # Collection-backed reports stay strictly scoped to their associated FASTA.
+    # Apply all of them first so later assemblies (notably GRCh37.p13) establish
+    # indexed RefSeq aliases that earlier report-only patches can reuse.
+    for context in collection_reports:
+        apply_assembly_report(store, context, {})
+
+    required_names = required_report_only_accessions(report_only_reports)
+    report_only_name_to_digest = build_indexed_name_to_digest_map(
         store, required_names
     )
-    for context in deferred_reports:
-        all_stats.append(
-            apply_assembly_report(store, context, report_only_name_to_digest)
-        )
+    for context in report_only_reports:
+        apply_assembly_report(store, context, report_only_name_to_digest)
+
+    # Preserve manifest ordering in the human-readable summary.
+    all_stats.extend(context.stats for context in deferred_reports)
 
     logger.info("persisting store to %s", args.store_dir)
     store.write()

@@ -122,14 +122,32 @@ class FakeStore:
         return []
 
 
+def test_report_only_lookup_uses_refseq_index_without_sequence_scan() -> None:
+    class IndexedStore:
+        def get_sequence_metadata_by_alias(self, namespace, alias):
+            assert namespace == "refseq"
+            if alias == "FOUND.1":
+                return SimpleNamespace(sha512t24u="digest")
+            if alias == "KEYERROR.1":
+                raise KeyError(alias)
+            return None
+
+        def iter_sequences(self):
+            raise AssertionError("report-only resolution must not scan the store")
+
+    assert build_store.build_indexed_name_to_digest_map(
+        IndexedStore(), {"FOUND.1", "MISSING.1", "KEYERROR.1"}
+    ) == {"FOUND.1": "digest"}
+
+
 @pytest.mark.parametrize(
     ("overrides", "expected"),
     [
-        ({}, ["ingest:asm", "seq:seq", "parse:asm", "lookup", "apply:asm"]),
-        ({"assembly": "asm"}, ["ingest:asm", "parse:asm", "lookup", "apply:asm"]),
+        ({}, ["ingest:asm", "seq:seq", "parse:asm", "apply:asm", "lookup"]),
+        ({"assembly": "asm"}, ["ingest:asm", "parse:asm", "apply:asm", "lookup"]),
         ({"seqset": "seq"}, ["seq:seq", "lookup"]),
         ({"skip_assemblies": True}, ["seq:seq", "lookup"]),
-        ({"skip_seqsets": True}, ["ingest:asm", "parse:asm", "lookup", "apply:asm"]),
+        ({"skip_seqsets": True}, ["ingest:asm", "parse:asm", "apply:asm", "lookup"]),
     ],
 )
 def test_build_phase_order_and_partial_modes(
@@ -173,7 +191,7 @@ def test_build_phase_order_and_partial_modes(
     monkeypatch.setattr(build_store, "ingest_assembly", ingest)
     monkeypatch.setattr(build_store, "process_seqset", seq)
     monkeypatch.setattr(build_store, "parse_deferred_assembly_report", parse)
-    monkeypatch.setattr(build_store, "build_targeted_name_to_digest_map", lookup)
+    monkeypatch.setattr(build_store, "build_indexed_name_to_digest_map", lookup)
     monkeypatch.setattr(build_store, "apply_assembly_report", apply)
 
     assert build_store.run_build(build_args(tmp_path, config, **overrides)) == 0
