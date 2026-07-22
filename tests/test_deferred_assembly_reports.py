@@ -140,6 +140,90 @@ def test_report_only_lookup_uses_refseq_index_without_sequence_scan() -> None:
     ) == {"FOUND.1": "digest"}
 
 
+class BatchStore:
+    def __init__(self, sequence_existing=(), collection_existing=()):
+        self.sequence_existing = set(sequence_existing)
+        self.collection_existing = set(collection_existing)
+        self.sequence_loads: list[tuple[str, list[str]]] = []
+        self.collection_loads: list[tuple[str, list[str]]] = []
+
+    def list_sequence_aliases(self, _namespace):
+        return list(self.sequence_existing)
+
+    def list_collection_aliases(self, _namespace):
+        return list(self.collection_existing)
+
+    def load_sequence_aliases(self, namespace, path):
+        rows = Path(path).read_text().splitlines()
+        self.sequence_loads.append((namespace, rows))
+        return len(rows)
+
+    def load_collection_aliases(self, namespace, path):
+        rows = Path(path).read_text().splitlines()
+        self.collection_loads.append((namespace, rows))
+        return len(rows)
+
+    def add_sequence_alias(self, *_args):
+        raise AssertionError("reports must not add aliases individually")
+
+    def iter_sequences(self):
+        raise AssertionError("reports must not scan sequences")
+
+
+def test_report_alias_batches_are_first_seen_and_count_originating_stats() -> None:
+    store = BatchStore(sequence_existing={"existing"})
+    aliases = build_store.ReportAliasAccumulator(store)
+    first = build_store.AssemblyStats("first")
+    second = build_store.AssemblyStats("second")
+
+    assert not aliases.add_sequence("refseq", "existing", "old", first)
+    assert aliases.add_sequence("refseq", "shared", "first-digest", first)
+    assert not aliases.add_sequence("refseq", "shared", "second-digest", second)
+    assert aliases.add_sequence("refseq", "unique", "unique-digest", second)
+    aliases.add_collection("refseq", "GCF_1", "collection", first)
+    aliases.add_collection("insdc", "GCA_1", "collection", first)
+
+    aliases.flush()
+
+    assert first.sequence_aliases_skipped == 1
+    assert second.sequence_aliases_skipped == 1
+    assert first.sequence_aliases_added == 1
+    assert second.sequence_aliases_added == 1
+    assert first.collection_aliases_added == 2
+    assert store.sequence_loads == [
+        ("refseq", ["shared\tfirst-digest", "unique\tunique-digest"])
+    ]
+    assert {namespace for namespace, _ in store.collection_loads} == {"refseq", "insdc"}
+
+
+def test_report_alias_batch_count_mismatch_fails() -> None:
+    class ShortLoadStore(BatchStore):
+        def load_sequence_aliases(self, namespace, path):
+            super().load_sequence_aliases(namespace, path)
+            return 0
+
+    aliases = build_store.ReportAliasAccumulator(ShortLoadStore())
+    stats = build_store.AssemblyStats("asm")
+    aliases.add_sequence("refseq", "A.1", "digest", stats)
+
+    with pytest.raises(RuntimeError, match="planned 1, loaded 0"):
+        aliases.flush()
+    assert stats.sequence_aliases_added == 0
+
+
+def test_pending_refseq_overlay_precedes_metadata_index() -> None:
+    class Store(BatchStore):
+        def get_sequence_metadata_by_alias(self, _namespace, _alias):
+            raise AssertionError("pending aliases must resolve without stored lookup")
+
+    store = Store()
+    aliases = build_store.ReportAliasAccumulator(store)
+    aliases.add_sequence("refseq", "LATER.1", "digest", build_store.AssemblyStats("p13"))
+    assert build_store.build_indexed_name_to_digest_map(
+        store, {"LATER.1"}, aliases
+    ) == {"LATER.1": "digest"}
+
+
 @pytest.mark.parametrize(
     ("overrides", "expected"),
     [
@@ -177,12 +261,12 @@ def test_build_phase_order_and_partial_modes(
         events.append(f"parse:{context.entry.namespace}")
         context.report = build_store.AssemblyReport(None, None, [])
 
-    def lookup(_store, required):
+    def lookup(_store, required, _aliases):
         assert required == set()
         events.append("lookup")
         return {}
 
-    def apply(_store, context, _lookup):
+    def apply(_store, context, _lookup, _aliases):
         events.append(f"apply:{context.entry.namespace}")
         return context.stats
 

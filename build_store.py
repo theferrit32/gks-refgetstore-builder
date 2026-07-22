@@ -14,6 +14,7 @@ import hashlib
 import logging
 import re
 import tempfile
+import time
 import tomllib
 import urllib.request
 from dataclasses import dataclass, field
@@ -484,11 +485,21 @@ def build_name_to_digest_map(
 
 
 def build_indexed_name_to_digest_map(
-    store: RefgetStore, required_names: set[str]
+    store: RefgetStore,
+    required_names: set[str],
+    pending_refseq: ReportAliasAccumulator | None = None,
 ) -> dict[str, str]:
-    """Resolve requested RefSeq accessions through the store's alias index."""
+    """Resolve requested RefSeq accessions through pending and stored indexes."""
+    started = time.monotonic()
     out: dict[str, str] = {}
     for name in required_names:
+        pending = (
+            pending_refseq.pending_sequence_digest("refseq", name)
+            if pending_refseq is not None else None
+        )
+        if pending is not None:
+            out[name] = pending
+            continue
         try:
             metadata = store.get_sequence_metadata_by_alias("refseq", name)
         except KeyError:
@@ -496,30 +507,117 @@ def build_indexed_name_to_digest_map(
         if metadata is not None:
             out[name] = metadata.sha512t24u
     logger.info(
-        "report-only indexed lookup: resolved %d/%d RefSeq accessions",
+        "report-only indexed lookup: resolved %d/%d RefSeq accessions in %.2fs",
         len(out),
         len(required_names),
+        time.monotonic() - started,
     )
     return out
 
 
-def add_unique_alias(
-    store: RefgetStore,
-    namespace: str,
-    alias: str,
-    digest: str,
-    stats: AssemblyStats,
-) -> None:
-    existing = store.get_sequence_by_alias(namespace, alias)
-    if existing is not None:
-        stats.sequence_aliases_skipped += 1
-        return
-    store.add_sequence_alias(namespace, alias, digest)
-    stats.sequence_aliases_added += 1
+class ReportAliasAccumulator:
+    """First-seen-wins batches for aliases derived from assembly reports."""
+
+    def __init__(self, store: RefgetStore) -> None:
+        self.store = store
+        self.sequence: dict[str, dict[str, tuple[str, AssemblyStats]]] = {}
+        self.collection: dict[str, dict[str, tuple[str, AssemblyStats]]] = {}
+        self._existing_sequence: dict[str, set[str]] = {}
+        self._existing_collection: dict[str, set[str]] = {}
+
+    def _sequence_aliases(self, namespace: str) -> set[str]:
+        if namespace not in self._existing_sequence:
+            self._existing_sequence[namespace] = set(
+                self.store.list_sequence_aliases(namespace) or []
+            )
+        return self._existing_sequence[namespace]
+
+    def _collection_aliases(self, namespace: str) -> set[str]:
+        if namespace not in self._existing_collection:
+            self._existing_collection[namespace] = set(
+                self.store.list_collection_aliases(namespace) or []
+            )
+        return self._existing_collection[namespace]
+
+    def add_sequence(
+        self, namespace: str, alias: str, digest: str, stats: AssemblyStats
+    ) -> bool:
+        pending = self.sequence.setdefault(namespace, {})
+        if alias in self._sequence_aliases(namespace) or alias in pending:
+            stats.sequence_aliases_skipped += 1
+            return False
+        pending[alias] = (digest, stats)
+        return True
+
+    def add_collection(
+        self, namespace: str, alias: str, digest: str, stats: AssemblyStats
+    ) -> bool:
+        pending = self.collection.setdefault(namespace, {})
+        if alias in self._collection_aliases(namespace) or alias in pending:
+            return False
+        pending[alias] = (digest, stats)
+        return True
+
+    def pending_sequence_digest(self, namespace: str, alias: str) -> str | None:
+        entry = self.sequence.get(namespace, {}).get(alias)
+        return entry[0] if entry else None
+
+    @staticmethod
+    def _write_tsv(entries: dict[str, tuple[str, AssemblyStats]]) -> Path:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".tsv", delete=False) as tmp:
+            for alias, (digest, _) in entries.items():
+                tmp.write(f"{alias}\t{digest}\n")
+            return Path(tmp.name)
+
+    def flush(self) -> None:
+        started = time.monotonic()
+        sequence_count = 0
+        collection_count = 0
+        for namespace, entries in self.sequence.items():
+            if not entries:
+                continue
+            path = self._write_tsv(entries)
+            try:
+                loaded = self.store.load_sequence_aliases(namespace, str(path))
+            finally:
+                path.unlink(missing_ok=True)
+            expected = len(entries)
+            if loaded != expected:
+                raise RuntimeError(
+                    f"sequence alias batch mismatch for {namespace}: "
+                    f"planned {expected}, loaded {loaded}"
+                )
+            for _, stats in entries.values():
+                stats.sequence_aliases_added += 1
+            sequence_count += loaded
+
+        for namespace, entries in self.collection.items():
+            if not entries:
+                continue
+            path = self._write_tsv(entries)
+            try:
+                loaded = self.store.load_collection_aliases(namespace, str(path))
+            finally:
+                path.unlink(missing_ok=True)
+            expected = len(entries)
+            if loaded != expected:
+                raise RuntimeError(
+                    f"collection alias batch mismatch for {namespace}: "
+                    f"planned {expected}, loaded {loaded}"
+                )
+            for _, stats in entries.values():
+                stats.collection_aliases_added += 1
+            collection_count += loaded
+        logger.info(
+            "report alias batch flush: %d sequence, %d collection aliases in %.2fs",
+            sequence_count,
+            collection_count,
+            time.monotonic() - started,
+        )
 
 
 def add_aliases_for_row(
-    store: RefgetStore,
+    aliases: ReportAliasAccumulator,
     row: dict[str, str],
     namespace: str,
     name_to_digest: dict[str, str],
@@ -529,7 +627,7 @@ def add_aliases_for_row(
     """Add supported aliases from one NCBI assembly-report row.
 
     Args:
-        store: RefgetStore receiving sequence aliases.
+        aliases: Accumulator receiving planned sequence aliases.
         row: Parsed NCBI assembly-report row.
         namespace: Assembly namespace for sequence-name and UCSC aliases.
         name_to_digest: RefSeq accession-to-digest mapping for the source FASTA.
@@ -570,31 +668,29 @@ def add_aliases_for_row(
     # spelling seqrepo uses for its assembly namespaces, distinct from the UCSC
     # "chr1"/"chrM" form. Add it so seqrepo-style lookups (GRCh38:1) resolve.
     if seq_name and seq_name.lower() not in NA_VALUES:
-        add_unique_alias(store, namespace, seq_name, digest, stats)
+        aliases.add_sequence(namespace, seq_name, digest, stats)
     if ucsc_name and ucsc_name.lower() not in NA_VALUES:
-        add_unique_alias(store, namespace, ucsc_name, digest, stats)
+        aliases.add_sequence(namespace, ucsc_name, digest, stats)
     if genbank_ac and genbank_ac.lower() not in NA_VALUES:
-        add_unique_alias(store, namespace, genbank_ac, digest, stats)
-        add_unique_alias(store, "insdc", genbank_ac, digest, stats)
-    add_unique_alias(store, "refseq", refseq_ac, digest, stats)
+        aliases.add_sequence(namespace, genbank_ac, digest, stats)
+        aliases.add_sequence("insdc", genbank_ac, digest, stats)
+    aliases.add_sequence("refseq", refseq_ac, digest, stats)
 
 
 def add_collection_aliases(
-    store: RefgetStore,
+    aliases: ReportAliasAccumulator,
     report: AssemblyReport,
     collection_digest: str,
     stats: AssemblyStats,
 ) -> None:
     if report.refseq_assembly_accession:
-        store.add_collection_alias(
-            "refseq", report.refseq_assembly_accession, collection_digest
+        aliases.add_collection(
+            "refseq", report.refseq_assembly_accession, collection_digest, stats
         )
-        stats.collection_aliases_added += 1
     if report.genbank_assembly_accession:
-        store.add_collection_alias(
-            "insdc", report.genbank_assembly_accession, collection_digest
+        aliases.add_collection(
+            "insdc", report.genbank_assembly_accession, collection_digest, stats
         )
-        stats.collection_aliases_added += 1
 
 
 def ingest_assembly(
@@ -686,6 +782,7 @@ def apply_assembly_report(
     store: RefgetStore,
     context: DeferredAssemblyReport,
     report_only_name_to_digest: dict[str, str],
+    aliases: ReportAliasAccumulator,
 ) -> AssemblyStats:
     """Apply one parsed report, preserving collection-scoped resolution."""
     report = context.report
@@ -698,7 +795,7 @@ def apply_assembly_report(
 
     for row in report.rows:
         add_aliases_for_row(
-            store,
+            aliases,
             row,
             context.entry.namespace,
             name_to_digest,
@@ -707,7 +804,7 @@ def apply_assembly_report(
         )
 
     if context.collection_digest is not None:
-        add_collection_aliases(store, report, context.collection_digest, stats)
+        add_collection_aliases(aliases, report, context.collection_digest, stats)
 
     return stats
 
@@ -1049,18 +1146,27 @@ def run_build(args) -> int:
         if context.collection_digest is None
     ]
 
+    aliases = ReportAliasAccumulator(store)
+    planning_started = time.monotonic()
+
     # Collection-backed reports stay strictly scoped to their associated FASTA.
-    # Apply all of them first so later assemblies (notably GRCh37.p13) establish
-    # indexed RefSeq aliases that earlier report-only patches can reuse.
+    # Plan all of them first so later assemblies (notably GRCh37.p13) establish
+    # pending RefSeq aliases that earlier report-only patches can reuse.
     for context in collection_reports:
-        apply_assembly_report(store, context, {})
+        apply_assembly_report(store, context, {}, aliases)
 
     required_names = required_report_only_accessions(report_only_reports)
     report_only_name_to_digest = build_indexed_name_to_digest_map(
-        store, required_names
+        store, required_names, aliases
     )
     for context in report_only_reports:
-        apply_assembly_report(store, context, report_only_name_to_digest)
+        apply_assembly_report(
+            store, context, report_only_name_to_digest, aliases
+        )
+    logger.info(
+        "assembly report planning completed in %.2fs", time.monotonic() - planning_started
+    )
+    aliases.flush()
 
     # Preserve manifest ordering in the human-readable summary.
     all_stats.extend(context.stats for context in deferred_reports)
