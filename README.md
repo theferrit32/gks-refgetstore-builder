@@ -53,8 +53,11 @@ header names. The only runtime dependency is `gtars`.
     build.lock.json                # provenance lock for the most recent build (see below)
     verify_store.py                # post-build gtars self-checks (standalone)
     seqrepo_equivalence/           # optional backwards-compat check vs a seqrepo snapshot
+    RUNBOOK.md                     # reproducible run-record lifecycle and policies
+    runs/                          # compact historical manifests, summaries, logs, evidence
     downloads/                     # cached FASTA + assembly_report.txt (gitignored)
-    store/                         # output RefgetStore (gitignored)
+    store/                         # local output/playground RefgetStore (gitignored)
+    store.2026-07-22/              # preserved published store (local, gitignored)
 
 ## CLI
 
@@ -126,7 +129,7 @@ Exit code is non-zero on any failure, so `verify` is CI-friendly.
 
 ### `lock` — (re)generate a build lock without rebuilding
 
-    gks-refgetstore lock --from-log build_full.log   # -> ./build.lock.json
+    gks-refgetstore lock --from-log runs/YYYY-MM-DD-build/logs/build.log
 
 Reconstructs the file→collection mapping from a build log and re-hashes the
 cache, producing the same lock a full build would. Use it to backfill a lock
@@ -306,3 +309,20 @@ identifiers **despite storing identical sequence bytes**. This is caused by
 digest in seqrepo, while gtars computes `sha512t24u` directly from the raw
 FASTA bytes. The store's digest is correct per the GA4GH VRS specification.
 DNA sequences are not affected.
+
+## Published store, experiments, and run records
+
+The current published artifact is the preserved `store.2026-07-22/` build:
+1,213,617 sequences and 107 collections, uploaded at
+`theferrit32-public:theferrit32-public/refgetstore/2026-07-22`. Its authoritative
+manifest remains inside that store; the compact audit record is
+[`runs/2026-07-22-published-store/`](runs/2026-07-22-published-store/).
+
+The local `store/` may be a build target or experiment playground. It currently
+contains the isolated Ensembl release-116 genomic experiment and is explicitly
+**not publishable**; see
+[`runs/2026-07-23-ensembl-r116-genomic-experiment/`](runs/2026-07-23-ensembl-r116-genomic-experiment/).
+Do not infer publication status from the presence of a local store directory.
+
+Use [`RUNBOOK.md`](RUNBOOK.md) for new reproducible runs and browse
+[`runs/`](runs/) for retained historical evidence.

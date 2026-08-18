@@ -1,0 +1,61 @@
+{
+  "collection_digest": "oLfPx0NOBKKXMIngGeQ4YewtU4Ge_wKz",
+  "source_url": "https://ftp.ensembl.org/pub/release-116/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz",
+  "source_sha256": "d8c3af0094a7bba6125763bad779ec18a81483c739c6ed122094bdf86c187b92",
+  "counts": {
+    "baseline_digest_missing": 15,
+    "baseline_digest_present": 179,
+    "chromosome_grch38_name_different": 15,
+    "chromosome_grch38_name_same": 10,
+    "chromosome_records": 25,
+    "ensembl_alias_matches": 194,
+    "grch38_name_different": 15,
+    "grch38_name_same": 179,
+    "records": 194
+  },
+  "total_character_differences": 99,
+  "ensembl_to_grch38_substitutions": {
+    "N->B": 2,
+    "N->K": 8,
+    "N->M": 8,
+    "N->R": 27,
+    "N->S": 5,
+    "N->W": 14,
+    "N->Y": 35
+  },
+  "missing_from_baseline": [
+    "1",
+    "10",
+    "12",
+    "13",
+    "16",
+    "17",
+    "2",
+    "21",
+    "22",
+    "3",
+    "6",
+    "7",
+    "9",
+    "X",
+    "Y"
+  ],
+  "grch38_name_differences": [
+    "1",
+    "10",
+    "12",
+    "13",
+    "16",
+    "17",
+    "2",
+    "21",
+    "22",
+    "3",
+    "6",
+    "7",
+    "9",
+    "X",
+    "Y"
+  ],
+  "grch38_name_missing_examples": []
+}

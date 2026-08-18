@@ -1,0 +1,50 @@
+{
+  "schema": "gks-refgetstore-run/1",
+  "run_id": "2026-07-22-published-store",
+  "kind": "build-and-publication",
+  "title": "Published refget store build",
+  "status": "succeeded",
+  "timestamps": {
+    "build_utc": "2026-07-22T22:14:13.909546+00:00",
+    "upload_date": "2026-07-23"
+  },
+  "baseline_run_id": null,
+  "evidence": {
+    "quality": "captured",
+    "missing": ["exact build log", "exact verifier log", "exact upload log"]
+  },
+  "git": {
+    "commit": "dc04e5e285a4f8a294298d58fb2d5814adf4fe8a",
+    "dirty": false,
+    "status_text": "",
+    "diff_sha256": null,
+    "build_lock_git": {
+      "commit": "9a213c4d1227cdda8068fb140b54354b9ec8d03c",
+      "describe": "9a213c4-dirty",
+      "dirty": true
+    }
+  },
+  "tool_versions": {"gtars": "0.9.2"},
+  "commands": [],
+  "artifacts": [
+    {"role": "summary", "path": "README.md", "bytes": 1555, "sha256": "10e3380c86b7c45076608328c42a264c31ba176627d4cab76c5301fe63416d20"},
+    {"role": "published-manifest", "path": "published-manifest.json", "bytes": 9581, "sha256": "36be27a75988684a738d07527ab0bd5cc2f186a381fbce295d10ca0ac5b0c62a"},
+    {"role": "build-lock", "path": "build.lock.json", "bytes": 77955, "sha256": "cad153cc0080e3af2399f87be162478ff7fd80810bc213bd3c824b2552caaed7"}
+  ],
+  "result_summary": {
+    "store_sequences": 1213617,
+    "store_collections": 107,
+    "locked_inputs": 129,
+    "uploaded_objects": 1213754,
+    "uploaded_bytes": 5646134737
+  },
+  "validations": [
+    {"command": ["root-hash-comparison"], "outcome": "passed", "summary": "preserved clone root manifest and indexes matched"},
+    {"command": ["uv", "run", "python", "verify_store.py", "store.2026-07-22"], "outcome": "passed", "summary": "67/67"},
+    {"command": ["rclone", "check"], "outcome": "passed", "summary": "upload checksum verification; raw log missing"}
+  ],
+  "publication": {
+    "destination": "theferrit32-public:theferrit32-public/refgetstore/2026-07-22",
+    "manifest_sha256": "36be27a75988684a738d07527ab0bd5cc2f186a381fbce295d10ca0ac5b0c62a"
+  }
+}

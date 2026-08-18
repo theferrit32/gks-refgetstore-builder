@@ -1,0 +1,194 @@
+{
+  "schema": "refgetstore-manifest/1",
+  "upload_date": "2026-07-23",
+  "destination": "theferrit32-public:theferrit32-public/refgetstore/2026-07-22",
+  "repo": {
+    "name": "gks-refgetstore-builder",
+    "commit": "dc04e5e285a4f8a294298d58fb2d5814adf4fe8a",
+    "describe": "dc04e5e",
+    "dirty": false
+  },
+  "gtars_version": "0.9.2",
+  "object_count": 1213754,
+  "total_bytes": 5646134737,
+  "assemblies": [
+    {
+      "namespace": "GRCh38",
+      "fasta_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.26_GRCh38/GCF_000001405.26_GRCh38_genomic.fna.gz",
+      "report_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.26_GRCh38/GCF_000001405.26_GRCh38_assembly_report.txt"
+    },
+    {
+      "namespace": "GRCh38.p1",
+      "fasta_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.27_GRCh38.p1/GCF_000001405.27_GRCh38.p1_genomic.fna.gz",
+      "report_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.27_GRCh38.p1/GCF_000001405.27_GRCh38.p1_assembly_report.txt"
+    },
+    {
+      "namespace": "GRCh38.p2",
+      "fasta_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.28_GRCh38.p2/GCF_000001405.28_GRCh38.p2_genomic.fna.gz",
+      "report_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.28_GRCh38.p2/GCF_000001405.28_GRCh38.p2_assembly_report.txt"
+    },
+    {
+      "namespace": "GRCh38.p3",
+      "fasta_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.29_GRCh38.p3/GCF_000001405.29_GRCh38.p3_genomic.fna.gz",
+      "report_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.29_GRCh38.p3/GCF_000001405.29_GRCh38.p3_assembly_report.txt"
+    },
+    {
+      "namespace": "GRCh38.p4",
+      "fasta_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.30_GRCh38.p4/GCF_000001405.30_GRCh38.p4_genomic.fna.gz",
+      "report_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.30_GRCh38.p4/GCF_000001405.30_GRCh38.p4_assembly_report.txt"
+    },
+    {
+      "namespace": "GRCh38.p5",
+      "fasta_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.31_GRCh38.p5/GCF_000001405.31_GRCh38.p5_genomic.fna.gz",
+      "report_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.31_GRCh38.p5/GCF_000001405.31_GRCh38.p5_assembly_report.txt"
+    },
+    {
+      "namespace": "GRCh38.p6",
+      "fasta_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.32_GRCh38.p6/GCF_000001405.32_GRCh38.p6_genomic.fna.gz",
+      "report_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.32_GRCh38.p6/GCF_000001405.32_GRCh38.p6_assembly_report.txt"
+    },
+    {
+      "namespace": "GRCh38.p7",
+      "fasta_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.33_GRCh38.p7/GCF_000001405.33_GRCh38.p7_genomic.fna.gz",
+      "report_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.33_GRCh38.p7/GCF_000001405.33_GRCh38.p7_assembly_report.txt"
+    },
+    {
+      "namespace": "GRCh38.p8",
+      "fasta_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.34_GRCh38.p8/GCF_000001405.34_GRCh38.p8_genomic.fna.gz",
+      "report_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.34_GRCh38.p8/GCF_000001405.34_GRCh38.p8_assembly_report.txt"
+    },
+    {
+      "namespace": "GRCh38.p9",
+      "fasta_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.35_GRCh38.p9/GCF_000001405.35_GRCh38.p9_genomic.fna.gz",
+      "report_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.35_GRCh38.p9/GCF_000001405.35_GRCh38.p9_assembly_report.txt"
+    },
+    {
+      "namespace": "GRCh38.p10",
+      "fasta_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.36_GRCh38.p10/GCF_000001405.36_GRCh38.p10_genomic.fna.gz",
+      "report_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.36_GRCh38.p10/GCF_000001405.36_GRCh38.p10_assembly_report.txt"
+    },
+    {
+      "namespace": "GRCh38.p11",
+      "fasta_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.37_GRCh38.p11/GCF_000001405.37_GRCh38.p11_genomic.fna.gz",
+      "report_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.37_GRCh38.p11/GCF_000001405.37_GRCh38.p11_assembly_report.txt"
+    },
+    {
+      "namespace": "GRCh38.p12",
+      "fasta_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.38_GRCh38.p12/GCF_000001405.38_GRCh38.p12_genomic.fna.gz",
+      "report_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.38_GRCh38.p12/GCF_000001405.38_GRCh38.p12_assembly_report.txt"
+    },
+    {
+      "namespace": "GRCh38.p14",
+      "fasta_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_genomic.fna.gz",
+      "report_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_assembly_report.txt"
+    },
+    {
+      "namespace": "GRCh37",
+      "fasta_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.13_GRCh37/GCF_000001405.13_GRCh37_genomic.fna.gz",
+      "report_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.13_GRCh37/GCF_000001405.13_GRCh37_assembly_report.txt"
+    },
+    {
+      "namespace": "GRCh37.p2",
+      "fasta_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.14_GRCh37.p2/GCF_000001405.14_GRCh37.p2_genomic.fna.gz",
+      "report_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.14_GRCh37.p2/GCF_000001405.14_GRCh37.p2_assembly_report.txt"
+    },
+    {
+      "namespace": "GRCh37.p5",
+      "fasta_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.17_GRCh37.p5/GCF_000001405.17_GRCh37.p5_genomic.fna.gz",
+      "report_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.17_GRCh37.p5/GCF_000001405.17_GRCh37.p5_assembly_report.txt"
+    },
+    {
+      "namespace": "GRCh37.p9",
+      "fasta_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.21_GRCh37.p9/GCF_000001405.21_GRCh37.p9_genomic.fna.gz",
+      "report_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.21_GRCh37.p9/GCF_000001405.21_GRCh37.p9_assembly_report.txt"
+    },
+    {
+      "namespace": "GRCh37.p10",
+      "fasta_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.22_GRCh37.p10/GCF_000001405.22_GRCh37.p10_genomic.fna.gz",
+      "report_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.22_GRCh37.p10/GCF_000001405.22_GRCh37.p10_assembly_report.txt"
+    },
+    {
+      "namespace": "GRCh37.p11",
+      "fasta_url": null,
+      "report_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.23_GRCh37.p11/GCF_000001405.23_GRCh37.p11_assembly_report.txt"
+    },
+    {
+      "namespace": "GRCh37.p12",
+      "fasta_url": null,
+      "report_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.24_GRCh37.p12/GCF_000001405.24_GRCh37.p12_assembly_report.txt"
+    },
+    {
+      "namespace": "GRCh37.p13",
+      "fasta_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.25_GRCh37.p13/GCF_000001405.25_GRCh37.p13_genomic.fna.gz",
+      "report_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.25_GRCh37.p13/GCF_000001405.25_GRCh37.p13_assembly_report.txt"
+    }
+  ],
+  "seqsets": [
+    {
+      "name": "refseq_human_rna",
+      "namespace": "refseq",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "refseq_human_protein",
+      "namespace": "refseq",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "refseq_human_refseqgene",
+      "namespace": "refseq",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "refseq_history_grch38_rna",
+      "namespace": "refseq",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "refseq_history_grch38_protein",
+      "namespace": "refseq",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "ensembl_human_cdna",
+      "namespace": "ensembl",
+      "url_template": "https://ftp.ensembl.org/pub/release-113/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
+      "shard_range": null
+    },
+    {
+      "name": "ensembl_human_ncrna",
+      "namespace": "ensembl",
+      "url_template": "https://ftp.ensembl.org/pub/release-113/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
+      "shard_range": null
+    },
+    {
+      "name": "ensembl_human_pep",
+      "namespace": "ensembl",
+      "url_template": "https://ftp.ensembl.org/pub/release-113/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
+      "shard_range": null
+    },
+    {
+      "name": "ensembl_history_cdna",
+      "namespace": "ensembl",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "ensembl_history_ncrna",
+      "namespace": "ensembl",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "ensembl_history_pep",
+      "namespace": "ensembl",
+      "url_template": null,
+      "shard_range": null
+    }
+  ]
+}

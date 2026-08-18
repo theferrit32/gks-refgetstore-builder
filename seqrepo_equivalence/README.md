@@ -22,10 +22,15 @@ as a build defect.
   digesting and gtars does not — see the root README). Without this fixture those
   mismatches would be reported as *unexplained* and flip the verdict to fail.
   **This fixture corresponds to the biocommons seqrepo `2024-12-20` snapshot.**
+- `parity_membership.py` — emits the exhaustive digest-membership table and a
+  compact Markdown summary.
+- `probe_source_coverage.py` — measures candidate-source coverage against a
+  verifier gap table while caching compact accession lists.
 
 ## Usage
 
-Run from the repo root (defaults point at `../store` and the 2024-12-20 snapshot):
+Run from the repo root (defaults point at `./store`, the 2024-12-20 snapshot,
+and the July 2 run-record output paths):
 
     uv run python seqrepo_equivalence/verify_seqrepo_equivalence.py -v
 
@@ -36,3 +41,7 @@ Key flags (see `--help`): `--seqrepo PATH` (snapshot dir), `--store PATH`
 If you point this at a different seqrepo snapshot, regenerate
 `ensembl_known_divergent.txt` for that version — the set of `*`-divergent
 accessions can change between snapshots.
+
+Bulk `build_gaps.tsv` and `parity_by_digest.tsv` outputs are reproducible and
+ignored. Retain their schema, row count, byte size, SHA-256, and headline
+categories in the relevant run README rather than committing the tables.

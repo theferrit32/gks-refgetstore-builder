@@ -1,0 +1,8 @@
+# Local-only experiment: compare Ensembl release 116's unmasked human primary
+# assembly against the already-built RefgetStore. This intentionally does not
+# modify the repository's canonical sources.toml.
+
+[[seqset]]
+name = "ensembl_human_dna_primary_r116"
+namespace = "ensembl"
+url_template = "https://ftp.ensembl.org/pub/release-116/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz"

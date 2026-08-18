@@ -3,9 +3,8 @@
 /downloads*/
 *.part
 
-# Generated analysis artifacts (regenerable; large or machine-only).
-# build.lock.json and parity_summary.md are intentionally NOT ignored — they are
-# small, portable provenance/report records meant to be committed.
+# Legacy root-level generated artifacts (regenerable; large or machine-only).
+# Compact summaries belong in runs/ and are intentionally visible to Git.
 /build_full.log
 /parity_by_digest.tsv
 /parity_summary.md
@@ -13,6 +12,14 @@
 /seqrepo_equivalence_report.json
 /.probe_cache/
 sources.toml.bak.*
+
+# Run records are retained, but reproducible bulk tables/caches are not.
+/runs/**/parity_by_digest.tsv
+/runs/**/build_gaps.tsv
+/runs/**/.probe_cache/
+/runs/**/*.fasta
+/runs/**/*.fa
+/runs/**/*.fa.gz
 
 # Local-only working notes / one-off analysis (kept on disk, not part of the repo)
 /TODO.md

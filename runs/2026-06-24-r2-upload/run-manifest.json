@@ -1,0 +1,70 @@
+{
+  "schema": "gks-refgetstore-run/1",
+  "run_id": "2026-06-24-r2-upload",
+  "kind": "publication",
+  "title": "Cloudflare R2 store upload",
+  "status": "succeeded",
+  "timestamps": {
+    "executed_date": "2026-06-24",
+    "published_date": "2026-06-25"
+  },
+  "baseline_run_id": null,
+  "evidence": {
+    "quality": "reconstructed",
+    "missing": [
+      "raw upload log",
+      "exact start and finish timestamps",
+      "Git status and diff at execution time",
+      "generated upload manifest"
+    ]
+  },
+  "git": {
+    "commit": null,
+    "dirty": null,
+    "status_text": null,
+    "diff_sha256": null
+  },
+  "tool_versions": {
+    "rclone": "v1.74.3",
+    "gtars": "0.9.2"
+  },
+  "commands": [
+    {
+      "label": "live-upload",
+      "argv": ["./upload_store.sh", "--bucket", "theferrit32-public", "--transfers", "64", "--checkers", "64"],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": null,
+      "finished_utc": null,
+      "exit_code": 0,
+      "evidence_quality": "reconstructed"
+    }
+  ],
+  "artifacts": [
+    {
+      "role": "summary",
+      "path": "README.md",
+      "bytes": 938,
+      "sha256": "ab47be611eb0825bec829f02958f1bb1d82a2275be45b2335845c48c0d6bbd8c"
+    }
+  ],
+  "result_summary": {
+    "object_count": 783641,
+    "transfers": 64,
+    "checkers": 64,
+    "matching_files": 783641,
+    "differences": 0,
+    "public_url": "https://static.ferriter.dev/refgetstore/2026-06-24/"
+  },
+  "validations": [
+    {
+      "command": ["rclone", "check"],
+      "outcome": "passed",
+      "summary": "783,641 matching files; 0 differences",
+      "evidence_quality": "reconstructed"
+    }
+  ],
+  "publication": {
+    "destination": "theferrit32-public:theferrit32-public/refgetstore/2026-06-24",
+    "public_url": "https://static.ferriter.dev/refgetstore/2026-06-24/"
+  }
+}

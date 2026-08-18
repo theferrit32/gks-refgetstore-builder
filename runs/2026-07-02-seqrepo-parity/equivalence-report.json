@@ -1,0 +1,3195 @@
+{
+  "meta": {
+    "seqrepo_path": "/Users/kferrite/dev/data/seqrepo/2024-12-20",
+    "seqrepo_snapshot": "2024-12-20",
+    "store_path": "/Users/kferrite/dev/gks-refgetstore-builder/store",
+    "gtars_version": "0.9.2",
+    "known_divergent_file": "/Users/kferrite/dev/gks-refgetstore-builder/ensembl_known_divergent.txt",
+    "fail_on": "gaps",
+    "tool_version": "1.0"
+  },
+  "verdict": {
+    "backwards_compatible": false,
+    "criteria": {
+      "no_unexplained_digest_mismatches": false,
+      "no_missing_sequences_in_core_namespaces": false,
+      "no_alias_naming_gaps_in_core_namespaces": false
+    },
+    "fail_reasons": [
+      "10 unexplained digest mismatch(es) (core)",
+      "35774 missing sequence(s) in core namespaces (absent from build)",
+      "23723 alias-naming gap(s) in core namespaces (sequence present, alias string not resolvable \u2014 fix by adding alias spellings)"
+    ],
+    "warnings": {
+      "backfill_candidates": 119
+    },
+    "additional_namespaces": {
+      "alias_naming_gap": 185,
+      "sequence_missing": 332,
+      "note": "patch-ladder / legacy-assembly namespaces seqrepo exposes but the store does not; alias_naming_gap entries are cheap to close (sequence already present), sequence_missing need new sources."
+    }
+  },
+  "namespace_classification": {
+    "mapped": [
+      {
+        "seqrepo_ns": "NCBI",
+        "refget_ns": "refseq",
+        "seqrepo_count": 885113
+      },
+      {
+        "seqrepo_ns": "Ensembl",
+        "refget_ns": "ensembl",
+        "seqrepo_count": 388235
+      },
+      {
+        "seqrepo_ns": "GRCh38",
+        "refget_ns": "GRCh38",
+        "seqrepo_count": 910
+      },
+      {
+        "seqrepo_ns": "GRCh37.p13",
+        "refget_ns": "GRCh37.p13",
+        "seqrepo_count": 390
+      },
+      {
+        "seqrepo_ns": "GRCh37",
+        "refget_ns": "GRCh37",
+        "seqrepo_count": 184
+      }
+    ],
+    "expected_omit": [
+      {
+        "seqrepo_ns": "MD5",
+        "count": 1144093
+      },
+      {
+        "seqrepo_ns": "SEGUID",
+        "count": 1144093
+      },
+      {
+        "seqrepo_ns": "SHA1",
+        "count": 1144093
+      },
+      {
+        "seqrepo_ns": "VMC",
+        "count": 1144093
+      }
+    ],
+    "version_drift": [
+      {
+        "seqrepo_ns": "GRCh38.p10",
+        "count": 998
+      },
+      {
+        "seqrepo_ns": "GRCh38.p11",
+        "count": 998
+      },
+      {
+        "seqrepo_ns": "GRCh38.p8",
+        "count": 998
+      },
+      {
+        "seqrepo_ns": "GRCh38.p9",
+        "count": 998
+      },
+      {
+        "seqrepo_ns": "GRCh38.p12",
+        "count": 996
+      },
+      {
+        "seqrepo_ns": "GRCh38.p7",
+        "count": 980
+      },
+      {
+        "seqrepo_ns": "GRCh38.p6",
+        "count": 976
+      },
+      {
+        "seqrepo_ns": "GRCh38.p5",
+        "count": 972
+      },
+      {
+        "seqrepo_ns": "GRCh38.p4",
+        "count": 965
+      },
+      {
+        "seqrepo_ns": "GRCh38.p3",
+        "count": 949
+      },
+      {
+        "seqrepo_ns": "GRCh38.p2",
+        "count": 941
+      },
+      {
+        "seqrepo_ns": "GRCh38.p1",
+        "count": 926
+      },
+      {
+        "seqrepo_ns": "GRCh37.p12",
+        "count": 380
+      },
+      {
+        "seqrepo_ns": "GRCh37.p11",
+        "count": 373
+      },
+      {
+        "seqrepo_ns": "GRCh37.p10",
+        "count": 368
+      },
+      {
+        "seqrepo_ns": "GRCh37.p9",
+        "count": 338
+      },
+      {
+        "seqrepo_ns": "GRCh37.p5",
+        "count": 291
+      },
+      {
+        "seqrepo_ns": "GRCh37.p2",
+        "count": 256
+      },
+      {
+        "seqrepo_ns": "NCBI36",
+        "count": 149
+      },
+      {
+        "seqrepo_ns": "hs37d5",
+        "count": 86
+      },
+      {
+        "seqrepo_ns": "hs37-1kg",
+        "count": 84
+      },
+      {
+        "seqrepo_ns": "NCBI35",
+        "count": 26
+      },
+      {
+        "seqrepo_ns": "JRGv1",
+        "count": 25
+      },
+      {
+        "seqrepo_ns": "JRGv2",
+        "count": 25
+      },
+      {
+        "seqrepo_ns": "CHM1_1.1",
+        "count": 23
+      },
+      {
+        "seqrepo_ns": "NCBI34",
+        "count": 3
+      }
+    ],
+    "refget_only": [
+      "GRCh37.p10",
+      "GRCh37.p11",
+      "GRCh37.p12",
+      "GRCh37.p2",
+      "GRCh37.p5",
+      "GRCh37.p9",
+      "GRCh38.p1",
+      "GRCh38.p10",
+      "GRCh38.p11",
+      "GRCh38.p12",
+      "GRCh38.p14",
+      "GRCh38.p2",
+      "GRCh38.p3",
+      "GRCh38.p4",
+      "GRCh38.p5",
+      "GRCh38.p6",
+      "GRCh38.p7",
+      "GRCh38.p8",
+      "GRCh38.p9",
+      "insdc"
+    ],
+    "unrecognized": []
+  },
+  "alias_comparison": [
+    {
+      "seqrepo_ns": "NCBI",
+      "refget_ns": "refseq",
+      "group": "core",
+      "seqrepo_alias_count": 885113,
+      "refget_alias_count": 922649,
+      "common": 823713,
+      "matched": 823713,
+      "mismatch_total": 0,
+      "mismatch_explained": 0,
+      "mismatch_unexplained": 0,
+      "mismatch_by_cause": {},
+      "superseded_old_version": 2762,
+      "backfill_candidate": 5,
+      "alias_naming_gap": 23396,
+      "alias_naming_by_prefix": {
+        "XP_": 3602,
+        "XR_": 17981,
+        "XM_": 1459,
+        "NR_": 7,
+        "U43": 1,
+        "NP_": 302,
+        "NM_": 7,
+        "NC_": 37
+      },
+      "sequence_missing": 35237,
+      "sequence_missing_by_prefix": {
+        "XP_": 2408,
+        "XR_": 27218,
+        "XM_": 4869,
+        "NP_": 65,
+        "NM_": 8,
+        "NR_": 24,
+        "NG_": 43,
+        "U14": 1,
+        "NW_": 167,
+        "AC_": 25,
+        "NT_": 362,
+        "NC_": 47
+      },
+      "refget_only": 98936,
+      "examples_unexplained": [],
+      "examples_alias_naming": [
+        {
+          "alias": "XP_016855163.1",
+          "digest": "fb8LGfRjf3TsKPzsPaImnKVIxwnH0ZM8"
+        },
+        {
+          "alias": "XP_016855166.1",
+          "digest": "eXGqpqF3Gq3-XQtE6jYEntLvoRCObbVH"
+        },
+        {
+          "alias": "XP_016855196.1",
+          "digest": "j7gN0raceSzrWSK5LECmeTffks6fuo0H"
+        },
+        {
+          "alias": "XP_016855198.1",
+          "digest": "LQczk-gSQRXj9vJgDr5EWcWva3wGJV41"
+        },
+        {
+          "alias": "XP_016855213.1",
+          "digest": "SDHg8HM7euqqhBiLOUtx3daB7r-lSZ3q"
+        },
+        {
+          "alias": "XP_011547559.2",
+          "digest": "Pr46rjvEeGyvgd_of7P4cW5xSDKxDwEO"
+        },
+        {
+          "alias": "XP_011547574.1",
+          "digest": "1oRgIq9YovwwRy7KOdoa8RexMTFkJ-Nl"
+        },
+        {
+          "alias": "XP_016855240.1",
+          "digest": "Np_eD1TpI5dLnRO-p1fn6hyxPNceDoDn"
+        },
+        {
+          "alias": "XP_016855243.1",
+          "digest": "w7MoYL7k2RpyUhMo2ORolfBwHf-2G67P"
+        },
+        {
+          "alias": "XP_011547628.1",
+          "digest": "EFOsOfTGPJMtXQmjsIoVWLcP59HUKmM1"
+        },
+        {
+          "alias": "XP_003960174.1",
+          "digest": "bGGF9HdSqI71agO0eI5m0wLDamcv2iPU"
+        },
+        {
+          "alias": "XP_016855244.1",
+          "digest": "L9ZQb5F_oDmcgaavggAdrciv40SYGrpA"
+        },
+        {
+          "alias": "XP_006726435.1",
+          "digest": "NlB7bbkKxM6GFBhe6aAAN3iQ2rqZD_JX"
+        },
+        {
+          "alias": "XP_016855245.1",
+          "digest": "nlG0UpGF-sMePBC71Q8xRtTEdXSh1uiH"
+        },
+        {
+          "alias": "XP_016855246.1",
+          "digest": "nlG0UpGF-sMePBC71Q8xRtTEdXSh1uiH"
+        },
+        {
+          "alias": "XP_016855248.1",
+          "digest": "ybE5YmVULq4sIpmQMsZXFVXHX0YjrSDn"
+        },
+        {
+          "alias": "XP_016855257.1",
+          "digest": "c1aA_-JM9aKLaYzsfTGUOeyffLrf34p0"
+        },
+        {
+          "alias": "XP_016855259.1",
+          "digest": "U0T0PiA_cwhZKEzxs8Q_7pFeTNfiDYDY"
+        },
+        {
+          "alias": "XP_011507022.1",
+          "digest": "3nOoi8yrOoRbROsvTd8YcqRHI6MZB_Uv"
+        },
+        {
+          "alias": "XP_016855260.1",
+          "digest": "sB4f5zAyfTDSmXFdfFtl-o4vHDKDsEHn"
+        },
+        {
+          "alias": "XP_016855261.1",
+          "digest": "sB4f5zAyfTDSmXFdfFtl-o4vHDKDsEHn"
+        },
+        {
+          "alias": "XP_016855262.1",
+          "digest": "1uSVNbWkJznucC-MBlA1tsf1v86R4tKH"
+        },
+        {
+          "alias": "XP_016855264.1",
+          "digest": "V7XbByHRQJloHtwkbFEWyLqjICoKs8c0"
+        },
+        {
+          "alias": "XP_016855265.1",
+          "digest": "cuRY62tmwE99GtPzrVJ8z50Iro_MjEgQ"
+        },
+        {
+          "alias": "XP_011507227.1",
+          "digest": "CVdnnCzd6_2kIo-Att88wm7zPhJPlmaN"
+        },
+        {
+          "alias": "XP_011507228.1",
+          "digest": "_-5vxnR8Zq_SRkVoHsz3gXDteVgD0vdn"
+        },
+        {
+          "alias": "XP_016855292.1",
+          "digest": "RrhAl68SqKQ35JKGb5iiibe9J4oQdLTz"
+        },
+        {
+          "alias": "XP_003960325.1",
+          "digest": "j6LZQDo3hpbOGEePYLAzDt7WjB5W3rAh"
+        },
+        {
+          "alias": "XP_016855296.1",
+          "digest": "q-JFEFXvmlyoN8253AJ8DWWdzk9i7Hnb"
+        },
+        {
+          "alias": "XP_016855297.1",
+          "digest": "1EevZUWpvByFlMKIu4pylXnsVyKq1vWx"
+        },
+        {
+          "alias": "XP_011507280.1",
+          "digest": "1EevZUWpvByFlMKIu4pylXnsVyKq1vWx"
+        },
+        {
+          "alias": "XP_011507281.1",
+          "digest": "c8HqnluDadhVwzk7riTvZhtrECu7TLpS"
+        },
+        {
+          "alias": "XP_011507282.1",
+          "digest": "Fqqb-1VCC27O_bYFR96veoDD8Ldj_hK4"
+        },
+        {
+          "alias": "XP_011507286.1",
+          "digest": "hgNZX0FSrMmuw9aFluaLu2aydkSW7Fkx"
+        },
+        {
+          "alias": "XP_011507296.1",
+          "digest": "78BMe96rH6nfCco736WyQ5z7l0pw6dnd"
+        },
+        {
+          "alias": "XP_016855348.1",
+          "digest": "_4jgvivkiKcS45wSKMvXKtB8YNEW0wyq"
+        },
+        {
+          "alias": "XP_011547604.1",
+          "digest": "7ULQALxhb54dWqK0VJk7bcaNsb9Nu-2l"
+        },
+        {
+          "alias": "XP_016855349.1",
+          "digest": "QO2HlTib4jiIaQcArx4ZWR9jEFoJTo4w"
+        },
+        {
+          "alias": "XP_016855350.1",
+          "digest": "iIXKjz-Lnfyyj-2MJglr3JRxT0QHs0V4"
+        },
+        {
+          "alias": "XP_011547606.1",
+          "digest": "iIXKjz-Lnfyyj-2MJglr3JRxT0QHs0V4"
+        },
+        {
+          "alias": "XP_016855351.1",
+          "digest": "iIXKjz-Lnfyyj-2MJglr3JRxT0QHs0V4"
+        },
+        {
+          "alias": "XP_005276200.1",
+          "digest": "jysfRzchPXPfwaBx1EUrivVOeYdMO5Xm"
+        },
+        {
+          "alias": "XP_016855352.1",
+          "digest": "_j9u5yiZgZeJmXZnAG3W1Jy4VKoGL-t-"
+        },
+        {
+          "alias": "XP_011547607.1",
+          "digest": "QHaHjrTAjR-NI7tY678J5D81cfhH37ZK"
+        },
+        {
+          "alias": "XP_016855353.1",
+          "digest": "Yf28N0BBAaZ8nn8kllV3hXF_5-KUV5dT"
+        },
+        {
+          "alias": "XP_011547609.1",
+          "digest": "QHaHjrTAjR-NI7tY678J5D81cfhH37ZK"
+        },
+        {
+          "alias": "XP_016855354.1",
+          "digest": "b5jHTx91Tag_5JnS7yOfLAMJdQCVhJWs"
+        },
+        {
+          "alias": "XP_005276201.1",
+          "digest": "ezixuNvXgWUq33qt_d04vjU3QmvZn3gf"
+        },
+        {
+          "alias": "XP_011506960.1",
+          "digest": "QfGVRl6HEJ1WT_EL0CXCRW6AX204fP-E"
+        },
+        {
+          "alias": "XP_016855355.1",
+          "digest": "1vqAKaYFTze0_R4OMHOoX_lbbFn5bOCm"
+        }
+      ],
+      "examples_sequence_missing": [
+        "XP_016855170.1",
+        "XP_016855181.1",
+        "XP_016855191.1",
+        "XP_016855197.1",
+        "XP_016855199.1",
+        "XP_016855200.1",
+        "XP_016855211.1",
+        "XP_016855241.1",
+        "XP_006726395.1",
+        "XP_016855242.1",
+        "XP_016855247.1",
+        "XP_016855253.1",
+        "XP_016855258.1",
+        "XP_016855263.1",
+        "XP_011507277.1",
+        "XP_016855295.1",
+        "XP_006726394.1",
+        "XP_011507023.1",
+        "XP_016855397.1",
+        "XP_016854924.1",
+        "XP_016854925.1",
+        "XP_016854927.1",
+        "XP_016854928.1",
+        "XP_016854929.1",
+        "XP_011547619.1",
+        "XP_011547626.1",
+        "XP_016854931.1",
+        "XP_016854932.1",
+        "XP_016854933.1",
+        "XP_016854935.1",
+        "XP_011547644.1",
+        "XP_011547646.1",
+        "XP_011547648.1",
+        "XP_011547649.1",
+        "XP_016854936.1",
+        "XP_016854940.1",
+        "XP_016854942.1",
+        "XP_016854943.1",
+        "XP_016854944.1",
+        "XP_016854945.1",
+        "XP_016854946.1",
+        "XP_016854947.1",
+        "XP_016854948.1",
+        "XP_016854949.1",
+        "XP_016854950.1",
+        "XP_011547617.1",
+        "XP_016854956.1",
+        "XP_016854957.1",
+        "XP_011547661.1",
+        "XP_006726580.1"
+      ],
+      "examples_backfill": [
+        {
+          "alias": "NT_113914.2",
+          "refget_versions": [
+            1
+          ]
+        },
+        {
+          "alias": "NT_167212.2",
+          "refget_versions": [
+            1
+          ]
+        },
+        {
+          "alias": "NT_167231.2",
+          "refget_versions": [
+            1
+          ]
+        },
+        {
+          "alias": "NT_167227.2",
+          "refget_versions": [
+            1
+          ]
+        },
+        {
+          "alias": "NT_113961.2",
+          "refget_versions": [
+            1
+          ]
+        }
+      ],
+      "backwards_compat_coverage_pct": 93.3751
+    },
+    {
+      "seqrepo_ns": "Ensembl",
+      "refget_ns": "ensembl",
+      "group": "core",
+      "seqrepo_alias_count": 388235,
+      "refget_alias_count": 945525,
+      "common": 386610,
+      "matched": 386484,
+      "mismatch_total": 126,
+      "mismatch_explained": 116,
+      "mismatch_unexplained": 10,
+      "mismatch_by_cause": {
+        "star_normalization": 115,
+        "unexplained": 10,
+        "sequence_divergence": 1
+      },
+      "superseded_old_version": 647,
+      "backfill_candidate": 114,
+      "alias_naming_gap": 327,
+      "alias_naming_by_prefix": {
+        "11": 1,
+        "14": 1,
+        "15": 1,
+        "18": 1,
+        "19": 1,
+        "20": 1,
+        "4": 1,
+        "5": 1,
+        "8": 1,
+        "ENSP": 86,
+        "ENST": 62,
+        "GL0": 16,
+        "KI2": 153,
+        "MT": 1
+      },
+      "sequence_missing": 537,
+      "sequence_missing_by_prefix": {
+        "1": 1,
+        "10": 1,
+        "12": 1,
+        "13": 1,
+        "16": 1,
+        "17": 1,
+        "2": 1,
+        "21": 1,
+        "22": 1,
+        "3": 1,
+        "6": 1,
+        "7": 1,
+        "9": 1,
+        "CHR": 445,
+        "ENSP": 2,
+        "ENST": 75,
+        "X": 1,
+        "Y": 1
+      },
+      "refget_only": 558915,
+      "examples_unexplained": [
+        {
+          "alias": "ENSP00000451021.1",
+          "seqrepo_seq_id": "VnnP9ZTDmH2CY-tOehETnHzziq-Ms0qa",
+          "refget_digest": "hQF-OqwxjBvPO43kqNXfqOzP8G2vbsLH"
+        },
+        {
+          "alias": "ENSP00000476098.1",
+          "seqrepo_seq_id": "jeupCPPCzacZ_fmGgI1Ip2yfI-QaU9K6",
+          "refget_digest": "zM2TXaNDDLu5jFrhmco6oZDsJ6qiYl-1"
+        },
+        {
+          "alias": "ENSP00000477259.2",
+          "seqrepo_seq_id": "AlKSb7ywKLef2uY_oqJ97OqTeZ1Cdb1D",
+          "refget_digest": "SzZa7T9y81S_V8iQp9RnpbnKshXX9IHp"
+        },
+        {
+          "alias": "ENSP00000477337.1",
+          "seqrepo_seq_id": "gCLtrTaPqIUARJyFgb1TnOEz7mac5jbz",
+          "refget_digest": "_wV4yeODv_mvKf7Pv_g7XFfqsSnrCHEx"
+        },
+        {
+          "alias": "ENSP00000485054.1",
+          "seqrepo_seq_id": "deuhrWuuXf0fQha94RlMVQNi9BPpGkmf",
+          "refget_digest": "tMZ1QXJ-vWLAhYtH7-Uv7tiX_W88fJ7g"
+        },
+        {
+          "alias": "ENSP00000486888.2",
+          "seqrepo_seq_id": "Uhse8S3k-XBeIPbPXz5x-_flwvP5kPYK",
+          "refget_digest": "PQ6ycTCyYrIBULXsVcK89xCKAavhf2E6"
+        },
+        {
+          "alias": "ENSP00000489972.1",
+          "seqrepo_seq_id": "8GXnHJnzM4bpecz5wdlWcxk38y-j10CV",
+          "refget_digest": "aZkLljE1pZ0XBN9lBwwydaB_WQWiX1qK"
+        },
+        {
+          "alias": "ENSP00000493593.1",
+          "seqrepo_seq_id": "PDvgg4f6gNX3wM3NfuafXffVKD43GkDD",
+          "refget_digest": "cIf5wYEAf3fsqjj-xOojFTQD_VEvCwNy"
+        },
+        {
+          "alias": "ENSP00000495001.1",
+          "seqrepo_seq_id": "44cdV1l2G6BWpXAzYPfVFsPe76t7waOZ",
+          "refget_digest": "6yy--Re5vHBqNaIve00jHy5CY-jXTsnD"
+        },
+        {
+          "alias": "ENSP00000497463.1",
+          "seqrepo_seq_id": "IeaSGc-UAr5ZmuG8Ymn-jksBUhsgmR7-",
+          "refget_digest": "66OMvJ2UKJ2Hu5PC_aqPfE6boMWLXElt"
+        }
+      ],
+      "examples_alias_naming": [
+        {
+          "alias": "11",
+          "digest": "2NkFm8HK88MqeNkCgj78KidCAXgnsfV1"
+        },
+        {
+          "alias": "14",
+          "digest": "eK4D2MosgK_ivBkgi6FVPg5UXs1bYESm"
+        },
+        {
+          "alias": "15",
+          "digest": "AsXvWL1-2i5U_buw6_niVIxD6zTbAuS6"
+        },
+        {
+          "alias": "18",
+          "digest": "vWwFhJ5lQDMhh-czg06YtlWqu0lvFAZV"
+        },
+        {
+          "alias": "19",
+          "digest": "IIB53T8CNeJJdUqzn9V_JnRtQadwWCbl"
+        },
+        {
+          "alias": "20",
+          "digest": "-A1QmD_MatoqxvgVxBLZTONHz9-c7nQo"
+        },
+        {
+          "alias": "4",
+          "digest": "HxuclGHh0XCDuF8x6yQrpHUBL7ZntAHc"
+        },
+        {
+          "alias": "5",
+          "digest": "aUiQCzCPZ2d0csHbMSbh2NzInhonSXwI"
+        },
+        {
+          "alias": "8",
+          "digest": "209Z7zJ-mFypBEWLk4rNC6S_OxY5p7bs"
+        },
+        {
+          "alias": "ENSP00000492262.1",
+          "digest": "iQHS-B7PKZToP0Qc_spupzRoql6gw8LW"
+        },
+        {
+          "alias": "ENSP00000492535.1",
+          "digest": "ATCh3Tgtpbtpk-Tek6QNYfVDFWpxI5Qc"
+        },
+        {
+          "alias": "ENSP00000493589.1",
+          "digest": "A8YTYnOg1LKmpXQmoe7iCy326rAuLk_j"
+        },
+        {
+          "alias": "ENSP00000495767.1",
+          "digest": "Q2XXrqdumokPkrCo2nV7Kd2uwEG91G5s"
+        },
+        {
+          "alias": "ENSP00000496762.1",
+          "digest": "Ic8QekR9L4uG3rPLUC_uyhkoXMpbA8ak"
+        },
+        {
+          "alias": "ENSP00000498241.1",
+          "digest": "Oyn0lbZ0jhCHnaczI4Gv62YHHYqXfLgy"
+        },
+        {
+          "alias": "ENSP00000498251.1",
+          "digest": "VZ3765KKd10ghi1rJhbB4oHcRS4abgTQ"
+        },
+        {
+          "alias": "ENSP00000498266.1",
+          "digest": "Q2XXrqdumokPkrCo2nV7Kd2uwEG91G5s"
+        },
+        {
+          "alias": "ENSP00000498330.1",
+          "digest": "2XeNr0kQeK4FquJkXIzGnodnUmeOkggD"
+        },
+        {
+          "alias": "ENSP00000498379.1",
+          "digest": "TwfL04LebmFWufDt64Vm5HVVwfn_UoNg"
+        },
+        {
+          "alias": "ENSP00000498403.1",
+          "digest": "-LaFMNcme-XU68YhuZA2PEbHTvg1Uz_S"
+        },
+        {
+          "alias": "ENSP00000498429.1",
+          "digest": "SnrHqTmYH5MuTciSujzublPFKHaDjpXl"
+        },
+        {
+          "alias": "ENSP00000498437.1",
+          "digest": "4BIH801YtsY1IbcXtConQfJ4Sxu0_Uiu"
+        },
+        {
+          "alias": "ENSP00000498442.1",
+          "digest": "tm6iYOFToyoEPKZHssoCbsGPNY2E80xJ"
+        },
+        {
+          "alias": "ENSP00000498468.1",
+          "digest": "qYDathHNAv2ury6Quq4DXbavbCwwsz9V"
+        },
+        {
+          "alias": "ENSP00000498490.1",
+          "digest": "yaBDjr-ss_kTcFtRn-OlwX4zFL_6mS3v"
+        },
+        {
+          "alias": "ENSP00000498506.1",
+          "digest": "-kGzEDGOHnmssAFWLIr29k4mSXom9yss"
+        },
+        {
+          "alias": "ENSP00000498521.1",
+          "digest": "VdbrWo_hL_RslufF1DsIxqEXCTlHeSd2"
+        },
+        {
+          "alias": "ENSP00000498522.1",
+          "digest": "xQmFJekLJ4AyS0Vgd97MfG9ooLtYwZfr"
+        },
+        {
+          "alias": "ENSP00000498556.1",
+          "digest": "-TZxJPP49Y-6AHv-qepwJ9wHC31_KT-M"
+        },
+        {
+          "alias": "ENSP00000498561.1",
+          "digest": "qWAHvU4CJK1cniPuUfwUkw9UjaTM8Iv4"
+        },
+        {
+          "alias": "ENSP00000498569.1",
+          "digest": "JXtsYTiz_FDNsyNBbM5Plc1-CoO_KE_x"
+        },
+        {
+          "alias": "ENSP00000498647.1",
+          "digest": "HtrZH9XY9Du0ppUp5b7iFEPwudbBGic8"
+        },
+        {
+          "alias": "ENSP00000498750.1",
+          "digest": "ldhU5o0sIRxubnVezJE0ne-eOBmdBPDV"
+        },
+        {
+          "alias": "ENSP00000498753.1",
+          "digest": "8voXwM_qQ31O_ZtY67T65u2TDEV7a1sd"
+        },
+        {
+          "alias": "ENSP00000498772.1",
+          "digest": "agEGj-WaG9Mb9ebudY7Nir5Fj2AfY6kc"
+        },
+        {
+          "alias": "ENSP00000498783.1",
+          "digest": "TpSfEr9cVNup4PwT5CzTLb3mjEQOtqDM"
+        },
+        {
+          "alias": "ENSP00000498791.1",
+          "digest": "7PQtatMhtITWWbSuH_7jqUp3uBzLLZSI"
+        },
+        {
+          "alias": "ENSP00000498807.1",
+          "digest": "NQ2U4xjk_4gimjouImH5x08ragD7HRvW"
+        },
+        {
+          "alias": "ENSP00000498820.1",
+          "digest": "mXU_uJE8B0SIVCYLVzCP5Q-fsk8CR3Xu"
+        },
+        {
+          "alias": "ENSP00000498822.1",
+          "digest": "n3RGk1iZXVR8WG_giQ2oC6Qehh03Drg3"
+        },
+        {
+          "alias": "ENSP00000498855.1",
+          "digest": "QzFohT73lFucFKclUGNi14uVUaf9Poj5"
+        },
+        {
+          "alias": "ENSP00000498856.1",
+          "digest": "H3Xne1CcfPqgghV1a770b7217tOjRtU9"
+        },
+        {
+          "alias": "ENSP00000498888.1",
+          "digest": "3kVSyWLWcbnCEYfWK1QN9hbIeYHtJrdV"
+        },
+        {
+          "alias": "ENSP00000498891.1",
+          "digest": "0fHZYNzG01zeXY-zgEhcr9-SVjlRRD-b"
+        },
+        {
+          "alias": "ENSP00000498909.1",
+          "digest": "YOENf3Ybc9--ZWDJ17YUz_fKADaq-8-8"
+        },
+        {
+          "alias": "ENSP00000498943.1",
+          "digest": "uVHcIybrIp0pyDog8jY2j2p1_60YaG1E"
+        },
+        {
+          "alias": "ENSP00000498949.1",
+          "digest": "zgq_r1Qw70NjbBg3FM8W3oiMY7YlJW5w"
+        },
+        {
+          "alias": "ENSP00000498958.1",
+          "digest": "gutaR1is664VvXbjoQn4oJIMztp1U2CO"
+        },
+        {
+          "alias": "ENSP00000498960.1",
+          "digest": "MEWb_g2JWXfX52gr2Kca93D4h3DuASbY"
+        },
+        {
+          "alias": "ENSP00000498962.1",
+          "digest": "B-jmpkraV_7O3a3XamBlpD_d_GtmfwX9"
+        }
+      ],
+      "examples_sequence_missing": [
+        "1",
+        "10",
+        "12",
+        "13",
+        "16",
+        "17",
+        "2",
+        "21",
+        "22",
+        "3",
+        "6",
+        "7",
+        "9",
+        "CHR_HG107_PATCH",
+        "CHR_HG109_PATCH",
+        "CHR_HG126_PATCH",
+        "CHR_HG1277_PATCH",
+        "CHR_HG1296_PATCH",
+        "CHR_HG1298_PATCH",
+        "CHR_HG1299_PATCH",
+        "CHR_HG1309_PATCH",
+        "CHR_HG1311_PATCH",
+        "CHR_HG1320_PATCH",
+        "CHR_HG1342_HG2282_PATCH",
+        "CHR_HG1362_PATCH",
+        "CHR_HG1384_PATCH",
+        "CHR_HG1395_PATCH",
+        "CHR_HG1398_PATCH",
+        "CHR_HG142_HG150_NOVEL_TEST",
+        "CHR_HG1445_PATCH",
+        "CHR_HG1466_PATCH",
+        "CHR_HG1485_PATCH",
+        "CHR_HG1506_PATCH",
+        "CHR_HG1507_PATCH",
+        "CHR_HG1509_PATCH",
+        "CHR_HG151_NOVEL_TEST",
+        "CHR_HG1521_PATCH",
+        "CHR_HG1523_PATCH",
+        "CHR_HG1524_PATCH",
+        "CHR_HG1531_PATCH",
+        "CHR_HG1535_PATCH",
+        "CHR_HG1651_PATCH",
+        "CHR_HG1708_PATCH",
+        "CHR_HG1815_PATCH",
+        "CHR_HG1817_1_PATCH",
+        "CHR_HG1832_PATCH",
+        "CHR_HG1_PATCH",
+        "CHR_HG2002_PATCH",
+        "CHR_HG2021_PATCH",
+        "CHR_HG2022_PATCH"
+      ],
+      "examples_backfill": [
+        {
+          "alias": "ENSP00000281474.6",
+          "refget_versions": [
+            5
+          ]
+        },
+        {
+          "alias": "ENSP00000364371.4",
+          "refget_versions": [
+            3
+          ]
+        },
+        {
+          "alias": "ENSP00000367046.4",
+          "refget_versions": [
+            3
+          ]
+        },
+        {
+          "alias": "ENSP00000369140.6",
+          "refget_versions": [
+            5
+          ]
+        },
+        {
+          "alias": "ENSP00000419020.2",
+          "refget_versions": [
+            1
+          ]
+        },
+        {
+          "alias": "ENSP00000421359.2",
+          "refget_versions": [
+            1
+          ]
+        },
+        {
+          "alias": "ENSP00000441973.2",
+          "refget_versions": [
+            1
+          ]
+        },
+        {
+          "alias": "ENSP00000452633.2",
+          "refget_versions": [
+            1
+          ]
+        },
+        {
+          "alias": "ENSP00000453580.2",
+          "refget_versions": [
+            1
+          ]
+        },
+        {
+          "alias": "ENSP00000456201.2",
+          "refget_versions": [
+            1
+          ]
+        },
+        {
+          "alias": "ENSP00000468007.2",
+          "refget_versions": [
+            1
+          ]
+        },
+        {
+          "alias": "ENSP00000476412.2",
+          "refget_versions": [
+            1
+          ]
+        },
+        {
+          "alias": "ENSP00000479510.2",
+          "refget_versions": [
+            1
+          ]
+        },
+        {
+          "alias": "ENSP00000483981.2",
+          "refget_versions": [
+            1
+          ]
+        },
+        {
+          "alias": "ENSP00000486290.2",
+          "refget_versions": [
+            1
+          ]
+        },
+        {
+          "alias": "ENSP00000486444.2",
+          "refget_versions": [
+            1
+          ]
+        },
+        {
+          "alias": "ENSP00000495781.2",
+          "refget_versions": [
+            1
+          ]
+        },
+        {
+          "alias": "ENST00000035383.10",
+          "refget_versions": [
+            9
+          ]
+        },
+        {
+          "alias": "ENST00000062104.4",
+          "refget_versions": [
+            3
+          ]
+        },
+        {
+          "alias": "ENST00000205890.11",
+          "refget_versions": [
+            9,
+            10
+          ]
+        },
+        {
+          "alias": "ENST00000262888.9",
+          "refget_versions": [
+            7,
+            8
+          ]
+        },
+        {
+          "alias": "ENST00000263816.8",
+          "refget_versions": [
+            7
+          ]
+        },
+        {
+          "alias": "ENST00000267540.3",
+          "refget_versions": [
+            2
+          ]
+        },
+        {
+          "alias": "ENST00000278559.8",
+          "refget_versions": [
+            7
+          ]
+        },
+        {
+          "alias": "ENST00000281474.10",
+          "refget_versions": [
+            9
+          ]
+        },
+        {
+          "alias": "ENST00000290846.9",
+          "refget_versions": [
+            8
+          ]
+        },
+        {
+          "alias": "ENST00000302463.11",
+          "refget_versions": [
+            10
+          ]
+        },
+        {
+          "alias": "ENST00000311322.10",
+          "refget_versions": [
+            8,
+            9
+          ]
+        },
+        {
+          "alias": "ENST00000313478.12",
+          "refget_versions": [
+            11
+          ]
+        },
+        {
+          "alias": "ENST00000320354.6",
+          "refget_versions": [
+            5
+          ]
+        },
+        {
+          "alias": "ENST00000331789.11",
+          "refget_versions": [
+            9,
+            10
+          ]
+        },
+        {
+          "alias": "ENST00000356192.8",
+          "refget_versions": [
+            6,
+            7
+          ]
+        },
+        {
+          "alias": "ENST00000361112.7",
+          "refget_versions": [
+            6
+          ]
+        },
+        {
+          "alias": "ENST00000366688.5",
+          "refget_versions": [
+            4
+          ]
+        },
+        {
+          "alias": "ENST00000368695.6",
+          "refget_versions": [
+            5
+          ]
+        },
+        {
+          "alias": "ENST00000370690.8",
+          "refget_versions": [
+            7
+          ]
+        },
+        {
+          "alias": "ENST00000371265.6",
+          "refget_versions": [
+            4,
+            5
+          ]
+        },
+        {
+          "alias": "ENST00000372389.8",
+          "refget_versions": [
+            7
+          ]
+        },
+        {
+          "alias": "ENST00000373186.9",
+          "refget_versions": [
+            8
+          ]
+        },
+        {
+          "alias": "ENST00000374059.8",
+          "refget_versions": [
+            7
+          ]
+        },
+        {
+          "alias": "ENST00000374098.7",
+          "refget_versions": [
+            6
+          ]
+        },
+        {
+          "alias": "ENST00000375223.5",
+          "refget_versions": [
+            4
+          ]
+        },
+        {
+          "alias": "ENST00000377113.6",
+          "refget_versions": [
+            5
+          ]
+        },
+        {
+          "alias": "ENST00000377113.7",
+          "refget_versions": [
+            5
+          ]
+        },
+        {
+          "alias": "ENST00000377617.8",
+          "refget_versions": [
+            7
+          ]
+        },
+        {
+          "alias": "ENST00000377815.5",
+          "refget_versions": [
+            4
+          ]
+        },
+        {
+          "alias": "ENST00000378062.6",
+          "refget_versions": [
+            5
+          ]
+        },
+        {
+          "alias": "ENST00000379812.10",
+          "refget_versions": [
+            9
+          ]
+        },
+        {
+          "alias": "ENST00000380299.4",
+          "refget_versions": [
+            3
+          ]
+        },
+        {
+          "alias": "ENST00000393688.8",
+          "refget_versions": [
+            7
+          ]
+        }
+      ],
+      "backwards_compat_coverage_pct": 99.7455
+    },
+    {
+      "seqrepo_ns": "GRCh38",
+      "refget_ns": "GRCh38",
+      "group": "core",
+      "seqrepo_alias_count": 910,
+      "refget_alias_count": 1365,
+      "common": 910,
+      "matched": 910,
+      "mismatch_total": 0,
+      "mismatch_explained": 0,
+      "mismatch_unexplained": 0,
+      "mismatch_by_cause": {},
+      "superseded_old_version": 0,
+      "backfill_candidate": 0,
+      "alias_naming_gap": 0,
+      "alias_naming_by_prefix": {},
+      "sequence_missing": 0,
+      "sequence_missing_by_prefix": {},
+      "refget_only": 455,
+      "examples_unexplained": [],
+      "examples_alias_naming": [],
+      "examples_sequence_missing": [],
+      "examples_backfill": [],
+      "backwards_compat_coverage_pct": 100.0
+    },
+    {
+      "seqrepo_ns": "GRCh37",
+      "refget_ns": "GRCh37",
+      "group": "core",
+      "seqrepo_alias_count": 184,
+      "refget_alias_count": 276,
+      "common": 184,
+      "matched": 184,
+      "mismatch_total": 0,
+      "mismatch_explained": 0,
+      "mismatch_unexplained": 0,
+      "mismatch_by_cause": {},
+      "superseded_old_version": 0,
+      "backfill_candidate": 0,
+      "alias_naming_gap": 0,
+      "alias_naming_by_prefix": {},
+      "sequence_missing": 0,
+      "sequence_missing_by_prefix": {},
+      "refget_only": 92,
+      "examples_unexplained": [],
+      "examples_alias_naming": [],
+      "examples_sequence_missing": [],
+      "examples_backfill": [],
+      "backwards_compat_coverage_pct": 100.0
+    },
+    {
+      "seqrepo_ns": "GRCh37.p13",
+      "refget_ns": "GRCh37.p13",
+      "group": "core",
+      "seqrepo_alias_count": 390,
+      "refget_alias_count": 687,
+      "common": 390,
+      "matched": 390,
+      "mismatch_total": 0,
+      "mismatch_explained": 0,
+      "mismatch_unexplained": 0,
+      "mismatch_by_cause": {},
+      "superseded_old_version": 0,
+      "backfill_candidate": 0,
+      "alias_naming_gap": 0,
+      "alias_naming_by_prefix": {},
+      "sequence_missing": 0,
+      "sequence_missing_by_prefix": {},
+      "refget_only": 297,
+      "examples_unexplained": [],
+      "examples_alias_naming": [],
+      "examples_sequence_missing": [],
+      "examples_backfill": [],
+      "backwards_compat_coverage_pct": 100.0
+    },
+    {
+      "seqrepo_ns": "GRCh38.p10",
+      "refget_ns": "GRCh38.p10",
+      "group": "additional",
+      "seqrepo_alias_count": 998,
+      "refget_alias_count": 1565,
+      "common": 996,
+      "matched": 996,
+      "mismatch_total": 0,
+      "mismatch_explained": 0,
+      "mismatch_unexplained": 0,
+      "mismatch_by_cause": {},
+      "superseded_old_version": 0,
+      "backfill_candidate": 0,
+      "alias_naming_gap": 0,
+      "alias_naming_by_prefix": {},
+      "sequence_missing": 2,
+      "sequence_missing_by_prefix": {
+        "HG1": 2
+      },
+      "refget_only": 569,
+      "examples_unexplained": [],
+      "examples_alias_naming": [],
+      "examples_sequence_missing": [
+        "HG107_PATCH",
+        "HG1311_PATCH"
+      ],
+      "examples_backfill": [],
+      "backwards_compat_coverage_pct": 99.7996
+    },
+    {
+      "seqrepo_ns": "GRCh38.p11",
+      "refget_ns": "GRCh38.p11",
+      "group": "additional",
+      "seqrepo_alias_count": 998,
+      "refget_alias_count": 1607,
+      "common": 996,
+      "matched": 996,
+      "mismatch_total": 0,
+      "mismatch_explained": 0,
+      "mismatch_unexplained": 0,
+      "mismatch_by_cause": {},
+      "superseded_old_version": 0,
+      "backfill_candidate": 0,
+      "alias_naming_gap": 0,
+      "alias_naming_by_prefix": {},
+      "sequence_missing": 2,
+      "sequence_missing_by_prefix": {
+        "HG1": 2
+      },
+      "refget_only": 611,
+      "examples_unexplained": [],
+      "examples_alias_naming": [],
+      "examples_sequence_missing": [
+        "HG107_PATCH",
+        "HG1311_PATCH"
+      ],
+      "examples_backfill": [],
+      "backwards_compat_coverage_pct": 99.7996
+    },
+    {
+      "seqrepo_ns": "GRCh38.p8",
+      "refget_ns": "GRCh38.p8",
+      "group": "additional",
+      "seqrepo_alias_count": 998,
+      "refget_alias_count": 1537,
+      "common": 996,
+      "matched": 996,
+      "mismatch_total": 0,
+      "mismatch_explained": 0,
+      "mismatch_unexplained": 0,
+      "mismatch_by_cause": {},
+      "superseded_old_version": 0,
+      "backfill_candidate": 0,
+      "alias_naming_gap": 0,
+      "alias_naming_by_prefix": {},
+      "sequence_missing": 2,
+      "sequence_missing_by_prefix": {
+        "HG1": 2
+      },
+      "refget_only": 541,
+      "examples_unexplained": [],
+      "examples_alias_naming": [],
+      "examples_sequence_missing": [
+        "HG107_PATCH",
+        "HG1311_PATCH"
+      ],
+      "examples_backfill": [],
+      "backwards_compat_coverage_pct": 99.7996
+    },
+    {
+      "seqrepo_ns": "GRCh38.p9",
+      "refget_ns": "GRCh38.p9",
+      "group": "additional",
+      "seqrepo_alias_count": 998,
+      "refget_alias_count": 1553,
+      "common": 996,
+      "matched": 996,
+      "mismatch_total": 0,
+      "mismatch_explained": 0,
+      "mismatch_unexplained": 0,
+      "mismatch_by_cause": {},
+      "superseded_old_version": 0,
+      "backfill_candidate": 0,
+      "alias_naming_gap": 0,
+      "alias_naming_by_prefix": {},
+      "sequence_missing": 2,
+      "sequence_missing_by_prefix": {
+        "HG1": 2
+      },
+      "refget_only": 557,
+      "examples_unexplained": [],
+      "examples_alias_naming": [],
+      "examples_sequence_missing": [
+        "HG107_PATCH",
+        "HG1311_PATCH"
+      ],
+      "examples_backfill": [],
+      "backwards_compat_coverage_pct": 99.7996
+    },
+    {
+      "seqrepo_ns": "GRCh38.p12",
+      "refget_ns": "GRCh38.p12",
+      "group": "additional",
+      "seqrepo_alias_count": 996,
+      "refget_alias_count": 1638,
+      "common": 994,
+      "matched": 994,
+      "mismatch_total": 0,
+      "mismatch_explained": 0,
+      "mismatch_unexplained": 0,
+      "mismatch_by_cause": {},
+      "superseded_old_version": 0,
+      "backfill_candidate": 0,
+      "alias_naming_gap": 0,
+      "alias_naming_by_prefix": {},
+      "sequence_missing": 2,
+      "sequence_missing_by_prefix": {
+        "HG1": 2
+      },
+      "refget_only": 644,
+      "examples_unexplained": [],
+      "examples_alias_naming": [],
+      "examples_sequence_missing": [
+        "HG107_PATCH",
+        "HG1311_PATCH"
+      ],
+      "examples_backfill": [],
+      "backwards_compat_coverage_pct": 99.7992
+    },
+    {
+      "seqrepo_ns": "GRCh38.p7",
+      "refget_ns": "GRCh38.p7",
+      "group": "additional",
+      "seqrepo_alias_count": 980,
+      "refget_alias_count": 1501,
+      "common": 978,
+      "matched": 978,
+      "mismatch_total": 0,
+      "mismatch_explained": 0,
+      "mismatch_unexplained": 0,
+      "mismatch_by_cause": {},
+      "superseded_old_version": 0,
+      "backfill_candidate": 0,
+      "alias_naming_gap": 0,
+      "alias_naming_by_prefix": {},
+      "sequence_missing": 2,
+      "sequence_missing_by_prefix": {
+        "HG1": 2
+      },
+      "refget_only": 523,
+      "examples_unexplained": [],
+      "examples_alias_naming": [],
+      "examples_sequence_missing": [
+        "HG107_PATCH",
+        "HG1311_PATCH"
+      ],
+      "examples_backfill": [],
+      "backwards_compat_coverage_pct": 99.7959
+    },
+    {
+      "seqrepo_ns": "GRCh38.p6",
+      "refget_ns": "GRCh38.p6",
+      "group": "additional",
+      "seqrepo_alias_count": 976,
+      "refget_alias_count": 1493,
+      "common": 974,
+      "matched": 974,
+      "mismatch_total": 0,
+      "mismatch_explained": 0,
+      "mismatch_unexplained": 0,
+      "mismatch_by_cause": {},
+      "superseded_old_version": 0,
+      "backfill_candidate": 0,
+      "alias_naming_gap": 0,
+      "alias_naming_by_prefix": {},
+      "sequence_missing": 2,
+      "sequence_missing_by_prefix": {
+        "HG1": 2
+      },
+      "refget_only": 519,
+      "examples_unexplained": [],
+      "examples_alias_naming": [],
+      "examples_sequence_missing": [
+        "HG107_PATCH",
+        "HG1311_PATCH"
+      ],
+      "examples_backfill": [],
+      "backwards_compat_coverage_pct": 99.7951
+    },
+    {
+      "seqrepo_ns": "GRCh38.p5",
+      "refget_ns": "GRCh38.p5",
+      "group": "additional",
+      "seqrepo_alias_count": 972,
+      "refget_alias_count": 1489,
+      "common": 972,
+      "matched": 972,
+      "mismatch_total": 0,
+      "mismatch_explained": 0,
+      "mismatch_unexplained": 0,
+      "mismatch_by_cause": {},
+      "superseded_old_version": 0,
+      "backfill_candidate": 0,
+      "alias_naming_gap": 0,
+      "alias_naming_by_prefix": {},
+      "sequence_missing": 0,
+      "sequence_missing_by_prefix": {},
+      "refget_only": 517,
+      "examples_unexplained": [],
+      "examples_alias_naming": [],
+      "examples_sequence_missing": [],
+      "examples_backfill": [],
+      "backwards_compat_coverage_pct": 100.0
+    },
+    {
+      "seqrepo_ns": "GRCh38.p4",
+      "refget_ns": "GRCh38.p4",
+      "group": "additional",
+      "seqrepo_alias_count": 965,
+      "refget_alias_count": 1475,
+      "common": 965,
+      "matched": 965,
+      "mismatch_total": 0,
+      "mismatch_explained": 0,
+      "mismatch_unexplained": 0,
+      "mismatch_by_cause": {},
+      "superseded_old_version": 0,
+      "backfill_candidate": 0,
+      "alias_naming_gap": 0,
+      "alias_naming_by_prefix": {},
+      "sequence_missing": 0,
+      "sequence_missing_by_prefix": {},
+      "refget_only": 510,
+      "examples_unexplained": [],
+      "examples_alias_naming": [],
+      "examples_sequence_missing": [],
+      "examples_backfill": [],
+      "backwards_compat_coverage_pct": 100.0
+    },
+    {
+      "seqrepo_ns": "GRCh38.p3",
+      "refget_ns": "GRCh38.p3",
+      "group": "additional",
+      "seqrepo_alias_count": 949,
+      "refget_alias_count": 1443,
+      "common": 949,
+      "matched": 949,
+      "mismatch_total": 0,
+      "mismatch_explained": 0,
+      "mismatch_unexplained": 0,
+      "mismatch_by_cause": {},
+      "superseded_old_version": 0,
+      "backfill_candidate": 0,
+      "alias_naming_gap": 0,
+      "alias_naming_by_prefix": {},
+      "sequence_missing": 0,
+      "sequence_missing_by_prefix": {},
+      "refget_only": 494,
+      "examples_unexplained": [],
+      "examples_alias_naming": [],
+      "examples_sequence_missing": [],
+      "examples_backfill": [],
+      "backwards_compat_coverage_pct": 100.0
+    },
+    {
+      "seqrepo_ns": "GRCh38.p2",
+      "refget_ns": "GRCh38.p2",
+      "group": "additional",
+      "seqrepo_alias_count": 941,
+      "refget_alias_count": 1427,
+      "common": 941,
+      "matched": 941,
+      "mismatch_total": 0,
+      "mismatch_explained": 0,
+      "mismatch_unexplained": 0,
+      "mismatch_by_cause": {},
+      "superseded_old_version": 0,
+      "backfill_candidate": 0,
+      "alias_naming_gap": 0,
+      "alias_naming_by_prefix": {},
+      "sequence_missing": 0,
+      "sequence_missing_by_prefix": {},
+      "refget_only": 486,
+      "examples_unexplained": [],
+      "examples_alias_naming": [],
+      "examples_sequence_missing": [],
+      "examples_backfill": [],
+      "backwards_compat_coverage_pct": 100.0
+    },
+    {
+      "seqrepo_ns": "GRCh38.p1",
+      "refget_ns": "GRCh38.p1",
+      "group": "additional",
+      "seqrepo_alias_count": 926,
+      "refget_alias_count": 1397,
+      "common": 926,
+      "matched": 926,
+      "mismatch_total": 0,
+      "mismatch_explained": 0,
+      "mismatch_unexplained": 0,
+      "mismatch_by_cause": {},
+      "superseded_old_version": 0,
+      "backfill_candidate": 0,
+      "alias_naming_gap": 0,
+      "alias_naming_by_prefix": {},
+      "sequence_missing": 0,
+      "sequence_missing_by_prefix": {},
+      "refget_only": 471,
+      "examples_unexplained": [],
+      "examples_alias_naming": [],
+      "examples_sequence_missing": [],
+      "examples_backfill": [],
+      "backwards_compat_coverage_pct": 100.0
+    },
+    {
+      "seqrepo_ns": "GRCh37.p12",
+      "refget_ns": "GRCh37.p12",
+      "group": "additional",
+      "seqrepo_alias_count": 380,
+      "refget_alias_count": 637,
+      "common": 365,
+      "matched": 365,
+      "mismatch_total": 0,
+      "mismatch_explained": 0,
+      "mismatch_unexplained": 0,
+      "mismatch_by_cause": {},
+      "superseded_old_version": 0,
+      "backfill_candidate": 0,
+      "alias_naming_gap": 0,
+      "alias_naming_by_prefix": {},
+      "sequence_missing": 15,
+      "sequence_missing_by_prefix": {
+        "HG1": 6,
+        "HG4": 3,
+        "HG3": 2,
+        "HSCH": 1,
+        "HG7": 2,
+        "HG9": 1
+      },
+      "refget_only": 272,
+      "examples_unexplained": [],
+      "examples_alias_naming": [],
+      "examples_sequence_missing": [
+        "HG1292_PATCH",
+        "HG1472_PATCH",
+        "HG418_PATCH",
+        "HG122_PATCH",
+        "HG344_PATCH",
+        "HG1595_PATCH",
+        "HG417_PATCH",
+        "HSCHR17_1_CTG1",
+        "HG745_PATCH",
+        "HG987_PATCH",
+        "HG385_PATCH",
+        "HG730_PATCH",
+        "HG480_HG481_PATCH",
+        "HG1497_PATCH",
+        "HG1459_PATCH"
+      ],
+      "examples_backfill": [],
+      "backwards_compat_coverage_pct": 96.0526
+    },
+    {
+      "seqrepo_ns": "GRCh37.p11",
+      "refget_ns": "GRCh37.p11",
+      "group": "additional",
+      "seqrepo_alias_count": 373,
+      "refget_alias_count": 623,
+      "common": 358,
+      "matched": 358,
+      "mismatch_total": 0,
+      "mismatch_explained": 0,
+      "mismatch_unexplained": 0,
+      "mismatch_by_cause": {},
+      "superseded_old_version": 0,
+      "backfill_candidate": 0,
+      "alias_naming_gap": 0,
+      "alias_naming_by_prefix": {},
+      "sequence_missing": 15,
+      "sequence_missing_by_prefix": {
+        "HG1": 6,
+        "HG4": 3,
+        "HG3": 2,
+        "HSCH": 1,
+        "HG7": 2,
+        "HG9": 1
+      },
+      "refget_only": 265,
+      "examples_unexplained": [],
+      "examples_alias_naming": [],
+      "examples_sequence_missing": [
+        "HG1292_PATCH",
+        "HG1472_PATCH",
+        "HG418_PATCH",
+        "HG122_PATCH",
+        "HG344_PATCH",
+        "HG417_PATCH",
+        "HSCHR17_1_CTG1",
+        "HG745_PATCH",
+        "HG987_PATCH",
+        "HG385_PATCH",
+        "HG730_PATCH",
+        "HG480_HG481_PATCH",
+        "HG1497_PATCH",
+        "HG1426_PATCH",
+        "HG1459_PATCH"
+      ],
+      "examples_backfill": [],
+      "backwards_compat_coverage_pct": 95.9786
+    },
+    {
+      "seqrepo_ns": "GRCh37.p10",
+      "refget_ns": "GRCh37.p10",
+      "group": "additional",
+      "seqrepo_alias_count": 368,
+      "refget_alias_count": 609,
+      "common": 351,
+      "matched": 351,
+      "mismatch_total": 0,
+      "mismatch_explained": 0,
+      "mismatch_unexplained": 0,
+      "mismatch_by_cause": {},
+      "superseded_old_version": 0,
+      "backfill_candidate": 0,
+      "alias_naming_gap": 0,
+      "alias_naming_by_prefix": {},
+      "sequence_missing": 17,
+      "sequence_missing_by_prefix": {
+        "HG1": 8,
+        "HG4": 3,
+        "HG3": 1,
+        "HSCH": 2,
+        "HG7": 2,
+        "HG9": 1
+      },
+      "refget_only": 258,
+      "examples_unexplained": [],
+      "examples_alias_naming": [],
+      "examples_sequence_missing": [
+        "HG1287_PATCH",
+        "HG1292_PATCH",
+        "HG1472_PATCH",
+        "HG418_PATCH",
+        "HG122_PATCH",
+        "HG344_PATCH",
+        "HG417_PATCH",
+        "HSCHR17_1_CTG1",
+        "HG745_PATCH",
+        "HG987_PATCH",
+        "HG730_PATCH",
+        "HSCHR22_1_CTG1",
+        "HG480_HG481_PATCH",
+        "HG1497_PATCH",
+        "HG1426_PATCH",
+        "HG1436_HG1432_PATCH",
+        "HG1459_PATCH"
+      ],
+      "examples_backfill": [],
+      "backwards_compat_coverage_pct": 95.3804
+    },
+    {
+      "seqrepo_ns": "GRCh37.p9",
+      "refget_ns": "GRCh37.p9",
+      "group": "additional",
+      "seqrepo_alias_count": 338,
+      "refget_alias_count": 555,
+      "common": 324,
+      "matched": 324,
+      "mismatch_total": 0,
+      "mismatch_explained": 0,
+      "mismatch_unexplained": 0,
+      "mismatch_by_cause": {},
+      "superseded_old_version": 0,
+      "backfill_candidate": 0,
+      "alias_naming_gap": 0,
+      "alias_naming_by_prefix": {},
+      "sequence_missing": 14,
+      "sequence_missing_by_prefix": {
+        "HG1": 5,
+        "HG4": 2,
+        "HG3": 1,
+        "HSCH": 2,
+        "HG7": 2,
+        "HG9": 1,
+        "HG6": 1
+      },
+      "refget_only": 231,
+      "examples_unexplained": [],
+      "examples_alias_naming": [],
+      "examples_sequence_missing": [
+        "HG1287_PATCH",
+        "HG1292_PATCH",
+        "HG418_PATCH",
+        "HG122_PATCH",
+        "HG344_PATCH",
+        "HSCHR17_1_CTG1",
+        "HG745_PATCH",
+        "HG987_PATCH",
+        "HG730_PATCH",
+        "HSCHR22_1_CTG1",
+        "HG480_HG481_PATCH",
+        "HG681_PATCH",
+        "HG1253_PATCH",
+        "HG1426_PATCH"
+      ],
+      "examples_backfill": [],
+      "backwards_compat_coverage_pct": 95.858
+    },
+    {
+      "seqrepo_ns": "GRCh37.p5",
+      "refget_ns": "GRCh37.p5",
+      "group": "additional",
+      "seqrepo_alias_count": 291,
+      "refget_alias_count": 463,
+      "common": 278,
+      "matched": 278,
+      "mismatch_total": 0,
+      "mismatch_explained": 0,
+      "mismatch_unexplained": 0,
+      "mismatch_by_cause": {},
+      "superseded_old_version": 0,
+      "backfill_candidate": 0,
+      "alias_naming_gap": 0,
+      "alias_naming_by_prefix": {},
+      "sequence_missing": 13,
+      "sequence_missing_by_prefix": {
+        "HSCH": 6,
+        "HG1": 2,
+        "HG7": 2,
+        "HG9": 1,
+        "HG5": 1,
+        "HG4": 1
+      },
+      "refget_only": 185,
+      "examples_unexplained": [],
+      "examples_alias_naming": [],
+      "examples_sequence_missing": [
+        "HSCHR2_2_CTG12",
+        "HSCHR7_1_CTG6",
+        "HG142_HG150_HG151_PATCH",
+        "HSCHR12_3_CTG2_1",
+        "HSCHR17_1_CTG1",
+        "HG745_PATCH",
+        "HG987_PATCH",
+        "HG730_PATCH",
+        "HSCHR19_2_CTG3",
+        "HG1000_2_PATCH",
+        "HG506_HG1000_1_PATCH",
+        "HSCHR22_1_CTG1",
+        "HG480_HG481_PATCH"
+      ],
+      "examples_backfill": [],
+      "backwards_compat_coverage_pct": 95.5326
+    },
+    {
+      "seqrepo_ns": "GRCh37.p2",
+      "refget_ns": "GRCh37.p2",
+      "group": "additional",
+      "seqrepo_alias_count": 256,
+      "refget_alias_count": 403,
+      "common": 248,
+      "matched": 248,
+      "mismatch_total": 0,
+      "mismatch_explained": 0,
+      "mismatch_unexplained": 0,
+      "mismatch_by_cause": {},
+      "superseded_old_version": 0,
+      "backfill_candidate": 0,
+      "alias_naming_gap": 0,
+      "alias_naming_by_prefix": {},
+      "sequence_missing": 8,
+      "sequence_missing_by_prefix": {
+        "HSCH": 6,
+        "HG7": 1,
+        "HG9": 1
+      },
+      "refget_only": 155,
+      "examples_unexplained": [],
+      "examples_alias_naming": [],
+      "examples_sequence_missing": [
+        "HSCHR5_1_CTG1",
+        "HSCHR7_1_CTG6",
+        "HSCHR12_3_CTG2_1",
+        "HSCHR17_1_CTG1",
+        "HG745_PATCH",
+        "HG987_PATCH",
+        "HSCHR19_2_CTG3",
+        "HSCHR22_1_CTG1"
+      ],
+      "examples_backfill": [],
+      "backwards_compat_coverage_pct": 96.875
+    },
+    {
+      "seqrepo_ns": "NCBI36",
+      "refget_ns": "NCBI36",
+      "group": "additional",
+      "seqrepo_alias_count": 149,
+      "refget_alias_count": 0,
+      "common": 0,
+      "matched": 0,
+      "mismatch_total": 0,
+      "mismatch_explained": 0,
+      "mismatch_unexplained": 0,
+      "mismatch_by_cause": {},
+      "superseded_old_version": 0,
+      "backfill_candidate": 0,
+      "alias_naming_gap": 19,
+      "alias_naming_by_prefix": {
+        "Hs1": 9,
+        "Hs4": 3,
+        "Hs7": 1,
+        "Hs8": 2,
+        "Hs9": 3,
+        "Hs2": 1
+      },
+      "sequence_missing": 130,
+      "sequence_missing_by_prefix": {
+        "1": 1,
+        "chr": 24,
+        "2": 1,
+        "3": 1,
+        "4": 1,
+        "5": 1,
+        "6": 1,
+        "7": 1,
+        "8": 1,
+        "9": 1,
+        "10": 1,
+        "11": 1,
+        "12": 1,
+        "13": 1,
+        "14": 1,
+        "15": 1,
+        "16": 1,
+        "17": 1,
+        "18": 1,
+        "19": 1,
+        "20": 1,
+        "21": 1,
+        "22": 1,
+        "X": 1,
+        "chrX": 1,
+        "Y": 1,
+        "chrY": 1,
+        "Hs1": 32,
+        "Hs2": 12,
+        "Hs3": 4,
+        "Hs4": 2,
+        "Hs5": 3,
+        "Hs6": 9,
+        "Hs7": 2,
+        "Hs8": 6,
+        "Hs9": 4,
+        "HsX": 5,
+        "NG_": 1
+      },
+      "refget_only": 0,
+      "examples_unexplained": [],
+      "examples_alias_naming": [
+        {
+          "alias": "Hs1_111597_36",
+          "digest": "aX54PSRCZbj0EVn5QAH4zoO72gsmSTO8"
+        },
+        {
+          "alias": "Hs4_111604_36",
+          "digest": "be3_RQlT0dXc4jYLkbEiRC6HSl7u1FjF"
+        },
+        {
+          "alias": "Hs4_111607_36",
+          "digest": "WyYCLC4VxJvbBz2b_wBWF5BdQotiUVdB"
+        },
+        {
+          "alias": "Hs4_111608_36",
+          "digest": "sdL1gDzRGFP-F9sMKtNLSRAnQ-BC84H-"
+        },
+        {
+          "alias": "Hs7_111620_36",
+          "digest": "2LEWMcieZGf9Sx4VpEeWSDcULUVHGm0w"
+        },
+        {
+          "alias": "Hs8_111626_36",
+          "digest": "KHkBYmlg-UJaE9sUI912zBlzdGD2BBEF"
+        },
+        {
+          "alias": "Hs8_111628_36",
+          "digest": "ogs0_fByd3Mv6KgbGnhjdlP8-XQkfLm1"
+        },
+        {
+          "alias": "Hs9_111630_36",
+          "digest": "II3F2oT0mk0KjciIUvziQtHOquqc8_Pg"
+        },
+        {
+          "alias": "Hs9_111633_36",
+          "digest": "eGGFNElJYIEvmIdJSxYMOtJwtAeQjUAh"
+        },
+        {
+          "alias": "Hs9_111634_36",
+          "digest": "3IMtzIioR9P6hmwAcLFbjPrLHm8n-jZQ"
+        },
+        {
+          "alias": "Hs13_111642_36",
+          "digest": "RTZguWq8pXb7TU5HcvH7YTN7eWEU8kR2"
+        },
+        {
+          "alias": "Hs17_111649_36",
+          "digest": "lsaxkE65UUVeSsgF_1bgSpZODAKAXif6"
+        },
+        {
+          "alias": "Hs17_111660_36",
+          "digest": "sT2ZnJrlmZM-p20GfB8qMm_LRJSIyc7E"
+        },
+        {
+          "alias": "Hs17_111662_36",
+          "digest": "QdTT6dkTK-BiF9fSf4WNxYgT32IpMFeD"
+        },
+        {
+          "alias": "Hs17_111664_36",
+          "digest": "nXpYhtwAqXo65qRsbeHbRb9VXWj3HQD9"
+        },
+        {
+          "alias": "Hs18_111666_36",
+          "digest": "kpcAjK5AhEhFRhV_U86hPlA5oj2E5sny"
+        },
+        {
+          "alias": "Hs19_111667_36",
+          "digest": "xg302f-VLyLkkjPMrv8ejUHv4XrETznB"
+        },
+        {
+          "alias": "Hs19_111668_36",
+          "digest": "ANF6sM4plNAk7nPg1K58Vpx7N0nVtAgU"
+        },
+        {
+          "alias": "Hs22_111680_36",
+          "digest": "traI0om_Wa_tb8BBRkxI1Mpp4gx8TgHs"
+        }
+      ],
+      "examples_sequence_missing": [
+        "1",
+        "chr1",
+        "2",
+        "chr2",
+        "3",
+        "chr3",
+        "4",
+        "chr4",
+        "5",
+        "chr5",
+        "6",
+        "chr6",
+        "7",
+        "chr7",
+        "8",
+        "chr8",
+        "9",
+        "chr9",
+        "10",
+        "chr10",
+        "11",
+        "chr11",
+        "12",
+        "chr12",
+        "13",
+        "chr13",
+        "14",
+        "chr14",
+        "15",
+        "chr15",
+        "16",
+        "chr16",
+        "17",
+        "chr17",
+        "18",
+        "chr18",
+        "19",
+        "chr19",
+        "20",
+        "chr20",
+        "21",
+        "chr21",
+        "22",
+        "chr22",
+        "X",
+        "chrX",
+        "Y",
+        "chrY",
+        "Hs1_111589_36",
+        "Hs1_111590_36"
+      ],
+      "examples_backfill": [],
+      "backwards_compat_coverage_pct": 0.0
+    },
+    {
+      "seqrepo_ns": "hs37d5",
+      "refget_ns": "hs37d5",
+      "group": "additional",
+      "seqrepo_alias_count": 86,
+      "refget_alias_count": 0,
+      "common": 0,
+      "matched": 0,
+      "mismatch_total": 0,
+      "mismatch_explained": 0,
+      "mismatch_unexplained": 0,
+      "mismatch_by_cause": {},
+      "superseded_old_version": 0,
+      "backfill_candidate": 0,
+      "alias_naming_gap": 83,
+      "alias_naming_by_prefix": {
+        "1": 1,
+        "2": 1,
+        "3": 1,
+        "4": 1,
+        "5": 1,
+        "6": 1,
+        "7": 1,
+        "8": 1,
+        "9": 1,
+        "10": 1,
+        "11": 1,
+        "12": 1,
+        "13": 1,
+        "14": 1,
+        "15": 1,
+        "16": 1,
+        "17": 1,
+        "18": 1,
+        "19": 1,
+        "20": 1,
+        "21": 1,
+        "22": 1,
+        "X": 1,
+        "MT": 1,
+        "GL0": 59
+      },
+      "sequence_missing": 3,
+      "sequence_missing_by_prefix": {
+        "Y": 1,
+        "NC_": 1,
+        "hs3": 1
+      },
+      "refget_only": 0,
+      "examples_unexplained": [],
+      "examples_alias_naming": [
+        {
+          "alias": "1",
+          "digest": "S_KjnFVz-FE7M0W6yoaUDgYxLPc1jyWU"
+        },
+        {
+          "alias": "2",
+          "digest": "9KdcA9ZpY1Cpvxvg8bMSLYDUpsX6GDLO"
+        },
+        {
+          "alias": "3",
+          "digest": "VNBualIltAyi2AI_uXcKU7M9XUOuA7MS"
+        },
+        {
+          "alias": "4",
+          "digest": "iy7Zfceb5_VGtTQzJ-v5JpPbpeifHD_V"
+        },
+        {
+          "alias": "5",
+          "digest": "vbjOdMfHJvTjK_nqvFvpaSKhZillW0SX"
+        },
+        {
+          "alias": "6",
+          "digest": "KqaUhJMW3CDjhoVtBetdEKT1n6hM-7Ek"
+        },
+        {
+          "alias": "7",
+          "digest": "IW78mgV5Cqf6M24hy52hPjyyo5tCCd86"
+        },
+        {
+          "alias": "8",
+          "digest": "tTm7wmhz0G4lpt8wPspcNkAD_qiminj6"
+        },
+        {
+          "alias": "9",
+          "digest": "HBckYGQ4wYG9APHLpjoQ9UUe9v7NxExt"
+        },
+        {
+          "alias": "10",
+          "digest": "-BOZ8Esn8J88qDwNiSEwUr5425UXdiGX"
+        },
+        {
+          "alias": "11",
+          "digest": "XXi2_O1ly-CCOi3HP5TypAw7LtC6niFG"
+        },
+        {
+          "alias": "12",
+          "digest": "105bBysLoDFQHhajooTAUyUkNiZ8LJEH"
+        },
+        {
+          "alias": "13",
+          "digest": "Ewb9qlgTqN6e_XQiRVYpoUfZJHXeiUfH"
+        },
+        {
+          "alias": "14",
+          "digest": "5Ji6FGEKfejK1U6BMScqrdKJK8GqmIGf"
+        },
+        {
+          "alias": "15",
+          "digest": "zIMZb3Ft7RdWa5XYq0PxIlezLY2ccCgt"
+        },
+        {
+          "alias": "16",
+          "digest": "W6wLoIFOn4G7cjopxPxYNk2lcEqhLQFb"
+        },
+        {
+          "alias": "17",
+          "digest": "AjWXsI7AkTK35XW9pgd3UbjpC3MAevlz"
+        },
+        {
+          "alias": "18",
+          "digest": "BTj4BDaaHYoPhD3oY2GdwC_l0uqZ92UD"
+        },
+        {
+          "alias": "19",
+          "digest": "ItRDD47aMoioDCNW_occY5fWKZBKlxCX"
+        },
+        {
+          "alias": "20",
+          "digest": "iy_UbUrvECxFRX5LPTH_KPojdlT7BKsf"
+        },
+        {
+          "alias": "21",
+          "digest": "LpTaNW-hwuY_yARP0rtarCnpCQLkgVCg"
+        },
+        {
+          "alias": "22",
+          "digest": "XOgHwwR3Upfp5sZYk6ZKzvV25a4RBVu8"
+        },
+        {
+          "alias": "X",
+          "digest": "v7noePfnNpK8ghYXEqZ9NukMXW7YeNsm"
+        },
+        {
+          "alias": "MT",
+          "digest": "k3grVkjY-hoWcCUojHw6VU6GE3MZ8Sct"
+        },
+        {
+          "alias": "GL000207.1",
+          "digest": "kpcAjK5AhEhFRhV_U86hPlA5oj2E5sny"
+        },
+        {
+          "alias": "GL000226.1",
+          "digest": "rJFy652rJMoL5PqH-PiqrJ1zpHc4uUiz"
+        },
+        {
+          "alias": "GL000229.1",
+          "digest": "du5ydl6l4jzenxq6QSdajUIV_trdW9-J"
+        },
+        {
+          "alias": "GL000231.1",
+          "digest": "7C__QM-xdQ4U_VbZNyLKqaCmq1alAsAw"
+        },
+        {
+          "alias": "GL000210.1",
+          "digest": "Lew6ZNRWZcBW8KaqScUV0HTyFU_qDGXS"
+        },
+        {
+          "alias": "GL000239.1",
+          "digest": "IZlunX_aR7RX1WJKyZM0cnKFW4YY6dzi"
+        },
+        {
+          "alias": "GL000235.1",
+          "digest": "YPOeiq_9uTtIsMUja9AqKO_NbDm91yuZ"
+        },
+        {
+          "alias": "GL000201.1",
+          "digest": "II3F2oT0mk0KjciIUvziQtHOquqc8_Pg"
+        },
+        {
+          "alias": "GL000247.1",
+          "digest": "IFj5Y607NHkMgQJKUZEi_j5bH6qKs53k"
+        },
+        {
+          "alias": "GL000245.1",
+          "digest": "GD1VIV3PDw_fJDLkPQ2E0AuiQ7d-FGLn"
+        },
+        {
+          "alias": "GL000197.1",
+          "digest": "KHkBYmlg-UJaE9sUI912zBlzdGD2BBEF"
+        },
+        {
+          "alias": "GL000203.1",
+          "digest": "sT2ZnJrlmZM-p20GfB8qMm_LRJSIyc7E"
+        },
+        {
+          "alias": "GL000246.1",
+          "digest": "TiBSRh_dGfiWea48SOQEhMsNzy0LnzaK"
+        },
+        {
+          "alias": "GL000249.1",
+          "digest": "uoSgKLeuWYiGisqvYYO1S7nhczOt1cv7"
+        },
+        {
+          "alias": "GL000196.1",
+          "digest": "ogs0_fByd3Mv6KgbGnhjdlP8-XQkfLm1"
+        },
+        {
+          "alias": "GL000248.1",
+          "digest": "h_JCKE33z8mP_oQe83hcdSs1e19T_iFU"
+        },
+        {
+          "alias": "GL000244.1",
+          "digest": "guyz6uCkbSzKOE1QVcDE2cvd5fCFNbCf"
+        },
+        {
+          "alias": "GL000238.1",
+          "digest": "F1dafeyt7rhA_8dHI4drAEsc9n0UbAd0"
+        },
+        {
+          "alias": "GL000202.1",
+          "digest": "vfbJmCvoE6vQMOSTobr0TnNDUpTNprQt"
+        },
+        {
+          "alias": "GL000234.1",
+          "digest": "oBgXlGXs-9D-BIuWYGZ9VAdyfBkv4ko6"
+        },
+        {
+          "alias": "GL000232.1",
+          "digest": "gu9uA4qtsocLUOm1CKLqq4Lr24q1Wh98"
+        },
+        {
+          "alias": "GL000206.1",
+          "digest": "nXpYhtwAqXo65qRsbeHbRb9VXWj3HQD9"
+        },
+        {
+          "alias": "GL000240.1",
+          "digest": "th33VVELCKOd0dhT-P_v4jof3AUPWIUr"
+        },
+        {
+          "alias": "GL000236.1",
+          "digest": "RNzX11H890dfkdlWjyXaUlSxj6LKv_bp"
+        },
+        {
+          "alias": "GL000241.1",
+          "digest": "BNgvT6xtaD6881pEbYrBVMaljpU2HdgX"
+        },
+        {
+          "alias": "GL000243.1",
+          "digest": "sJjlbRvT5jiqYgUC40aadDFUKp7C_xxe"
+        }
+      ],
+      "examples_sequence_missing": [
+        "Y",
+        "NC_007605",
+        "hs37d5"
+      ],
+      "examples_backfill": [],
+      "backwards_compat_coverage_pct": 0.0
+    },
+    {
+      "seqrepo_ns": "hs37-1kg",
+      "refget_ns": "hs37-1kg",
+      "group": "additional",
+      "seqrepo_alias_count": 84,
+      "refget_alias_count": 0,
+      "common": 0,
+      "matched": 0,
+      "mismatch_total": 0,
+      "mismatch_explained": 0,
+      "mismatch_unexplained": 0,
+      "mismatch_by_cause": {},
+      "superseded_old_version": 0,
+      "backfill_candidate": 0,
+      "alias_naming_gap": 83,
+      "alias_naming_by_prefix": {
+        "1": 1,
+        "2": 1,
+        "3": 1,
+        "4": 1,
+        "5": 1,
+        "6": 1,
+        "7": 1,
+        "8": 1,
+        "9": 1,
+        "10": 1,
+        "11": 1,
+        "12": 1,
+        "13": 1,
+        "14": 1,
+        "15": 1,
+        "16": 1,
+        "17": 1,
+        "18": 1,
+        "19": 1,
+        "20": 1,
+        "21": 1,
+        "22": 1,
+        "X": 1,
+        "MT": 1,
+        "GL0": 59
+      },
+      "sequence_missing": 1,
+      "sequence_missing_by_prefix": {
+        "Y": 1
+      },
+      "refget_only": 0,
+      "examples_unexplained": [],
+      "examples_alias_naming": [
+        {
+          "alias": "1",
+          "digest": "S_KjnFVz-FE7M0W6yoaUDgYxLPc1jyWU"
+        },
+        {
+          "alias": "2",
+          "digest": "9KdcA9ZpY1Cpvxvg8bMSLYDUpsX6GDLO"
+        },
+        {
+          "alias": "3",
+          "digest": "VNBualIltAyi2AI_uXcKU7M9XUOuA7MS"
+        },
+        {
+          "alias": "4",
+          "digest": "iy7Zfceb5_VGtTQzJ-v5JpPbpeifHD_V"
+        },
+        {
+          "alias": "5",
+          "digest": "vbjOdMfHJvTjK_nqvFvpaSKhZillW0SX"
+        },
+        {
+          "alias": "6",
+          "digest": "KqaUhJMW3CDjhoVtBetdEKT1n6hM-7Ek"
+        },
+        {
+          "alias": "7",
+          "digest": "IW78mgV5Cqf6M24hy52hPjyyo5tCCd86"
+        },
+        {
+          "alias": "8",
+          "digest": "tTm7wmhz0G4lpt8wPspcNkAD_qiminj6"
+        },
+        {
+          "alias": "9",
+          "digest": "HBckYGQ4wYG9APHLpjoQ9UUe9v7NxExt"
+        },
+        {
+          "alias": "10",
+          "digest": "-BOZ8Esn8J88qDwNiSEwUr5425UXdiGX"
+        },
+        {
+          "alias": "11",
+          "digest": "XXi2_O1ly-CCOi3HP5TypAw7LtC6niFG"
+        },
+        {
+          "alias": "12",
+          "digest": "105bBysLoDFQHhajooTAUyUkNiZ8LJEH"
+        },
+        {
+          "alias": "13",
+          "digest": "Ewb9qlgTqN6e_XQiRVYpoUfZJHXeiUfH"
+        },
+        {
+          "alias": "14",
+          "digest": "5Ji6FGEKfejK1U6BMScqrdKJK8GqmIGf"
+        },
+        {
+          "alias": "15",
+          "digest": "zIMZb3Ft7RdWa5XYq0PxIlezLY2ccCgt"
+        },
+        {
+          "alias": "16",
+          "digest": "W6wLoIFOn4G7cjopxPxYNk2lcEqhLQFb"
+        },
+        {
+          "alias": "17",
+          "digest": "AjWXsI7AkTK35XW9pgd3UbjpC3MAevlz"
+        },
+        {
+          "alias": "18",
+          "digest": "BTj4BDaaHYoPhD3oY2GdwC_l0uqZ92UD"
+        },
+        {
+          "alias": "19",
+          "digest": "ItRDD47aMoioDCNW_occY5fWKZBKlxCX"
+        },
+        {
+          "alias": "20",
+          "digest": "iy_UbUrvECxFRX5LPTH_KPojdlT7BKsf"
+        },
+        {
+          "alias": "21",
+          "digest": "LpTaNW-hwuY_yARP0rtarCnpCQLkgVCg"
+        },
+        {
+          "alias": "22",
+          "digest": "XOgHwwR3Upfp5sZYk6ZKzvV25a4RBVu8"
+        },
+        {
+          "alias": "X",
+          "digest": "v7noePfnNpK8ghYXEqZ9NukMXW7YeNsm"
+        },
+        {
+          "alias": "MT",
+          "digest": "k3grVkjY-hoWcCUojHw6VU6GE3MZ8Sct"
+        },
+        {
+          "alias": "GL000207.1",
+          "digest": "kpcAjK5AhEhFRhV_U86hPlA5oj2E5sny"
+        },
+        {
+          "alias": "GL000226.1",
+          "digest": "rJFy652rJMoL5PqH-PiqrJ1zpHc4uUiz"
+        },
+        {
+          "alias": "GL000229.1",
+          "digest": "du5ydl6l4jzenxq6QSdajUIV_trdW9-J"
+        },
+        {
+          "alias": "GL000231.1",
+          "digest": "7C__QM-xdQ4U_VbZNyLKqaCmq1alAsAw"
+        },
+        {
+          "alias": "GL000210.1",
+          "digest": "Lew6ZNRWZcBW8KaqScUV0HTyFU_qDGXS"
+        },
+        {
+          "alias": "GL000239.1",
+          "digest": "IZlunX_aR7RX1WJKyZM0cnKFW4YY6dzi"
+        },
+        {
+          "alias": "GL000235.1",
+          "digest": "YPOeiq_9uTtIsMUja9AqKO_NbDm91yuZ"
+        },
+        {
+          "alias": "GL000201.1",
+          "digest": "II3F2oT0mk0KjciIUvziQtHOquqc8_Pg"
+        },
+        {
+          "alias": "GL000247.1",
+          "digest": "IFj5Y607NHkMgQJKUZEi_j5bH6qKs53k"
+        },
+        {
+          "alias": "GL000245.1",
+          "digest": "GD1VIV3PDw_fJDLkPQ2E0AuiQ7d-FGLn"
+        },
+        {
+          "alias": "GL000197.1",
+          "digest": "KHkBYmlg-UJaE9sUI912zBlzdGD2BBEF"
+        },
+        {
+          "alias": "GL000203.1",
+          "digest": "sT2ZnJrlmZM-p20GfB8qMm_LRJSIyc7E"
+        },
+        {
+          "alias": "GL000246.1",
+          "digest": "TiBSRh_dGfiWea48SOQEhMsNzy0LnzaK"
+        },
+        {
+          "alias": "GL000249.1",
+          "digest": "uoSgKLeuWYiGisqvYYO1S7nhczOt1cv7"
+        },
+        {
+          "alias": "GL000196.1",
+          "digest": "ogs0_fByd3Mv6KgbGnhjdlP8-XQkfLm1"
+        },
+        {
+          "alias": "GL000248.1",
+          "digest": "h_JCKE33z8mP_oQe83hcdSs1e19T_iFU"
+        },
+        {
+          "alias": "GL000244.1",
+          "digest": "guyz6uCkbSzKOE1QVcDE2cvd5fCFNbCf"
+        },
+        {
+          "alias": "GL000238.1",
+          "digest": "F1dafeyt7rhA_8dHI4drAEsc9n0UbAd0"
+        },
+        {
+          "alias": "GL000202.1",
+          "digest": "vfbJmCvoE6vQMOSTobr0TnNDUpTNprQt"
+        },
+        {
+          "alias": "GL000234.1",
+          "digest": "oBgXlGXs-9D-BIuWYGZ9VAdyfBkv4ko6"
+        },
+        {
+          "alias": "GL000232.1",
+          "digest": "gu9uA4qtsocLUOm1CKLqq4Lr24q1Wh98"
+        },
+        {
+          "alias": "GL000206.1",
+          "digest": "nXpYhtwAqXo65qRsbeHbRb9VXWj3HQD9"
+        },
+        {
+          "alias": "GL000240.1",
+          "digest": "th33VVELCKOd0dhT-P_v4jof3AUPWIUr"
+        },
+        {
+          "alias": "GL000236.1",
+          "digest": "RNzX11H890dfkdlWjyXaUlSxj6LKv_bp"
+        },
+        {
+          "alias": "GL000241.1",
+          "digest": "BNgvT6xtaD6881pEbYrBVMaljpU2HdgX"
+        },
+        {
+          "alias": "GL000243.1",
+          "digest": "sJjlbRvT5jiqYgUC40aadDFUKp7C_xxe"
+        }
+      ],
+      "examples_sequence_missing": [
+        "Y"
+      ],
+      "examples_backfill": [],
+      "backwards_compat_coverage_pct": 0.0
+    },
+    {
+      "seqrepo_ns": "NCBI35",
+      "refget_ns": "NCBI35",
+      "group": "additional",
+      "seqrepo_alias_count": 26,
+      "refget_alias_count": 0,
+      "common": 0,
+      "matched": 0,
+      "mismatch_total": 0,
+      "mismatch_explained": 0,
+      "mismatch_unexplained": 0,
+      "mismatch_by_cause": {},
+      "superseded_old_version": 0,
+      "backfill_candidate": 0,
+      "alias_naming_gap": 0,
+      "alias_naming_by_prefix": {},
+      "sequence_missing": 26,
+      "sequence_missing_by_prefix": {
+        "5": 1,
+        "chr": 12,
+        "8": 1,
+        "11": 1,
+        "13": 1,
+        "14": 1,
+        "15": 1,
+        "16": 1,
+        "17": 1,
+        "18": 1,
+        "19": 1,
+        "20": 1,
+        "21": 1,
+        "NG_": 2
+      },
+      "refget_only": 0,
+      "examples_unexplained": [],
+      "examples_alias_naming": [],
+      "examples_sequence_missing": [
+        "5",
+        "chr5",
+        "8",
+        "chr8",
+        "11",
+        "chr11",
+        "13",
+        "chr13",
+        "14",
+        "chr14",
+        "15",
+        "chr15",
+        "16",
+        "chr16",
+        "17",
+        "chr17",
+        "18",
+        "chr18",
+        "19",
+        "chr19",
+        "20",
+        "chr20",
+        "21",
+        "chr21",
+        "NG_002392.2",
+        "NG_002433.1"
+      ],
+      "examples_backfill": [],
+      "backwards_compat_coverage_pct": 0.0
+    },
+    {
+      "seqrepo_ns": "JRGv1",
+      "refget_ns": "JRGv1",
+      "group": "additional",
+      "seqrepo_alias_count": 25,
+      "refget_alias_count": 0,
+      "common": 0,
+      "matched": 0,
+      "mismatch_total": 0,
+      "mismatch_explained": 0,
+      "mismatch_unexplained": 0,
+      "mismatch_by_cause": {},
+      "superseded_old_version": 0,
+      "backfill_candidate": 0,
+      "alias_naming_gap": 0,
+      "alias_naming_by_prefix": {},
+      "sequence_missing": 25,
+      "sequence_missing_by_prefix": {
+        "chr": 22,
+        "chrX": 1,
+        "chrY": 1,
+        "chrM": 1
+      },
+      "refget_only": 0,
+      "examples_unexplained": [],
+      "examples_alias_naming": [],
+      "examples_sequence_missing": [
+        "chr1",
+        "chr2",
+        "chr3",
+        "chr4",
+        "chr5",
+        "chr6",
+        "chr7",
+        "chr8",
+        "chr9",
+        "chr10",
+        "chr11",
+        "chr12",
+        "chr13",
+        "chr14",
+        "chr15",
+        "chr16",
+        "chr17",
+        "chr18",
+        "chr19",
+        "chr20",
+        "chr21",
+        "chr22",
+        "chrX",
+        "chrY",
+        "chrM"
+      ],
+      "examples_backfill": [],
+      "backwards_compat_coverage_pct": 0.0
+    },
+    {
+      "seqrepo_ns": "JRGv2",
+      "refget_ns": "JRGv2",
+      "group": "additional",
+      "seqrepo_alias_count": 25,
+      "refget_alias_count": 0,
+      "common": 0,
+      "matched": 0,
+      "mismatch_total": 0,
+      "mismatch_explained": 0,
+      "mismatch_unexplained": 0,
+      "mismatch_by_cause": {},
+      "superseded_old_version": 0,
+      "backfill_candidate": 0,
+      "alias_naming_gap": 0,
+      "alias_naming_by_prefix": {},
+      "sequence_missing": 25,
+      "sequence_missing_by_prefix": {
+        "chr": 22,
+        "chrX": 1,
+        "chrY": 1,
+        "chrM": 1
+      },
+      "refget_only": 0,
+      "examples_unexplained": [],
+      "examples_alias_naming": [],
+      "examples_sequence_missing": [
+        "chr1",
+        "chr2",
+        "chr3",
+        "chr4",
+        "chr5",
+        "chr6",
+        "chr7",
+        "chr8",
+        "chr9",
+        "chr10",
+        "chr11",
+        "chr12",
+        "chr13",
+        "chr14",
+        "chr15",
+        "chr16",
+        "chr17",
+        "chr18",
+        "chr19",
+        "chr20",
+        "chr21",
+        "chr22",
+        "chrX",
+        "chrY",
+        "chrM"
+      ],
+      "examples_backfill": [],
+      "backwards_compat_coverage_pct": 0.0
+    },
+    {
+      "seqrepo_ns": "CHM1_1.1",
+      "refget_ns": "CHM1_1.1",
+      "group": "additional",
+      "seqrepo_alias_count": 23,
+      "refget_alias_count": 0,
+      "common": 0,
+      "matched": 0,
+      "mismatch_total": 0,
+      "mismatch_explained": 0,
+      "mismatch_unexplained": 0,
+      "mismatch_by_cause": {},
+      "superseded_old_version": 0,
+      "backfill_candidate": 0,
+      "alias_naming_gap": 0,
+      "alias_naming_by_prefix": {},
+      "sequence_missing": 23,
+      "sequence_missing_by_prefix": {
+        "chr": 22,
+        "chrX": 1
+      },
+      "refget_only": 0,
+      "examples_unexplained": [],
+      "examples_alias_naming": [],
+      "examples_sequence_missing": [
+        "chr1",
+        "chr2",
+        "chr3",
+        "chr4",
+        "chr5",
+        "chr6",
+        "chr7",
+        "chr8",
+        "chr9",
+        "chr10",
+        "chr11",
+        "chr12",
+        "chr13",
+        "chr14",
+        "chr15",
+        "chr16",
+        "chr17",
+        "chr18",
+        "chr19",
+        "chr20",
+        "chr21",
+        "chr22",
+        "chrX"
+      ],
+      "examples_backfill": [],
+      "backwards_compat_coverage_pct": 0.0
+    },
+    {
+      "seqrepo_ns": "NCBI34",
+      "refget_ns": "NCBI34",
+      "group": "additional",
+      "seqrepo_alias_count": 3,
+      "refget_alias_count": 0,
+      "common": 0,
+      "matched": 0,
+      "mismatch_total": 0,
+      "mismatch_explained": 0,
+      "mismatch_unexplained": 0,
+      "mismatch_by_cause": {},
+      "superseded_old_version": 0,
+      "backfill_candidate": 0,
+      "alias_naming_gap": 0,
+      "alias_naming_by_prefix": {},
+      "sequence_missing": 3,
+      "sequence_missing_by_prefix": {
+        "19": 1,
+        "chr": 1,
+        "NG_": 1
+      },
+      "refget_only": 0,
+      "examples_unexplained": [],
+      "examples_alias_naming": [],
+      "examples_sequence_missing": [
+        "19",
+        "chr19",
+        "NG_002432.1"
+      ],
+      "examples_backfill": [],
+      "backwards_compat_coverage_pct": 0.0
+    }
+  ],
+  "digest_coverage": {
+    "seqrepo_distinct_digests": 1144093,
+    "present_in_refget": 974013,
+    "missing": 170080,
+    "coverage_pct": 85.1341,
+    "missing_referenced_by_mapped": 37331,
+    "missing_version_drift_only": 52,
+    "missing_other": 132697,
+    "examples_missing_mapped": [
+      {
+        "digest": "RJ1Ue5phB_JCLIbAIb5Z7mpJyRp56rHo",
+        "seqrepo_namespaces": [
+          "NCBI"
+        ]
+      },
+      {
+        "digest": "wZ4XiNogGa1KMJSSiFQYno5R9xqQvtiE",
+        "seqrepo_namespaces": [
+          "NCBI"
+        ]
+      },
+      {
+        "digest": "U9q66kn25jnpGdHb0VHdW3fHdOz_os_c",
+        "seqrepo_namespaces": [
+          "NCBI"
+        ]
+      },
+      {
+        "digest": "AToBTkDffykaHySBWuewnPHfefTDqfro",
+        "seqrepo_namespaces": [
+          "NCBI"
+        ]
+      },
+      {
+        "digest": "s0Fzz0iLYABLbTHs7or4xJNqWN0aN1JY",
+        "seqrepo_namespaces": [
+          "NCBI"
+        ]
+      },
+      {
+        "digest": "1AEkVLQN5DaxxGgbjRWxkdXylmKlHPnh",
+        "seqrepo_namespaces": [
+          "NCBI"
+        ]
+      },
+      {
+        "digest": "djKRzzKLbcVTKM1Yl2o6DGNHsFl4pN9x",
+        "seqrepo_namespaces": [
+          "NCBI"
+        ]
+      },
+      {
+        "digest": "bEU0DsRGrqAgaLBvtk38nnCAZGXtGxlE",
+        "seqrepo_namespaces": [
+          "NCBI"
+        ]
+      },
+      {
+        "digest": "6Q0sJuZRhVtQ3hEwdsPLHY7TjXbWGffT",
+        "seqrepo_namespaces": [
+          "NCBI"
+        ]
+      },
+      {
+        "digest": "IOwilakEiGOmhCofZBxv1kUMSY7kMS-W",
+        "seqrepo_namespaces": [
+          "NCBI"
+        ]
+      },
+      {
+        "digest": "WCmk_p-jAXnXPPkMGaJ9rCN6RISvd5bN",
+        "seqrepo_namespaces": [
+          "NCBI"
+        ]
+      },
+      {
+        "digest": "BWkWqGP202o8LrkqRyd5-v2aVx4mbWug",
+        "seqrepo_namespaces": [
+          "NCBI"
+        ]
+      },
+      {
+        "digest": "Wu2_r_U9QRG-JqZRKA6oUvSmSsHwZwUG",
+        "seqrepo_namespaces": [
+          "NCBI"
+        ]
+      },
+      {
+        "digest": "xisaxBHCz1rTRTZBYlC8yfP7zzvxb0Wk",
+        "seqrepo_namespaces": [
+          "NCBI"
+        ]
+      },
+      {
+        "digest": "KBFScglNUw2BFKU4q9zrtvcjDuJU9RHD",
+        "seqrepo_namespaces": [
+          "NCBI"
+        ]
+      },
+      {
+        "digest": "8fNmZQV7YUw1-WgKBH8FXAcOir7qEVJC",
+        "seqrepo_namespaces": [
+          "NCBI"
+        ]
+      },
+      {
+        "digest": "3R3IBbg7WqYrZrAgSJ49BdEJ8WaoFYXF",
+        "seqrepo_namespaces": [
+          "NCBI"
+        ]
+      },
+      {
+        "digest": "ON-mYEz4vgbYVoffoZ4I9UKxTkI_509w",
+        "seqrepo_namespaces": [
+          "NCBI"
+        ]
+      },
+      {
+        "digest": "2ag0oRBKJSpvoCuZUIOqVp3I4F2-DSA8",
+        "seqrepo_namespaces": [
+          "NCBI"
+        ]
+      },
+      {
+        "digest": "DfH7l_rfqZpTxc5lxzul1uG004IO9Sdu",
+        "seqrepo_namespaces": [
+          "NCBI"
+        ]
+      },
+      {
+        "digest": "hazm_AtzQ6Ns--xsMExRllsTEEn0r6fV",
+        "seqrepo_namespaces": [
+          "NCBI"
+        ]
+      },
+      {
+        "digest": "c-uGie1e3MOK6z7v9aW48_6RbzJET6nU",
+        "seqrepo_namespaces": [
+          "NCBI"
+        ]
+      },
+      {
+        "digest": "9C27puPfdxkDhmwY01bk3PaHSFnR08yQ",
+        "seqrepo_namespaces": [
+          "NCBI"
+        ]
+      },
+      {
+        "digest": "Mdk3_7Han1BJjbfUJQ5_cmX1iV1TmfSY",
+        "seqrepo_namespaces": [
+          "NCBI"
+        ]
+      },
+      {
+        "digest": "liyFJpKUloOtO7j49jtF7PtpJDrGMDpC",
+        "seqrepo_namespaces": [
+          "NCBI"
+        ]
+      },
+      {
+        "digest": "hSg9upJnZTISvwQPgx10l388F4mPpeX-",
+        "seqrepo_namespaces": [
+          "NCBI"
+        ]
+      },
+      {
+        "digest": "UWWNoTyyFt_s6_ifExH_yVWBHE038rHh",
+        "seqrepo_namespaces": [
+          "NCBI"
+        ]
+      },
+      {
+        "digest": "SmnIVAGgLKQj6WYlM9d4DxSsHqzWWUd4",
+        "seqrepo_namespaces": [
+          "NCBI"
+        ]
+      },
+      {
+        "digest": "XtnPaTrevbdHRcgrXq_WYnjuYRVJC5V-",
+        "seqrepo_namespaces": [
+          "NCBI"
+        ]
+      },
+      {
+        "digest": "har1n8V4-XzsoPJZiEkHP6ttKdSdDvDq",
+        "seqrepo_namespaces": [
+          "NCBI"
+        ]
+      },
+      {
+        "digest": "xbszBGNhFLQyqGSp0Xxopzfd_bTK4y0F",
+        "seqrepo_namespaces": [
+          "NCBI"
+        ]
+      },
+      {
+        "digest": "3klz6N3xQ67QwlL3MCTV_Ipo0qQ1_ml1",
+        "seqrepo_namespaces": [
+          "NCBI"
+        ]
+      },
+      {
+        "digest": "eqEt-K-yVPNvX8zDrDynQ_ZoiQ25tXLK",
+        "seqrepo_namespaces": [
+          "Ensembl"
+        ]
+      },
+      {
+        "digest": "WkT4StXDxtxcTqPYwU3xT5PLqS-KKGMZ",
+        "seqrepo_namespaces": [
+          "NCBI"
+        ]
+      },
+      {
+        "digest": "cSGRQ-AEdVNh2aL6S4u5p-SB0xfRkeMe",
+        "seqrepo_namespaces": [
+          "NCBI"
+        ]
+      },
+      {
+        "digest": "9VNl9iIzsnJXgHfbUFr72-a1cXdAxSEc",
+        "seqrepo_namespaces": [
+          "NCBI"
+        ]
+      },
+      {
+        "digest": "NiDJBuvu_UEjPgvtyc_73ikxcs1SXpVE",
+        "seqrepo_namespaces": [
+          "NCBI"
+        ]
+      },
+      {
+        "digest": "MhaTovx54zPVjIBfGUPeIFwlJKhmenkn",
+        "seqrepo_namespaces": [
+          "NCBI"
+        ]
+      },
+      {
+        "digest": "Wiv4Jqw9Qm3h3TW6B0uvvIbwfJcGkU5H",
+        "seqrepo_namespaces": [
+          "NCBI",
+          "NCBI36"
+        ]
+      },
+      {
+        "digest": "eCJhEwIpuAx9u1GgrpdbioLsdbyoseKJ",
+        "seqrepo_namespaces": [
+          "NCBI"
+        ]
+      },
+      {
+        "digest": "fE9m_pbcYvM8LRSAwgp6gT9W0dv9na4T",
+        "seqrepo_namespaces": [
+          "NCBI"
+        ]
+      },
+      {
+        "digest": "9s2hIf93v7sJNKB16ZMkaaeVOAXwGV87",
+        "seqrepo_namespaces": [
+          "NCBI"
+        ]
+      },
+      {
+        "digest": "12SqKkt3VPkdaISfi9TdQnT3Rx5aLKoD",
+        "seqrepo_namespaces": [
+          "NCBI"
+        ]
+      },
+      {
+        "digest": "74VTXCMXAVUcGfkIbfxISCw-33Es__by",
+        "seqrepo_namespaces": [
+          "NCBI"
+        ]
+      },
+      {
+        "digest": "oh15M2BdW3vW5VuGYWWfPWg5cIfxEB7v",
+        "seqrepo_namespaces": [
+          "NCBI"
+        ]
+      },
+      {
+        "digest": "aJZJafBVmxp3JCXpRE57_SCvRWFpB1uG",
+        "seqrepo_namespaces": [
+          "NCBI"
+        ]
+      },
+      {
+        "digest": "KJ3hcQ7CMIzS4qvq7C9c5-2M_-QM61af",
+        "seqrepo_namespaces": [
+          "NCBI"
+        ]
+      },
+      {
+        "digest": "VzQvKe34JZtxLBVYEqCrgzL6TMXgWewN",
+        "seqrepo_namespaces": [
+          "NCBI"
+        ]
+      },
+      {
+        "digest": "0ugfbx1ikwMTa4a2URLynRuXq_RWhgMI",
+        "seqrepo_namespaces": [
+          "NCBI"
+        ]
+      },
+      {
+        "digest": "zRfyLFlVc48uHmJXQaXkni1NnHbaQdfy",
+        "seqrepo_namespaces": [
+          "NCBI"
+        ]
+      }
+    ]
+  },
+  "metrics": {
+    "elapsed_seconds": 14.97
+  }
+}

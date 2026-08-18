@@ -1,0 +1,829 @@
+INFO build_store: loaded 22 assembly + 12 seqset entries from /Users/kferrite/dev/gks-refgetstore-builder/sources.toml
+INFO build_store: opened store at /Users/kferrite/dev/gks-refgetstore-builder/store (mode=StorageMode.Encoded)
+INFO build_store: === GRCh38 ===
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.26_GRCh38/GCF_000001405.26_GRCh38_genomic.fna.gz
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.26_GRCh38/GCF_000001405.26_GRCh38_assembly_report.txt
+INFO build_store: ingesting /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.26_GRCh38/GCF_000001405.26_GRCh38_genomic.fna.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.26_GRCh38/GCF_000001405.26_GRCh38_genomic.fna.gz...
+Added a49SC-s1S5x0XmpwwUIdi_kXdQmT0Yw6 (455 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.26_GRCh38/GCF_000001405.26_GRCh38_genomic.fna.gz in 0.0s
+Imported 1 file(s) in 14.5s (jobs=1)
+INFO build_store: collection a49SC-s1S5x0XmpwwUIdi_kXdQmT0Yw6 (new, 455 sequences)
+INFO build_store: parsing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.26_GRCh38/GCF_000001405.26_GRCh38_assembly_report.txt
+INFO build_store: report: 455 rows, refseq=GCF_000001405.26 genbank=GCA_000001405.15
+INFO build_store: === GRCh38.p14 ===
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_genomic.fna.gz
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_assembly_report.txt
+INFO build_store: ingesting /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_genomic.fna.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_genomic.fna.gz...
+Added u1HyLgIlq8M_XvEwy0oGqAvKGHJMGtxH (705 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_genomic.fna.gz in 0.0s
+Imported 1 file(s) in 14.9s (jobs=1)
+INFO build_store: collection u1HyLgIlq8M_XvEwy0oGqAvKGHJMGtxH (new, 705 sequences)
+INFO build_store: parsing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_assembly_report.txt
+INFO build_store: report: 709 rows, refseq=GCF_000001405.40 genbank=GCA_000001405.29
+INFO build_store: === GRCh37 ===
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.13_GRCh37/GCF_000001405.13_GRCh37_genomic.fna.gz
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.13_GRCh37/GCF_000001405.13_GRCh37_assembly_report.txt
+INFO build_store: ingesting /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.13_GRCh37/GCF_000001405.13_GRCh37_genomic.fna.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.13_GRCh37/GCF_000001405.13_GRCh37_genomic.fna.gz...
+Added YaoueyCRb6gEgYynaT9dpjTMziun3KvO (92 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.13_GRCh37/GCF_000001405.13_GRCh37_genomic.fna.gz in 0.0s
+Imported 1 file(s) in 13.7s (jobs=1)
+INFO build_store: collection YaoueyCRb6gEgYynaT9dpjTMziun3KvO (new, 92 sequences)
+INFO build_store: parsing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.13_GRCh37/GCF_000001405.13_GRCh37_assembly_report.txt
+INFO build_store: report: 92 rows, refseq=GCF_000001405.13 genbank=GCA_000001405.1
+INFO build_store: === GRCh37.p13 ===
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.25_GRCh37.p13/GCF_000001405.25_GRCh37.p13_genomic.fna.gz
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.25_GRCh37.p13/GCF_000001405.25_GRCh37.p13_assembly_report.txt
+INFO build_store: ingesting /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.25_GRCh37.p13/GCF_000001405.25_GRCh37.p13_genomic.fna.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.25_GRCh37.p13/GCF_000001405.25_GRCh37.p13_genomic.fna.gz...
+Added XJWKh8nsSqBFfcU0DIHMZohYyCWF-vcA (297 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.25_GRCh37.p13/GCF_000001405.25_GRCh37.p13_genomic.fna.gz in 0.0s
+Imported 1 file(s) in 14.1s (jobs=1)
+INFO build_store: collection XJWKh8nsSqBFfcU0DIHMZohYyCWF-vcA (new, 297 sequences)
+INFO build_store: parsing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.25_GRCh37.p13/GCF_000001405.25_GRCh37.p13_assembly_report.txt
+INFO build_store: report: 297 rows, refseq=GCF_000001405.25 genbank=GCA_000001405.14
+INFO build_store: === GRCh38.p1 ===
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.27_GRCh38.p1/GCF_000001405.27_GRCh38.p1_assembly_report.txt
+INFO build_store: load_fasta=false; using global name map
+INFO build_store: parsing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.27_GRCh38.p1/GCF_000001405.27_GRCh38.p1_assembly_report.txt
+INFO build_store: report: 471 rows, refseq=GCF_000001405.27 genbank=GCA_000001405.16
+INFO build_store: === GRCh38.p2 ===
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.28_GRCh38.p2/GCF_000001405.28_GRCh38.p2_assembly_report.txt
+INFO build_store: load_fasta=false; using global name map
+INFO build_store: parsing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.28_GRCh38.p2/GCF_000001405.28_GRCh38.p2_assembly_report.txt
+INFO build_store: report: 486 rows, refseq=GCF_000001405.28 genbank=GCA_000001405.17
+INFO build_store: === GRCh38.p3 ===
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.29_GRCh38.p3/GCF_000001405.29_GRCh38.p3_assembly_report.txt
+INFO build_store: load_fasta=false; using global name map
+INFO build_store: parsing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.29_GRCh38.p3/GCF_000001405.29_GRCh38.p3_assembly_report.txt
+INFO build_store: report: 494 rows, refseq=GCF_000001405.29 genbank=GCA_000001405.18
+INFO build_store: === GRCh38.p4 ===
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.30_GRCh38.p4/GCF_000001405.30_GRCh38.p4_assembly_report.txt
+INFO build_store: load_fasta=false; using global name map
+INFO build_store: parsing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.30_GRCh38.p4/GCF_000001405.30_GRCh38.p4_assembly_report.txt
+INFO build_store: report: 510 rows, refseq=GCF_000001405.30 genbank=GCA_000001405.19
+INFO build_store: === GRCh38.p5 ===
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.31_GRCh38.p5/GCF_000001405.31_GRCh38.p5_assembly_report.txt
+INFO build_store: load_fasta=false; using global name map
+INFO build_store: parsing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.31_GRCh38.p5/GCF_000001405.31_GRCh38.p5_assembly_report.txt
+INFO build_store: report: 517 rows, refseq=GCF_000001405.31 genbank=GCA_000001405.20
+INFO build_store: === GRCh38.p6 ===
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.32_GRCh38.p6/GCF_000001405.32_GRCh38.p6_assembly_report.txt
+INFO build_store: load_fasta=false; using global name map
+INFO build_store: parsing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.32_GRCh38.p6/GCF_000001405.32_GRCh38.p6_assembly_report.txt
+INFO build_store: report: 521 rows, refseq=GCF_000001405.32 genbank=GCA_000001405.21
+WARNING build_store: no digest for NW_015148966.1 in namespace GRCh38.p6 (FASTA does not contain it)
+WARNING build_store: no digest for NW_015148969.1 in namespace GRCh38.p6 (FASTA does not contain it)
+INFO build_store: === GRCh38.p7 ===
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.33_GRCh38.p7/GCF_000001405.33_GRCh38.p7_assembly_report.txt
+INFO build_store: load_fasta=false; using global name map
+INFO build_store: parsing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.33_GRCh38.p7/GCF_000001405.33_GRCh38.p7_assembly_report.txt
+INFO build_store: report: 525 rows, refseq=GCF_000001405.33 genbank=GCA_000001405.22
+WARNING build_store: no digest for NW_015148966.1 in namespace GRCh38.p7 (FASTA does not contain it)
+WARNING build_store: no digest for NW_015148969.1 in namespace GRCh38.p7 (FASTA does not contain it)
+INFO build_store: === GRCh38.p8 ===
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.34_GRCh38.p8/GCF_000001405.34_GRCh38.p8_assembly_report.txt
+INFO build_store: load_fasta=false; using global name map
+INFO build_store: parsing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.34_GRCh38.p8/GCF_000001405.34_GRCh38.p8_assembly_report.txt
+INFO build_store: report: 543 rows, refseq=GCF_000001405.34 genbank=GCA_000001405.23
+WARNING build_store: no digest for NW_015148966.1 in namespace GRCh38.p8 (FASTA does not contain it)
+WARNING build_store: no digest for NW_015148969.1 in namespace GRCh38.p8 (FASTA does not contain it)
+INFO build_store: === GRCh38.p9 ===
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.35_GRCh38.p9/GCF_000001405.35_GRCh38.p9_assembly_report.txt
+INFO build_store: load_fasta=false; using global name map
+INFO build_store: parsing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.35_GRCh38.p9/GCF_000001405.35_GRCh38.p9_assembly_report.txt
+INFO build_store: report: 551 rows, refseq=GCF_000001405.35 genbank=GCA_000001405.24
+WARNING build_store: no digest for NW_015148966.1 in namespace GRCh38.p9 (FASTA does not contain it)
+WARNING build_store: no digest for NW_015148969.1 in namespace GRCh38.p9 (FASTA does not contain it)
+INFO build_store: === GRCh38.p10 ===
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.36_GRCh38.p10/GCF_000001405.36_GRCh38.p10_assembly_report.txt
+INFO build_store: load_fasta=false; using global name map
+INFO build_store: parsing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.36_GRCh38.p10/GCF_000001405.36_GRCh38.p10_assembly_report.txt
+INFO build_store: report: 557 rows, refseq=GCF_000001405.36 genbank=GCA_000001405.25
+WARNING build_store: no digest for NW_015148966.1 in namespace GRCh38.p10 (FASTA does not contain it)
+WARNING build_store: no digest for NW_015148969.1 in namespace GRCh38.p10 (FASTA does not contain it)
+INFO build_store: === GRCh38.p11 ===
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.37_GRCh38.p11/GCF_000001405.37_GRCh38.p11_assembly_report.txt
+INFO build_store: load_fasta=false; using global name map
+INFO build_store: parsing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.37_GRCh38.p11/GCF_000001405.37_GRCh38.p11_assembly_report.txt
+INFO build_store: report: 578 rows, refseq=GCF_000001405.37 genbank=GCA_000001405.26
+WARNING build_store: no digest for NW_015148966.1 in namespace GRCh38.p11 (FASTA does not contain it)
+WARNING build_store: no digest for NW_015148969.1 in namespace GRCh38.p11 (FASTA does not contain it)
+INFO build_store: === GRCh38.p12 ===
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.38_GRCh38.p12/GCF_000001405.38_GRCh38.p12_assembly_report.txt
+INFO build_store: load_fasta=false; using global name map
+INFO build_store: parsing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.38_GRCh38.p12/GCF_000001405.38_GRCh38.p12_assembly_report.txt
+INFO build_store: report: 595 rows, refseq=GCF_000001405.38 genbank=GCA_000001405.27
+WARNING build_store: no digest for NW_015148966.1 in namespace GRCh38.p12 (FASTA does not contain it)
+WARNING build_store: no digest for NW_015148969.1 in namespace GRCh38.p12 (FASTA does not contain it)
+INFO build_store: === GRCh37.p2 ===
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.14_GRCh37.p2/GCF_000001405.14_GRCh37.p2_assembly_report.txt
+INFO build_store: load_fasta=false; using global name map
+INFO build_store: parsing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.14_GRCh37.p2/GCF_000001405.14_GRCh37.p2_assembly_report.txt
+INFO build_store: report: 163 rows, refseq=GCF_000001405.14 genbank=GCA_000001405.3
+WARNING build_store: no digest for NW_003315917.1 in namespace GRCh37.p2 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003315922.1 in namespace GRCh37.p2 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003315942.1 in namespace GRCh37.p2 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003315948.1 in namespace GRCh37.p2 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003315950.1 in namespace GRCh37.p2 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003315952.1 in namespace GRCh37.p2 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003315964.1 in namespace GRCh37.p2 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003315971.1 in namespace GRCh37.p2 (FASTA does not contain it)
+INFO build_store: === GRCh37.p5 ===
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.17_GRCh37.p5/GCF_000001405.17_GRCh37.p5_assembly_report.txt
+INFO build_store: load_fasta=false; using global name map
+INFO build_store: parsing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.17_GRCh37.p5/GCF_000001405.17_GRCh37.p5_assembly_report.txt
+INFO build_store: report: 198 rows, refseq=GCF_000001405.17 genbank=GCA_000001405.6
+WARNING build_store: no digest for NW_003571033.1 in namespace GRCh37.p5 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003315922.1 in namespace GRCh37.p5 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003571044.1 in namespace GRCh37.p5 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003315942.1 in namespace GRCh37.p5 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003315948.1 in namespace GRCh37.p5 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003315950.1 in namespace GRCh37.p5 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003315952.1 in namespace GRCh37.p5 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003571053.1 in namespace GRCh37.p5 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003315964.1 in namespace GRCh37.p5 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003571062.1 in namespace GRCh37.p5 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003571063.1 in namespace GRCh37.p5 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003315971.1 in namespace GRCh37.p5 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003571064.1 in namespace GRCh37.p5 (FASTA does not contain it)
+INFO build_store: === GRCh37.p9 ===
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.21_GRCh37.p9/GCF_000001405.21_GRCh37.p9_assembly_report.txt
+INFO build_store: load_fasta=false; using global name map
+INFO build_store: parsing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.21_GRCh37.p9/GCF_000001405.21_GRCh37.p9_assembly_report.txt
+INFO build_store: report: 245 rows, refseq=GCF_000001405.21 genbank=GCA_000001405.10
+WARNING build_store: no digest for NW_003871055.1 in namespace GRCh37.p9 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003871056.1 in namespace GRCh37.p9 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003871066.1 in namespace GRCh37.p9 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003871072.1 in namespace GRCh37.p9 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003871083.1 in namespace GRCh37.p9 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003315948.1 in namespace GRCh37.p9 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003315950.1 in namespace GRCh37.p9 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003315952.1 in namespace GRCh37.p9 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003571053.1 in namespace GRCh37.p9 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003315971.1 in namespace GRCh37.p9 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003571064.1 in namespace GRCh37.p9 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003871103.1 in namespace GRCh37.p9 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003871097.1 in namespace GRCh37.p9 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003871101.1 in namespace GRCh37.p9 (FASTA does not contain it)
+INFO build_store: === GRCh37.p10 ===
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.22_GRCh37.p10/GCF_000001405.22_GRCh37.p10_assembly_report.txt
+INFO build_store: load_fasta=false; using global name map
+INFO build_store: parsing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.22_GRCh37.p10/GCF_000001405.22_GRCh37.p10_assembly_report.txt
+INFO build_store: report: 275 rows, refseq=GCF_000001405.22 genbank=GCA_000001405.11
+WARNING build_store: no digest for NW_003871055.2 in namespace GRCh37.p10 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003871056.1 in namespace GRCh37.p10 (FASTA does not contain it)
+WARNING build_store: no digest for NW_004070864.1 in namespace GRCh37.p10 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003871066.1 in namespace GRCh37.p10 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003871072.1 in namespace GRCh37.p10 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003871083.1 in namespace GRCh37.p10 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003315948.1 in namespace GRCh37.p10 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003315950.1 in namespace GRCh37.p10 (FASTA does not contain it)
+WARNING build_store: no digest for NW_004070872.1 in namespace GRCh37.p10 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003315952.1 in namespace GRCh37.p10 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003571053.1 in namespace GRCh37.p10 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003315971.1 in namespace GRCh37.p10 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003571064.1 in namespace GRCh37.p10 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003871103.2 in namespace GRCh37.p10 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003871101.2 in namespace GRCh37.p10 (FASTA does not contain it)
+WARNING build_store: no digest for NW_004070880.1 in namespace GRCh37.p10 (FASTA does not contain it)
+WARNING build_store: no digest for NW_004070890.1 in namespace GRCh37.p10 (FASTA does not contain it)
+INFO build_store: === GRCh37.p11 ===
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.23_GRCh37.p11/GCF_000001405.23_GRCh37.p11_assembly_report.txt
+INFO build_store: load_fasta=false; using global name map
+INFO build_store: parsing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.23_GRCh37.p11/GCF_000001405.23_GRCh37.p11_assembly_report.txt
+INFO build_store: report: 280 rows, refseq=GCF_000001405.23 genbank=GCA_000001405.12
+WARNING build_store: no digest for NW_003871056.2 in namespace GRCh37.p11 (FASTA does not contain it)
+WARNING build_store: no digest for NW_004070864.1 in namespace GRCh37.p11 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003871066.1 in namespace GRCh37.p11 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003871072.1 in namespace GRCh37.p11 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003871083.1 in namespace GRCh37.p11 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003315948.1 in namespace GRCh37.p11 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003315950.1 in namespace GRCh37.p11 (FASTA does not contain it)
+WARNING build_store: no digest for NW_004070872.1 in namespace GRCh37.p11 (FASTA does not contain it)
+WARNING build_store: no digest for NW_004166864.1 in namespace GRCh37.p11 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003315952.1 in namespace GRCh37.p11 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003571053.1 in namespace GRCh37.p11 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003571064.1 in namespace GRCh37.p11 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003871103.2 in namespace GRCh37.p11 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003871101.2 in namespace GRCh37.p11 (FASTA does not contain it)
+WARNING build_store: no digest for NW_004070890.1 in namespace GRCh37.p11 (FASTA does not contain it)
+INFO build_store: === GRCh37.p12 ===
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.24_GRCh37.p12/GCF_000001405.24_GRCh37.p12_assembly_report.txt
+INFO build_store: load_fasta=false; using global name map
+INFO build_store: parsing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.24_GRCh37.p12/GCF_000001405.24_GRCh37.p12_assembly_report.txt
+INFO build_store: report: 287 rows, refseq=GCF_000001405.24 genbank=GCA_000001405.13
+WARNING build_store: no digest for NW_003871056.2 in namespace GRCh37.p12 (FASTA does not contain it)
+WARNING build_store: no digest for NW_004070864.1 in namespace GRCh37.p12 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003871066.1 in namespace GRCh37.p12 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003871072.1 in namespace GRCh37.p12 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003871083.1 in namespace GRCh37.p12 (FASTA does not contain it)
+WARNING build_store: no digest for NW_004504303.1 in namespace GRCh37.p12 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003315948.1 in namespace GRCh37.p12 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003315950.1 in namespace GRCh37.p12 (FASTA does not contain it)
+WARNING build_store: no digest for NW_004070872.1 in namespace GRCh37.p12 (FASTA does not contain it)
+WARNING build_store: no digest for NW_004166864.1 in namespace GRCh37.p12 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003315952.1 in namespace GRCh37.p12 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003571053.1 in namespace GRCh37.p12 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003571064.1 in namespace GRCh37.p12 (FASTA does not contain it)
+WARNING build_store: no digest for NW_003871103.2 in namespace GRCh37.p12 (FASTA does not contain it)
+WARNING build_store: no digest for NW_004070890.1 in namespace GRCh37.p12 (FASTA does not contain it)
+INFO build_store: === seqset refseq_human_rna ===
+INFO build_store: shard 1 (human.1.rna.fna.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.1.rna.fna.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.1.rna.fna.gz...
+Added K1ff_VyAsSyXGp0CM-EuGiP00UEHOFZB (18076 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.1.rna.fna.gz in 0.6s
+Imported 1 file(s) in 2.7s (jobs=1)
+INFO build_store:   collection K1ff_VyAsSyXGp0CM-EuGiP00UEHOFZB (new, 18076 sequences)
+INFO build_store: shard 2 (human.2.rna.fna.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.2.rna.fna.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.2.rna.fna.gz...
+Added d6fEeo_whJL_0iVCJWjQJabd_FNXw1oM (10738 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.2.rna.fna.gz in 0.4s
+Imported 1 file(s) in 2.0s (jobs=1)
+INFO build_store:   collection d6fEeo_whJL_0iVCJWjQJabd_FNXw1oM (new, 10738 sequences)
+INFO build_store: shard 3 (human.3.rna.fna.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.3.rna.fna.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.3.rna.fna.gz...
+Added oY-ZV2zPvCLvTWLfug4Yd-ri8oMRIiWv (10097 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.3.rna.fna.gz in 0.3s
+Imported 1 file(s) in 2.2s (jobs=1)
+INFO build_store:   collection oY-ZV2zPvCLvTWLfug4Yd-ri8oMRIiWv (new, 10097 sequences)
+INFO build_store: shard 4 (human.4.rna.fna.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.4.rna.fna.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.4.rna.fna.gz...
+Added I_XGq3HljoUg4FsUZGL0lkDRKjzqmhgI (10372 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.4.rna.fna.gz in 0.3s
+Imported 1 file(s) in 2.3s (jobs=1)
+INFO build_store:   collection I_XGq3HljoUg4FsUZGL0lkDRKjzqmhgI (new, 10372 sequences)
+INFO build_store: shard 5 (human.5.rna.fna.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.5.rna.fna.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.5.rna.fna.gz...
+Added C8QzGSCmzv-HIa68XHDrc-bFX_pxi607 (7962 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.5.rna.fna.gz in 0.3s
+Imported 1 file(s) in 2.2s (jobs=1)
+INFO build_store:   collection C8QzGSCmzv-HIa68XHDrc-bFX_pxi607 (new, 7962 sequences)
+INFO build_store: shard 6 (human.6.rna.fna.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.6.rna.fna.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.6.rna.fna.gz...
+Added A3D31vRSWwW9SbGeKDKipQw7rJF7g1Dc (15640 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.6.rna.fna.gz in 0.5s
+Imported 1 file(s) in 3.7s (jobs=1)
+INFO build_store:   collection A3D31vRSWwW9SbGeKDKipQw7rJF7g1Dc (new, 15640 sequences)
+INFO build_store: shard 7 (human.7.rna.fna.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.7.rna.fna.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.7.rna.fna.gz...
+Added CX_KGcjE1mW-h7vMNyoMDYUne9dH42T1 (40643 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.7.rna.fna.gz in 1.2s
+Imported 1 file(s) in 7.0s (jobs=1)
+INFO build_store:   collection CX_KGcjE1mW-h7vMNyoMDYUne9dH42T1 (new, 40643 sequences)
+INFO build_store: shard 8 (human.8.rna.fna.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.8.rna.fna.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.8.rna.fna.gz...
+Added 148C62XqfFMnwNSsXL_1S4uBxzoF9zBz (14816 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.8.rna.fna.gz in 0.5s
+Imported 1 file(s) in 4.3s (jobs=1)
+INFO build_store:   collection 148C62XqfFMnwNSsXL_1S4uBxzoF9zBz (new, 14816 sequences)
+INFO build_store: shard 9 (human.9.rna.fna.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.9.rna.fna.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.9.rna.fna.gz...
+Added PHD91Yyns7IysVxvpDDTHJJ6SP7Q4cDR (14931 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.9.rna.fna.gz in 0.5s
+Imported 1 file(s) in 4.7s (jobs=1)
+INFO build_store:   collection PHD91Yyns7IysVxvpDDTHJJ6SP7Q4cDR (new, 14931 sequences)
+INFO build_store: shard 10 (human.10.rna.fna.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.10.rna.fna.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.10.rna.fna.gz...
+Added qXww6FOuafXTfIwLubENkWXM0ZgADgi7 (14287 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.10.rna.fna.gz in 0.5s
+Imported 1 file(s) in 4.9s (jobs=1)
+INFO build_store:   collection qXww6FOuafXTfIwLubENkWXM0ZgADgi7 (new, 14287 sequences)
+INFO build_store: shard 11 (human.11.rna.fna.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.11.rna.fna.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.11.rna.fna.gz...
+Added OS1zNozoSjb9HtW-Srh3WZ_e-J8dY-gP (16916 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.11.rna.fna.gz in 0.6s
+Imported 1 file(s) in 5.4s (jobs=1)
+INFO build_store:   collection OS1zNozoSjb9HtW-Srh3WZ_e-J8dY-gP (new, 16916 sequences)
+INFO build_store: shard 12 (human.12.rna.fna.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.12.rna.fna.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.12.rna.fna.gz...
+Added J6B5oQGHm8gUW-wjgVUhjwBkwjk-fVVO (61944 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.12.rna.fna.gz in 1.9s
+Imported 1 file(s) in 12.7s (jobs=1)
+INFO build_store:   collection J6B5oQGHm8gUW-wjgVUhjwBkwjk-fVVO (new, 61944 sequences)
+INFO build_store: shard 13 (human.13.rna.fna.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.13.rna.fna.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.13.rna.fna.gz...
+Added rRYT0D0ThwthsS2oxmEN67oRGzKiWQ6d (10334 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.13.rna.fna.gz in 0.4s
+Imported 1 file(s) in 6.3s (jobs=1)
+INFO build_store:   collection rRYT0D0ThwthsS2oxmEN67oRGzKiWQ6d (new, 10334 sequences)
+INFO build_store: shard 14 (human.14.rna.fna.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.14.rna.fna.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.14.rna.fna.gz...
+Added 16SJ2oWJxfFLwXzSIKmFpnt5vzDbFXzW (11522 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.14.rna.fna.gz in 0.4s
+Imported 1 file(s) in 5.8s (jobs=1)
+INFO build_store:   collection 16SJ2oWJxfFLwXzSIKmFpnt5vzDbFXzW (new, 11522 sequences)
+INFO build_store: shard 15 (human.15.rna.fna.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.15.rna.fna.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.15.rna.fna.gz...
+Added QkbiEI77yPBt10G_FTNDbMmtiV6oYLD2 (15237 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.15.rna.fna.gz in 0.5s
+Imported 1 file(s) in 6.7s (jobs=1)
+INFO build_store:   collection QkbiEI77yPBt10G_FTNDbMmtiV6oYLD2 (new, 15237 sequences)
+INFO build_store:   refseq_human_rna: bulk-loaded 273515 new aliases into ns=refseq
+INFO build_store: === seqset refseq_human_protein ===
+INFO build_store: shard 1 (human.1.protein.faa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.1.protein.faa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.1.protein.faa.gz...
+Added 6ARlMZR3m4z3RN--NtqxC6znjsOHCZgq (2218 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.1.protein.faa.gz in 0.1s
+Imported 1 file(s) in 4.6s (jobs=1)
+INFO build_store:   collection 6ARlMZR3m4z3RN--NtqxC6znjsOHCZgq (new, 2218 sequences)
+INFO build_store: shard 2 (human.2.protein.faa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.2.protein.faa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.2.protein.faa.gz...
+Added jmIfOa0GqEy09iNMGf8yLgKSBxO1vEKC (10709 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.2.protein.faa.gz in 0.4s
+Imported 1 file(s) in 6.4s (jobs=1)
+INFO build_store:   collection jmIfOa0GqEy09iNMGf8yLgKSBxO1vEKC (new, 10709 sequences)
+INFO build_store: shard 3 (human.3.protein.faa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.3.protein.faa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.3.protein.faa.gz...
+Added -YOw3yMpKDr15y4PUIkg4QdukP2PKDpQ (10095 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.3.protein.faa.gz in 0.4s
+Imported 1 file(s) in 6.3s (jobs=1)
+INFO build_store:   collection -YOw3yMpKDr15y4PUIkg4QdukP2PKDpQ (new, 10095 sequences)
+INFO build_store: shard 4 (human.4.protein.faa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.4.protein.faa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.4.protein.faa.gz...
+Added ONLz1pNg3nwqcKAWfi_rxpOCv0bVFC6n (10369 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.4.protein.faa.gz in 0.3s
+Imported 1 file(s) in 5.7s (jobs=1)
+INFO build_store:   collection ONLz1pNg3nwqcKAWfi_rxpOCv0bVFC6n (new, 10369 sequences)
+INFO build_store: shard 5 (human.5.protein.faa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.5.protein.faa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.5.protein.faa.gz...
+Added TLc8Uc18CHtyP-sDWJgDr8ZEmcS02CPl (7083 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.5.protein.faa.gz in 0.2s
+Imported 1 file(s) in 5.6s (jobs=1)
+INFO build_store:   collection TLc8Uc18CHtyP-sDWJgDr8ZEmcS02CPl (new, 7083 sequences)
+INFO build_store: shard 6 (human.6.protein.faa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.6.protein.faa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.6.protein.faa.gz...
+Added 6hCH3fc0XooB79PM4UbPy0LlQJbhGUih (12168 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.6.protein.faa.gz in 0.4s
+Imported 1 file(s) in 6.3s (jobs=1)
+INFO build_store:   collection 6hCH3fc0XooB79PM4UbPy0LlQJbhGUih (new, 12168 sequences)
+INFO build_store: shard 7 (human.7.protein.faa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.7.protein.faa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.7.protein.faa.gz...
+Added 3i7ppu6s5VJqg1eeQ698Gcndu3R4cSp1 (29744 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.7.protein.faa.gz in 1.0s
+Imported 1 file(s) in 7.8s (jobs=1)
+INFO build_store:   collection 3i7ppu6s5VJqg1eeQ698Gcndu3R4cSp1 (new, 29744 sequences)
+INFO build_store: shard 8 (human.8.protein.faa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.8.protein.faa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.8.protein.faa.gz...
+Added tGyK3ppSpTFNOpCMBA52MI9feB_AmIkl (11036 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.8.protein.faa.gz in 0.4s
+Imported 1 file(s) in 6.4s (jobs=1)
+INFO build_store:   collection tGyK3ppSpTFNOpCMBA52MI9feB_AmIkl (new, 11036 sequences)
+INFO build_store: shard 9 (human.9.protein.faa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.9.protein.faa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.9.protein.faa.gz...
+Added GFcvtfsfyZbEbuKg7tiUfw4iM1fBCFQw (10832 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.9.protein.faa.gz in 0.3s
+Imported 1 file(s) in 6.5s (jobs=1)
+INFO build_store:   collection GFcvtfsfyZbEbuKg7tiUfw4iM1fBCFQw (new, 10832 sequences)
+INFO build_store: shard 10 (human.10.protein.faa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.10.protein.faa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.10.protein.faa.gz...
+Added UWD34ReVjlQtjh4H4TmJxj4hgw8GDJoS (10344 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.10.protein.faa.gz in 0.4s
+Imported 1 file(s) in 6.8s (jobs=1)
+INFO build_store:   collection UWD34ReVjlQtjh4H4TmJxj4hgw8GDJoS (new, 10344 sequences)
+INFO build_store: shard 11 (human.11.protein.faa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.11.protein.faa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.11.protein.faa.gz...
+Added Ol50vszS3fMYryegM40HAD1DB3KSLiok (11155 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.11.protein.faa.gz in 0.4s
+Imported 1 file(s) in 6.6s (jobs=1)
+INFO build_store:   collection Ol50vszS3fMYryegM40HAD1DB3KSLiok (new, 11155 sequences)
+INFO build_store: shard 12 (human.12.protein.faa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.12.protein.faa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.12.protein.faa.gz...
+Added 66ha-h7vlxqOrvQDHTCj4eLUm04igl0R (42187 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.12.protein.faa.gz in 1.3s
+Imported 1 file(s) in 8.5s (jobs=1)
+INFO build_store:   collection 66ha-h7vlxqOrvQDHTCj4eLUm04igl0R (new, 42187 sequences)
+INFO build_store: shard 13 (human.13.protein.faa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.13.protein.faa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.13.protein.faa.gz...
+Added mm4XrdqjQDAEo51Zn97oNI_pRkuz-bpk (10072 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.13.protein.faa.gz in 0.3s
+Imported 1 file(s) in 7.0s (jobs=1)
+INFO build_store:   collection mm4XrdqjQDAEo51Zn97oNI_pRkuz-bpk (new, 10072 sequences)
+INFO build_store: shard 14 (human.14.protein.faa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.14.protein.faa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.14.protein.faa.gz...
+Added XLAA3huf8oPpHquvYq4wqeXb8FHpCaAc (9619 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.14.protein.faa.gz in 0.3s
+Imported 1 file(s) in 7.4s (jobs=1)
+INFO build_store:   collection XLAA3huf8oPpHquvYq4wqeXb8FHpCaAc (new, 9619 sequences)
+INFO build_store: shard 15 (human.15.protein.faa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.15.protein.faa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.15.protein.faa.gz...
+Added FRkUDoB-uvqX_hbJxTCcLe2SI9-qCg69 (10232 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.15.protein.faa.gz in 0.3s
+Imported 1 file(s) in 7.3s (jobs=1)
+INFO build_store:   collection FRkUDoB-uvqX_hbJxTCcLe2SI9-qCg69 (new, 10232 sequences)
+INFO build_store:   refseq_human_protein: bulk-loaded 197863 new aliases into ns=refseq
+INFO build_store: === seqset refseq_human_refseqgene ===
+INFO build_store: shard 1 (refseqgene.1.genomic.fna.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/RefSeqGene/refseqgene.1.genomic.fna.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/RefSeqGene/refseqgene.1.genomic.fna.gz...
+Added GfUTogMc4KU6X2_ah8knANHeWiVKuujR (702 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/RefSeqGene/refseqgene.1.genomic.fna.gz in 0.1s
+Imported 1 file(s) in 6.2s (jobs=1)
+INFO build_store:   collection GfUTogMc4KU6X2_ah8knANHeWiVKuujR (new, 702 sequences)
+INFO build_store: shard 2 (refseqgene.2.genomic.fna.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/RefSeqGene/refseqgene.2.genomic.fna.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/RefSeqGene/refseqgene.2.genomic.fna.gz...
+Added fYaX34irAq_M2FD-OrxlnKqx7vsbK2rb (1045 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/RefSeqGene/refseqgene.2.genomic.fna.gz in 0.0s
+Imported 1 file(s) in 6.3s (jobs=1)
+INFO build_store:   collection fYaX34irAq_M2FD-OrxlnKqx7vsbK2rb (new, 1045 sequences)
+INFO build_store: shard 3 (refseqgene.3.genomic.fna.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/RefSeqGene/refseqgene.3.genomic.fna.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/RefSeqGene/refseqgene.3.genomic.fna.gz...
+Added KSzMoBFaro813rNXMbQRjtcMyAR9xhmR (910 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/RefSeqGene/refseqgene.3.genomic.fna.gz in 0.0s
+Imported 1 file(s) in 6.4s (jobs=1)
+INFO build_store:   collection KSzMoBFaro813rNXMbQRjtcMyAR9xhmR (new, 910 sequences)
+INFO build_store: shard 4 (refseqgene.4.genomic.fna.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/RefSeqGene/refseqgene.4.genomic.fna.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/RefSeqGene/refseqgene.4.genomic.fna.gz...
+Added zvQPQT8VXLVCOrcbhAF23E3z6jy1tB6- (821 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/RefSeqGene/refseqgene.4.genomic.fna.gz in 0.0s
+Imported 1 file(s) in 6.2s (jobs=1)
+INFO build_store:   collection zvQPQT8VXLVCOrcbhAF23E3z6jy1tB6- (new, 821 sequences)
+INFO build_store: shard 5 (refseqgene.5.genomic.fna.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/RefSeqGene/refseqgene.5.genomic.fna.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/RefSeqGene/refseqgene.5.genomic.fna.gz...
+Added r4LGSkRf80y4klh06hUtinOK69MeeGBN (871 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/RefSeqGene/refseqgene.5.genomic.fna.gz in 0.0s
+Imported 1 file(s) in 6.4s (jobs=1)
+INFO build_store:   collection r4LGSkRf80y4klh06hUtinOK69MeeGBN (new, 871 sequences)
+INFO build_store: shard 6 (refseqgene.6.genomic.fna.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/RefSeqGene/refseqgene.6.genomic.fna.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/RefSeqGene/refseqgene.6.genomic.fna.gz...
+Added FJajlv6li5NmVFqGw0p9fHCVCy7t6bzA (681 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/RefSeqGene/refseqgene.6.genomic.fna.gz in 0.0s
+Imported 1 file(s) in 6.3s (jobs=1)
+INFO build_store:   collection FJajlv6li5NmVFqGw0p9fHCVCy7t6bzA (new, 681 sequences)
+INFO build_store: shard 7 (refseqgene.7.genomic.fna.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/RefSeqGene/refseqgene.7.genomic.fna.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/RefSeqGene/refseqgene.7.genomic.fna.gz...
+Added NkUqJVyYfbGKj8PcWk7NGma8lGcjOZth (841 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/RefSeqGene/refseqgene.7.genomic.fna.gz in 0.0s
+Imported 1 file(s) in 6.3s (jobs=1)
+INFO build_store:   collection NkUqJVyYfbGKj8PcWk7NGma8lGcjOZth (new, 841 sequences)
+INFO build_store: shard 8 (refseqgene.8.genomic.fna.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/RefSeqGene/refseqgene.8.genomic.fna.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/RefSeqGene/refseqgene.8.genomic.fna.gz...
+Added h6Zjl7gcmtzX68-K1psTBdvs-76P4uhx (918 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/RefSeqGene/refseqgene.8.genomic.fna.gz in 0.0s
+Imported 1 file(s) in 6.9s (jobs=1)
+INFO build_store:   collection h6Zjl7gcmtzX68-K1psTBdvs-76P4uhx (new, 918 sequences)
+INFO build_store: shard 9 (refseqgene.9.genomic.fna.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/RefSeqGene/refseqgene.9.genomic.fna.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/RefSeqGene/refseqgene.9.genomic.fna.gz...
+Added IgW0nuhnxkWGahP5qAHns6jq7WB6B2z3 (55 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/RefSeqGene/refseqgene.9.genomic.fna.gz in 0.0s
+Imported 1 file(s) in 5.8s (jobs=1)
+INFO build_store:   collection IgW0nuhnxkWGahP5qAHns6jq7WB6B2z3 (new, 55 sequences)
+INFO build_store:   refseq_human_refseqgene: bulk-loaded 6844 new aliases into ns=refseq
+INFO build_store: === seqset ensembl_human_cdna ===
+INFO build_store: shard -
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-113/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-113/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz...
+Added 981XNHcRkJsJ97KmD8THr8MkOoZ_QRX9 (207133 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-113/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz in 6.7s
+Imported 1 file(s) in 43.8s (jobs=1)
+INFO build_store:   collection 981XNHcRkJsJ97KmD8THr8MkOoZ_QRX9 (new, 207133 sequences)
+INFO build_store:   ensembl_human_cdna: bulk-loaded 207133 new aliases into ns=ensembl
+INFO build_store: === seqset ensembl_human_ncrna ===
+INFO build_store: shard -
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-113/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-113/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz...
+Added y5fot3NHMZdDEV0iwthaKiCj3Ov6doY0 (203776 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-113/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz in 7.1s
+Imported 1 file(s) in 53.1s (jobs=1)
+INFO build_store:   collection y5fot3NHMZdDEV0iwthaKiCj3Ov6doY0 (new, 203776 sequences)
+INFO build_store:   ensembl_human_ncrna: bulk-loaded 203776 new aliases into ns=ensembl
+INFO build_store: === seqset ensembl_human_pep ===
+INFO build_store: shard -
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-113/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-113/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz...
+Added mDIffSch69TKHuHhLnqebkDk4lCxi61A (123845 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-113/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz in 4.0s
+Imported 1 file(s) in 30.0s (jobs=1)
+INFO build_store:   collection mDIffSch69TKHuHhLnqebkDk4lCxi61A (new, 123845 sequences)
+INFO build_store:   ensembl_human_pep: bulk-loaded 123845 new aliases into ns=ensembl
+INFO build_store: === seqset refseq_history_rna ===
+INFO build_store: shard 1 (GCF_000001405.26_GRCh38_rna.fna.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.26_GRCh38/GCF_000001405.26_GRCh38_rna.fna.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.26_GRCh38/GCF_000001405.26_GRCh38_rna.fna.gz...
+Added _p73QJtqxhknQ8xXLqe9V6_862yQpvP_ (87111 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.26_GRCh38/GCF_000001405.26_GRCh38_rna.fna.gz in 2.8s
+Imported 1 file(s) in 31.9s (jobs=1)
+INFO build_store:   collection _p73QJtqxhknQ8xXLqe9V6_862yQpvP_ (new, 87111 sequences)
+INFO build_store: shard 2 (GCF_000001405.28_GRCh38.p2_rna.fna.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.28_GRCh38.p2/GCF_000001405.28_GRCh38.p2_rna.fna.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.28_GRCh38.p2/GCF_000001405.28_GRCh38.p2_rna.fna.gz...
+Added RXKOcIT2KnqQPvI4x0fh2pRG1_icYNna (139116 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.28_GRCh38.p2/GCF_000001405.28_GRCh38.p2_rna.fna.gz in 4.4s
+Imported 1 file(s) in 38.2s (jobs=1)
+INFO build_store:   collection RXKOcIT2KnqQPvI4x0fh2pRG1_icYNna (new, 139116 sequences)
+INFO build_store: shard 3 (GCF_000001405.31_GRCh38.p5_rna.fna.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.31_GRCh38.p5/GCF_000001405.31_GRCh38.p5_rna.fna.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.31_GRCh38.p5/GCF_000001405.31_GRCh38.p5_rna.fna.gz...
+Added BJWRquLF-gmvV7xfIvFGg9Kkh4Rc-jhR (164135 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.31_GRCh38.p5/GCF_000001405.31_GRCh38.p5_rna.fna.gz in 5.2s
+Imported 1 file(s) in 43.0s (jobs=1)
+INFO build_store:   collection BJWRquLF-gmvV7xfIvFGg9Kkh4Rc-jhR (new, 164135 sequences)
+INFO build_store: shard 4 (GCF_000001405.33_GRCh38.p7_rna.fna.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.33_GRCh38.p7/GCF_000001405.33_GRCh38.p7_rna.fna.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.33_GRCh38.p7/GCF_000001405.33_GRCh38.p7_rna.fna.gz...
+Added 28dS0M6Q9IIWn_SqQuJDkihnuypBUc4v (153977 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.33_GRCh38.p7/GCF_000001405.33_GRCh38.p7_rna.fna.gz in 5.0s
+Imported 1 file(s) in 38.5s (jobs=1)
+INFO build_store:   collection 28dS0M6Q9IIWn_SqQuJDkihnuypBUc4v (new, 153977 sequences)
+INFO build_store: shard 5 (GCF_000001405.38_GRCh38.p12_rna.fna.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109/GCF_000001405.38_GRCh38.p12/GCF_000001405.38_GRCh38.p12_rna.fna.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109/GCF_000001405.38_GRCh38.p12/GCF_000001405.38_GRCh38.p12_rna.fna.gz...
+Added vVujRs88U8kvZvrZUErAh6v_4AaRxbaj (159998 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109/GCF_000001405.38_GRCh38.p12/GCF_000001405.38_GRCh38.p12_rna.fna.gz in 5.5s
+Imported 1 file(s) in 36.9s (jobs=1)
+INFO build_store:   collection vVujRs88U8kvZvrZUErAh6v_4AaRxbaj (new, 159998 sequences)
+INFO build_store: shard 6 (GCF_000001405.39_GRCh38.p13_rna.fna.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20190607/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_rna.fna.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20190607/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_rna.fna.gz...
+Added CI5RkL5MikKn1Zu7rIdAUEpj39ggmRGD (158792 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20190607/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_rna.fna.gz in 5.2s
+Imported 1 file(s) in 33.6s (jobs=1)
+INFO build_store:   collection CI5RkL5MikKn1Zu7rIdAUEpj39ggmRGD (new, 158792 sequences)
+INFO build_store: shard 7 (GCF_000001405.39_GRCh38.p13_rna.fna.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20191205/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_rna.fna.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20191205/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_rna.fna.gz...
+Added QLt-UpmkQ_gacQjqv_KqOFpGYTX99c8m (160052 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20191205/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_rna.fna.gz in 5.0s
+Imported 1 file(s) in 34.5s (jobs=1)
+INFO build_store:   collection QLt-UpmkQ_gacQjqv_KqOFpGYTX99c8m (new, 160052 sequences)
+INFO build_store: shard 8 (GCF_000001405.39_GRCh38.p13_rna.fna.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20201120/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_rna.fna.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20201120/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_rna.fna.gz...
+Added jrsl45TSAr0DhNmSA2-4ByYFGLI3hwVI (163975 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20201120/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_rna.fna.gz in 5.4s
+Imported 1 file(s) in 37.5s (jobs=1)
+INFO build_store:   collection jrsl45TSAr0DhNmSA2-4ByYFGLI3hwVI (new, 163975 sequences)
+INFO build_store: shard 9 (GCF_000001405.39_GRCh38.p13_rna.fna.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20211119/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_rna.fna.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20211119/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_rna.fna.gz...
+Added 94R1oluARKx2EZ26P3PzdaqQ1JR3vTg8 (163377 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20211119/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_rna.fna.gz in 7.7s
+Imported 1 file(s) in 43.2s (jobs=1)
+INFO build_store:   collection 94R1oluARKx2EZ26P3PzdaqQ1JR3vTg8 (new, 163377 sequences)
+INFO build_store: shard 10 (GCF_000001405.40_GRCh38.p14_rna.fna.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/110/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_rna.fna.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/110/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_rna.fna.gz...
+Added Zn0bEQotg5T0lcnMziMchyCwKQmI8C2H (177816 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/110/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_rna.fna.gz in 8.1s
+Imported 1 file(s) in 41.4s (jobs=1)
+INFO build_store:   collection Zn0bEQotg5T0lcnMziMchyCwKQmI8C2H (new, 177816 sequences)
+INFO build_store:   refseq_history_rna: bulk-loaded 313846 new aliases into ns=refseq
+INFO build_store: === seqset refseq_history_protein ===
+INFO build_store: shard 1 (GCF_000001405.26_GRCh38_protein.faa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.26_GRCh38/GCF_000001405.26_GRCh38_protein.faa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.26_GRCh38/GCF_000001405.26_GRCh38_protein.faa.gz...
+Added acSa52eGEg-EN0UIWtObXoL2lA9SX-ME (69839 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.26_GRCh38/GCF_000001405.26_GRCh38_protein.faa.gz in 2.4s
+Imported 1 file(s) in 31.2s (jobs=1)
+INFO build_store:   collection acSa52eGEg-EN0UIWtObXoL2lA9SX-ME (new, 69839 sequences)
+INFO build_store: shard 2 (GCF_000001405.28_GRCh38.p2_protein.faa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.28_GRCh38.p2/GCF_000001405.28_GRCh38.p2_protein.faa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.28_GRCh38.p2/GCF_000001405.28_GRCh38.p2_protein.faa.gz...
+Added nLBgMgdEaKuYvz1IAiRY6CjCzvuhi01u (98121 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.28_GRCh38.p2/GCF_000001405.28_GRCh38.p2_protein.faa.gz in 3.3s
+Imported 1 file(s) in 31.1s (jobs=1)
+INFO build_store:   collection nLBgMgdEaKuYvz1IAiRY6CjCzvuhi01u (new, 98121 sequences)
+INFO build_store: shard 3 (GCF_000001405.31_GRCh38.p5_protein.faa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.31_GRCh38.p5/GCF_000001405.31_GRCh38.p5_protein.faa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.31_GRCh38.p5/GCF_000001405.31_GRCh38.p5_protein.faa.gz...
+Added CxOGa84WDfmgkU1or8Mw2pzXYrG_ECSs (116239 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.31_GRCh38.p5/GCF_000001405.31_GRCh38.p5_protein.faa.gz in 3.9s
+Imported 1 file(s) in 29.8s (jobs=1)
+INFO build_store:   collection CxOGa84WDfmgkU1or8Mw2pzXYrG_ECSs (new, 116239 sequences)
+INFO build_store: shard 4 (GCF_000001405.33_GRCh38.p7_protein.faa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.33_GRCh38.p7/GCF_000001405.33_GRCh38.p7_protein.faa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.33_GRCh38.p7/GCF_000001405.33_GRCh38.p7_protein.faa.gz...
+Added uFzuGM0mH_1SR6LHUA9roDpL232gdQqN (109018 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.33_GRCh38.p7/GCF_000001405.33_GRCh38.p7_protein.faa.gz in 3.5s
+Imported 1 file(s) in 28.5s (jobs=1)
+INFO build_store:   collection uFzuGM0mH_1SR6LHUA9roDpL232gdQqN (new, 109018 sequences)
+INFO build_store: shard 5 (GCF_000001405.38_GRCh38.p12_protein.faa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109/GCF_000001405.38_GRCh38.p12/GCF_000001405.38_GRCh38.p12_protein.faa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109/GCF_000001405.38_GRCh38.p12/GCF_000001405.38_GRCh38.p12_protein.faa.gz...
+Added zMf5Gog4_kgzgBn_ZLdm7z7TNnResItN (113620 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109/GCF_000001405.38_GRCh38.p12/GCF_000001405.38_GRCh38.p12_protein.faa.gz in 3.6s
+Imported 1 file(s) in 29.1s (jobs=1)
+INFO build_store:   collection zMf5Gog4_kgzgBn_ZLdm7z7TNnResItN (new, 113620 sequences)
+INFO build_store: shard 6 (GCF_000001405.39_GRCh38.p13_protein.faa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20190607/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_protein.faa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20190607/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_protein.faa.gz...
+Added ZutEiWMOogutWcQg66ugZ4ZcqxsGPW0n (112268 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20190607/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_protein.faa.gz in 3.5s
+Imported 1 file(s) in 28.2s (jobs=1)
+INFO build_store:   collection ZutEiWMOogutWcQg66ugZ4ZcqxsGPW0n (new, 112268 sequences)
+INFO build_store: shard 7 (GCF_000001405.39_GRCh38.p13_protein.faa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20191205/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_protein.faa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20191205/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_protein.faa.gz...
+Added ED2xiyNhuUJKdy_6KbL6HiyzoiYN2Smg (113275 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20191205/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_protein.faa.gz in 3.5s
+Imported 1 file(s) in 31.7s (jobs=1)
+INFO build_store:   collection ED2xiyNhuUJKdy_6KbL6HiyzoiYN2Smg (new, 113275 sequences)
+INFO build_store: shard 8 (GCF_000001405.39_GRCh38.p13_protein.faa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20201120/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_protein.faa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20201120/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_protein.faa.gz...
+Added XJvFe2Xd4JBVZzlzreDoufmZq-BKLKyn (115987 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20201120/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_protein.faa.gz in 3.6s
+Imported 1 file(s) in 31.5s (jobs=1)
+INFO build_store:   collection XJvFe2Xd4JBVZzlzreDoufmZq-BKLKyn (new, 115987 sequences)
+INFO build_store: shard 9 (GCF_000001405.39_GRCh38.p13_protein.faa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20211119/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_protein.faa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20211119/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_protein.faa.gz...
+Added HkfHK6GqxqG7UmftFzbA2vZKgxyyotGY (115351 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20211119/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_protein.faa.gz in 3.5s
+Imported 1 file(s) in 31.6s (jobs=1)
+INFO build_store:   collection HkfHK6GqxqG7UmftFzbA2vZKgxyyotGY (new, 115351 sequences)
+INFO build_store: shard 10 (GCF_000001405.40_GRCh38.p14_protein.faa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/110/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_protein.faa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/110/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_protein.faa.gz...
+Added QUqYNmk-t2Kic-lQ6j_1zbqbjUFpheoA (130184 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/110/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_protein.faa.gz in 4.1s
+Imported 1 file(s) in 28.2s (jobs=1)
+INFO build_store:   collection QUqYNmk-t2Kic-lQ6j_1zbqbjUFpheoA (new, 130184 sequences)
+INFO build_store:   refseq_history_protein: bulk-loaded 88768 new aliases into ns=refseq
+INFO build_store: === seqset refseq_history_curated_rna ===
+INFO build_store: shard 1 (GCF_000001405.40-RS_2024_08_knownrefseq_rna.gbff.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/historical/GRCh38/current/GCF_000001405.40-RS_2024_08_knownrefseq_rna.gbff.gz
+INFO build_store: using cached gbff->fasta /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/historical/GRCh38/current/GCF_000001405.40-RS_2024_08_knownrefseq_rna.gbff.gz.fasta
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/historical/GRCh38/current/GCF_000001405.40-RS_2024_08_knownrefseq_rna.gbff.gz.fasta...
+Added UMEmbOyW1zamZ0P_YqiaD76pv6_Xd_bu (193033 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/historical/GRCh38/current/GCF_000001405.40-RS_2024_08_knownrefseq_rna.gbff.gz.fasta in 2.9s
+Imported 1 file(s) in 35.3s (jobs=1)
+INFO build_store:   collection UMEmbOyW1zamZ0P_YqiaD76pv6_Xd_bu (new, 193033 sequences)
+INFO build_store:   refseq_history_curated_rna: bulk-loaded 40872 new aliases into ns=refseq
+INFO build_store: === seqset ensembl_history_cdna ===
+INFO build_store: shard 1 (Homo_sapiens.GRCh38.cdna.all.fa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-76/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-76/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz...
+Added VAKPxEYd3XqIncer6Ng60VBss9O1uLDX (170786 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-76/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz in 5.5s
+Imported 1 file(s) in 37.4s (jobs=1)
+INFO build_store:   collection VAKPxEYd3XqIncer6Ng60VBss9O1uLDX (new, 170786 sequences)
+INFO build_store: shard 2 (Homo_sapiens.GRCh38.cdna.all.fa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-85/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-85/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz...
+Added F3jUxqyOM3hA-ZPalv0Kda8mb8KUk6HS (178136 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-85/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz in 5.7s
+Imported 1 file(s) in 33.6s (jobs=1)
+INFO build_store:   collection F3jUxqyOM3hA-ZPalv0Kda8mb8KUk6HS (new, 178136 sequences)
+INFO build_store: shard 3 (Homo_sapiens.GRCh38.cdna.all.fa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-90/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-90/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz...
+Added bX3VfKMsWb7VCV6b4KS8CekmIAEArD7B (180869 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-90/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz in 5.7s
+Imported 1 file(s) in 34.6s (jobs=1)
+INFO build_store:   collection bX3VfKMsWb7VCV6b4KS8CekmIAEArD7B (new, 180869 sequences)
+INFO build_store: shard 4 (Homo_sapiens.GRCh38.cdna.all.fa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-95/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-95/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz...
+Added UNoJ3cmkUG7K-2U-BWR_ZQv-8lSueJ18 (187626 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-95/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz in 6.2s
+Imported 1 file(s) in 33.3s (jobs=1)
+INFO build_store:   collection UNoJ3cmkUG7K-2U-BWR_ZQv-8lSueJ18 (new, 187626 sequences)
+INFO build_store: shard 5 (Homo_sapiens.GRCh38.cdna.all.fa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-100/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-100/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz...
+Added 9Z7_SdfZFycr9F46KxGi1DTo13MtN5fn (190522 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-100/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz in 6.3s
+Imported 1 file(s) in 34.0s (jobs=1)
+INFO build_store:   collection 9Z7_SdfZFycr9F46KxGi1DTo13MtN5fn (new, 190522 sequences)
+INFO build_store: shard 6 (Homo_sapiens.GRCh38.cdna.all.fa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-105/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-105/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz...
+Added DbGu_8nT0zBB9ZxXnzGUdO5YMdRGJwfF (202897 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-105/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz in 6.5s
+Imported 1 file(s) in 35.2s (jobs=1)
+INFO build_store:   collection DbGu_8nT0zBB9ZxXnzGUdO5YMdRGJwfF (new, 202897 sequences)
+INFO build_store: shard 7 (Homo_sapiens.GRCh38.cdna.all.fa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-110/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-110/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz...
+Added URil9d1jKFltpJ4ZiiKayDhnCkBstcC1 (207249 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-110/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz in 6.5s
+Imported 1 file(s) in 36.9s (jobs=1)
+INFO build_store:   collection URil9d1jKFltpJ4ZiiKayDhnCkBstcC1 (new, 207249 sequences)
+INFO build_store: shard 8 (Homo_sapiens.GRCh38.cdna.all.fa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-112/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-112/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz...
+Added Idx8M2xUP6ioHxqB10nLx1MHRM_rdGhj (206723 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-112/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz in 6.4s
+Imported 1 file(s) in 36.6s (jobs=1)
+INFO build_store:   collection Idx8M2xUP6ioHxqB10nLx1MHRM_rdGhj (new, 206723 sequences)
+INFO build_store: shard 9 (Homo_sapiens.GRCh37.75.cdna.all.fa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-75/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh37.75.cdna.all.fa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-75/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh37.75.cdna.all.fa.gz...
+Added KUup5rKuaOHEKWOmEPHW_NFMkLu3kjZr (180253 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-75/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh37.75.cdna.all.fa.gz in 6.0s
+Imported 1 file(s) in 35.3s (jobs=1)
+INFO build_store:   collection KUup5rKuaOHEKWOmEPHW_NFMkLu3kjZr (new, 180253 sequences)
+INFO build_store:   ensembl_history_cdna: bulk-loaded 227641 new aliases into ns=ensembl
+INFO build_store: === seqset ensembl_history_ncrna ===
+INFO build_store: shard 1 (Homo_sapiens.GRCh38.ncrna.fa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-76/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-76/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz...
+Added 2ALDKqeWu9nm8rx3ZJfSK60Gp5fGoVnZ (35397 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-76/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz in 1.1s
+Imported 1 file(s) in 28.1s (jobs=1)
+INFO build_store:   collection 2ALDKqeWu9nm8rx3ZJfSK60Gp5fGoVnZ (new, 35397 sequences)
+INFO build_store: shard 2 (Homo_sapiens.GRCh38.ncrna.fa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-85/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-85/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz...
+Added JQ_WhftbEMlSSDNY5HecyKOlRtNpR_Dy (36701 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-85/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz in 1.2s
+Imported 1 file(s) in 26.6s (jobs=1)
+INFO build_store:   collection JQ_WhftbEMlSSDNY5HecyKOlRtNpR_Dy (new, 36701 sequences)
+INFO build_store: shard 3 (Homo_sapiens.GRCh38.ncrna.fa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-90/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-90/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz...
+Added SXjCz4iZTkBas1M-bz4qQ4SZZmvS8gow (37297 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-90/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz in 1.2s
+Imported 1 file(s) in 28.6s (jobs=1)
+INFO build_store:   collection SXjCz4iZTkBas1M-bz4qQ4SZZmvS8gow (new, 37297 sequences)
+INFO build_store: shard 4 (Homo_sapiens.GRCh38.ncrna.fa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-95/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-95/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz...
+Added EJP9PqMc_1coUSi8II2qK84zE40VjSK6 (38739 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-95/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz in 1.3s
+Imported 1 file(s) in 28.0s (jobs=1)
+INFO build_store:   collection EJP9PqMc_1coUSi8II2qK84zE40VjSK6 (new, 38739 sequences)
+INFO build_store: shard 5 (Homo_sapiens.GRCh38.ncrna.fa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-100/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-100/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz...
+Added KvhnlQsU7nEk1SXueEbcpzxdMnEbylyy (58070 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-100/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz in 1.9s
+Imported 1 file(s) in 32.8s (jobs=1)
+INFO build_store:   collection KvhnlQsU7nEk1SXueEbcpzxdMnEbylyy (new, 58070 sequences)
+INFO build_store: shard 6 (Homo_sapiens.GRCh38.ncrna.fa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-105/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-105/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz...
+Added 9b42u8ftnDXrWexqb9BvnWKU4BEIEUQV (62583 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-105/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz in 2.1s
+Imported 1 file(s) in 28.9s (jobs=1)
+INFO build_store:   collection 9b42u8ftnDXrWexqb9BvnWKU4BEIEUQV (new, 62583 sequences)
+INFO build_store: shard 7 (Homo_sapiens.GRCh38.ncrna.fa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-110/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-110/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz...
+Added 9IZKoQtNEi7CTWnTBL5jivoxWSPLnbYE (68492 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-110/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz in 2.1s
+Imported 1 file(s) in 32.7s (jobs=1)
+INFO build_store:   collection 9IZKoQtNEi7CTWnTBL5jivoxWSPLnbYE (new, 68492 sequences)
+INFO build_store: shard 8 (Homo_sapiens.GRCh38.ncrna.fa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-112/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-112/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz...
+Added qPFjJvxbivz3LPJypvqmUKRnY2wTQdwL (70339 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-112/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz in 2.2s
+Imported 1 file(s) in 28.0s (jobs=1)
+INFO build_store:   collection qPFjJvxbivz3LPJypvqmUKRnY2wTQdwL (new, 70339 sequences)
+INFO build_store:   ensembl_history_ncrna: bulk-loaded 57532 new aliases into ns=ensembl
+INFO build_store: === seqset ensembl_history_pep ===
+INFO build_store: shard 1 (Homo_sapiens.GRCh38.pep.all.fa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-76/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-76/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz...
+Added s8aNt513DjT4I2ElPMnZgbnudN8mLj9y (99459 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-76/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz in 3.3s
+Imported 1 file(s) in 31.7s (jobs=1)
+INFO build_store:   collection s8aNt513DjT4I2ElPMnZgbnudN8mLj9y (new, 99459 sequences)
+INFO build_store: shard 2 (Homo_sapiens.GRCh38.pep.all.fa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-85/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-85/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz...
+Added HtiITBeVAkoG5rOpuDWvnck7v0pahTXy (102915 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-85/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz in 3.3s
+Imported 1 file(s) in 29.4s (jobs=1)
+INFO build_store:   collection HtiITBeVAkoG5rOpuDWvnck7v0pahTXy (new, 102915 sequences)
+INFO build_store: shard 3 (Homo_sapiens.GRCh38.pep.all.fa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-90/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-90/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz...
+Added C5H9uBdHj-yrKSaTnhI_Lb7VnfYwxIAs (104817 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-90/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz in 3.3s
+Imported 1 file(s) in 28.9s (jobs=1)
+INFO build_store:   collection C5H9uBdHj-yrKSaTnhI_Lb7VnfYwxIAs (new, 104817 sequences)
+INFO build_store: shard 4 (Homo_sapiens.GRCh38.pep.all.fa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-95/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-95/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz...
+Added cj0vzUaeyzWOGAzFZyoDpDT11-cSugQF (109095 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-95/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz in 3.4s
+Imported 1 file(s) in 30.5s (jobs=1)
+INFO build_store:   collection cj0vzUaeyzWOGAzFZyoDpDT11-cSugQF (new, 109095 sequences)
+INFO build_store: shard 5 (Homo_sapiens.GRCh38.pep.all.fa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-100/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-100/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz...
+Added KRbrh_uOchqM26cYWG191XQ8_llsNToe (111060 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-100/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz in 3.5s
+Imported 1 file(s) in 30.4s (jobs=1)
+INFO build_store:   collection KRbrh_uOchqM26cYWG191XQ8_llsNToe (new, 111060 sequences)
+INFO build_store: shard 6 (Homo_sapiens.GRCh38.pep.all.fa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-105/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-105/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz...
+Added CshmWVeieRuReUVNplLjNthX2K4OIZCl (117909 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-105/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz in 3.8s
+Imported 1 file(s) in 30.2s (jobs=1)
+INFO build_store:   collection CshmWVeieRuReUVNplLjNthX2K4OIZCl (new, 117909 sequences)
+INFO build_store: shard 7 (Homo_sapiens.GRCh38.pep.all.fa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-110/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-110/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz...
+Added WsIGrW1Pwxh6yEXXxeBD0-aOlnghw0TF (122614 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-110/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz in 3.9s
+Imported 1 file(s) in 29.9s (jobs=1)
+INFO build_store:   collection WsIGrW1Pwxh6yEXXxeBD0-aOlnghw0TF (new, 122614 sequences)
+INFO build_store: shard 8 (Homo_sapiens.GRCh38.pep.all.fa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-112/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-112/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz...
+Added 4oujamqoFfe7m91-ksmwRFb_CRewKvPi (123495 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-112/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz in 3.8s
+Imported 1 file(s) in 29.8s (jobs=1)
+INFO build_store:   collection 4oujamqoFfe7m91-ksmwRFb_CRewKvPi (new, 123495 sequences)
+INFO build_store: shard 9 (Homo_sapiens.GRCh37.75.pep.all.fa.gz)
+INFO build_store: using cached /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-75/fasta/homo_sapiens/pep/Homo_sapiens.GRCh37.75.pep.all.fa.gz
+Processing /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-75/fasta/homo_sapiens/pep/Homo_sapiens.GRCh37.75.pep.all.fa.gz...
+Added D0OYvXcTtCxbjPhhall2M-PTW2IvDKsy (104763 seqs) from /Users/kferrite/dev/gks-refgetstore-builder/downloads/ftp.ensembl.org/pub/release-75/fasta/homo_sapiens/pep/Homo_sapiens.GRCh37.75.pep.all.fa.gz in 3.3s
+Imported 1 file(s) in 30.6s (jobs=1)
+INFO build_store:   collection D0OYvXcTtCxbjPhhall2M-PTW2IvDKsy (new, 104763 sequences)
+INFO build_store:   ensembl_history_pep: bulk-loaded 125598 new aliases into ns=ensembl
+INFO build_store: persisting store to /Users/kferrite/dev/gks-refgetstore-builder/store
+
+Summary
+-------
+  GRCh38          rows= 455 resolved= 455 non_refseq=  0 seq_aliases_added=2275 skipped=   0 coll_aliases_added= 2 warnings=  0
+  GRCh38.p14      rows= 709 resolved= 705 non_refseq=  4 seq_aliases_added=2623 skipped= 902 coll_aliases_added= 2 warnings=  0
+  GRCh37          rows=  92 resolved=  92 non_refseq=  0 seq_aliases_added= 436 skipped=  24 coll_aliases_added= 2 warnings=  0
+  GRCh37.p13      rows= 297 resolved= 297 non_refseq=  0 seq_aliases_added= 991 skipped= 290 coll_aliases_added= 2 warnings=  0
+  GRCh38.p1       rows= 471 resolved= 471 non_refseq=  0 seq_aliases_added=1397 skipped= 942 coll_aliases_added= 0 warnings=  0
+  GRCh38.p2       rows= 486 resolved= 486 non_refseq=  0 seq_aliases_added=1427 skipped= 972 coll_aliases_added= 0 warnings=  0
+  GRCh38.p3       rows= 494 resolved= 494 non_refseq=  0 seq_aliases_added=1443 skipped= 988 coll_aliases_added= 0 warnings=  0
+  GRCh38.p4       rows= 510 resolved= 510 non_refseq=  0 seq_aliases_added=1475 skipped=1020 coll_aliases_added= 0 warnings=  0
+  GRCh38.p5       rows= 517 resolved= 517 non_refseq=  0 seq_aliases_added=1489 skipped=1034 coll_aliases_added= 0 warnings=  0
+  GRCh38.p6       rows= 521 resolved= 519 non_refseq=  0 seq_aliases_added=1493 skipped=1038 coll_aliases_added= 0 warnings=  2
+  GRCh38.p7       rows= 525 resolved= 523 non_refseq=  0 seq_aliases_added=1501 skipped=1046 coll_aliases_added= 0 warnings=  2
+  GRCh38.p8       rows= 543 resolved= 541 non_refseq=  0 seq_aliases_added=1537 skipped=1082 coll_aliases_added= 0 warnings=  2
+  GRCh38.p9       rows= 551 resolved= 549 non_refseq=  0 seq_aliases_added=1553 skipped=1098 coll_aliases_added= 0 warnings=  2
+  GRCh38.p10      rows= 557 resolved= 555 non_refseq=  0 seq_aliases_added=1565 skipped=1110 coll_aliases_added= 0 warnings=  2
+  GRCh38.p11      rows= 578 resolved= 576 non_refseq=  0 seq_aliases_added=1607 skipped=1152 coll_aliases_added= 0 warnings=  2
+  GRCh38.p12      rows= 595 resolved= 592 non_refseq=  1 seq_aliases_added=1638 skipped=1184 coll_aliases_added= 0 warnings=  2
+  GRCh37.p2       rows= 163 resolved= 155 non_refseq=  0 seq_aliases_added= 403 skipped= 310 coll_aliases_added= 0 warnings=  8
+  GRCh37.p5       rows= 198 resolved= 185 non_refseq=  0 seq_aliases_added= 463 skipped= 370 coll_aliases_added= 0 warnings= 13
+  GRCh37.p9       rows= 245 resolved= 231 non_refseq=  0 seq_aliases_added= 555 skipped= 462 coll_aliases_added= 0 warnings= 14
+  GRCh37.p10      rows= 275 resolved= 258 non_refseq=  0 seq_aliases_added= 609 skipped= 516 coll_aliases_added= 0 warnings= 17
+  GRCh37.p11      rows= 280 resolved= 265 non_refseq=  0 seq_aliases_added= 623 skipped= 530 coll_aliases_added= 0 warnings= 15
+  GRCh37.p12      rows= 287 resolved= 272 non_refseq=  0 seq_aliases_added= 637 skipped= 544 coll_aliases_added= 0 warnings= 15
+  refseq_human_rna          ns=refseq   shards= 15 seqs= 273515 seq_aliases_added= 273515 skipped=     0 warnings=  0
+  refseq_human_protein      ns=refseq   shards= 15 seqs= 197863 seq_aliases_added= 197863 skipped=     0 warnings=  0
+  refseq_human_refseqgene   ns=refseq   shards=  9 seqs=   6844 seq_aliases_added=   6844 skipped=     0 warnings=  0
+  ensembl_human_cdna        ns=ensembl  shards=  1 seqs= 207133 seq_aliases_added= 207133 skipped=     0 warnings=  0
+  ensembl_human_ncrna       ns=ensembl  shards=  1 seqs= 203776 seq_aliases_added= 203776 skipped=     0 warnings=  0
+  ensembl_human_pep         ns=ensembl  shards=  1 seqs= 123845 seq_aliases_added= 123845 skipped=     0 warnings=  0
+  refseq_history_rna        ns=refseq   shards= 10 seqs=1528349 seq_aliases_added= 313846 skipped=168589 warnings=  0
+  refseq_history_protein    ns=refseq   shards= 10 seqs=1093902 seq_aliases_added=  88768 skipped=125131 warnings=  0
+  refseq_history_curated_rna  ns=refseq   shards=  1 seqs= 193033 seq_aliases_added=  40872 skipped=152161 warnings=  0
+  ensembl_history_cdna      ns=ensembl  shards=  9 seqs=1705061 seq_aliases_added= 227641 skipped=210136 warnings=  0
+  ensembl_history_ncrna     ns=ensembl  shards=  8 seqs= 407618 seq_aliases_added=  57532 skipped= 57917 warnings=  0
+  ensembl_history_pep       ns=ensembl  shards=  9 seqs= 996127 seq_aliases_added= 125598 skipped=123401 warnings=  0
+
+Store stats: {'n_collections_loaded': '93', 'n_sequences': '1252244', 'storage_mode': 'Encoded', 'n_sequences_loaded': '0', 'n_collections': '93'}
+Sequence alias namespaces: ['GRCh37', 'GRCh37.p10', 'GRCh37.p11', 'GRCh37.p12', 'GRCh37.p13', 'GRCh37.p2', 'GRCh37.p5', 'GRCh37.p9', 'GRCh38', 'GRCh38.p1', 'GRCh38.p10', 'GRCh38.p11', 'GRCh38.p12', 'GRCh38.p14', 'GRCh38.p2', 'GRCh38.p3', 'GRCh38.p4', 'GRCh38.p5', 'GRCh38.p6', 'GRCh38.p7', 'GRCh38.p8', 'GRCh38.p9', 'ensembl', 'insdc', 'refseq']
+Collection alias namespaces: ['insdc', 'refseq']

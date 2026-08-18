@@ -1,0 +1,35 @@
+{
+  "schema": "gks-refgetstore-build-lock/2",
+  "build": {
+    "timestamp_utc": "2026-07-23T20:59:43.763657+00:00",
+    "git": {
+      "commit": "dc04e5e285a4f8a294298d58fb2d5814adf4fe8a",
+      "describe": "dc04e5e",
+      "dirty": false
+    },
+    "gtars_version": "0.9.2",
+    "sources_toml": {
+      "path": "downloads.ensembl-experiment/sources.ensembl-dna-r116.toml",
+      "sha256": "2f5a39754926968c714d3ed91609dfe7b03066b5e96125791f9f5a186a473ef3"
+    },
+    "store": {
+      "n_sequences": "1213632",
+      "n_collections": "108"
+    }
+  },
+  "sources": [
+    {
+      "kind": "seqset",
+      "owner": "ensembl_human_dna_primary_r116",
+      "url": "https://ftp.ensembl.org/pub/release-116/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz",
+      "cache_path": "ftp.ensembl.org/pub/release-116/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz",
+      "mutable": false,
+      "upstream_md5": null,
+      "bytes": 881964081,
+      "sha256": "d8c3af0094a7bba6125763bad779ec18a81483c739c6ed122094bdf86c187b92",
+      "present": true,
+      "collection_digest": "oLfPx0NOBKKXMIngGeQ4YewtU4Ge_wKz",
+      "n_sequences": 194
+    }
+  ]
+}

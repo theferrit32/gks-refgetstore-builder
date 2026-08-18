@@ -39,8 +39,9 @@ REPO_ROOT = HERE.parent  # this script lives in seqrepo_equivalence/
 DEFAULT_SEQREPO = Path("/Users/kferrite/dev/data/seqrepo/2024-12-20")
 DEFAULT_STORE = REPO_ROOT / "store"
 DEFAULT_KNOWN_DIVERGENT = HERE / "ensembl_known_divergent.txt"
-DEFAULT_REPORT = REPO_ROOT / "seqrepo_equivalence_report.json"
-DEFAULT_GAP_LIST = REPO_ROOT / "build_gaps.tsv"
+DEFAULT_RUN_DIR = REPO_ROOT / "runs" / "2026-07-02-seqrepo-parity"
+DEFAULT_REPORT = DEFAULT_RUN_DIR / "equivalence-report.json"
+DEFAULT_GAP_LIST = DEFAULT_RUN_DIR / "build_gaps.tsv"
 
 # seqrepo namespace -> refgetstore namespace, for namespaces that should be equivalent.
 NAMESPACE_MAP: dict[str, str] = {
