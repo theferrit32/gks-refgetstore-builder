@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import zipfile
 from pathlib import Path
 
 import pytest
@@ -8,7 +9,8 @@ import pytest
 import build_lock
 import build_store
 from build_store import (ResolvedSource, SeqsetConfig, apply_locked_sources,
-                         load_config, parse_checksum_manifest, resolve_sources)
+                         load_config, parse_checksum_manifest,
+                         parse_ensembl_checksum_manifest, resolve_sources)
 
 
 BASE = "https://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/"
@@ -30,6 +32,17 @@ def test_config_source_modes_are_exclusive_and_pattern_pair_is_required() -> Non
     with pytest.raises(ValueError, match="require HTTPS"):
         SeqsetConfig("bad", "x", url_pattern="ftp://x/a/*.gz",
                      checksum_manifest_url="ftp://x/a/files.installed")
+    with pytest.raises(ValueError, match="format must be one of"):
+        SeqsetConfig("bad", "x", url_template="https://x/a", format="zip")
+    assert SeqsetConfig(
+        "ok", "lrg", urls=["https://x/a.zip"], format="lrg_zip"
+    ).format == "lrg_zip"
+
+
+def test_derived_fasta_resolvers_cover_every_non_fasta_format() -> None:
+    assert set(build_store.DERIVED_FASTA_RESOLVERS) | {"fasta"} == set(
+        build_store.SEQSET_FORMATS
+    )
 
 
 @pytest.mark.parametrize("text", [
@@ -40,6 +53,17 @@ def test_config_source_modes_are_exclusive_and_pattern_pair_is_required() -> Non
 def test_manifest_rejects_malformed_duplicate_or_unsafe_records(text: str) -> None:
     with pytest.raises(ValueError):
         parse_checksum_manifest(text)
+
+
+def test_ensembl_checksum_parser_and_bsd_sum(tmp_path: Path) -> None:
+    assert parse_ensembl_checksum_manifest("65 1 one.fa.gz\n") == {
+        "one.fa.gz": ("00065", 1)
+    }
+    path = tmp_path / "one"
+    path.write_bytes(b"A")
+    assert build_store.bsd_sum_file(path) == ("00065", 1)
+    with pytest.raises(ValueError, match="unsafe"):
+        parse_ensembl_checksum_manifest("1 1 ../one.fa.gz\n")
 
 
 def test_shared_manifest_filtering_natural_order_gaps_and_changing_counts() -> None:
@@ -62,6 +86,24 @@ def test_shared_manifest_filtering_natural_order_gaps_and_changing_counts() -> N
         "human.2.rna.fna.gz", "human.10.rna.fna.gz", "human.7.protein.faa.gz"
     ]
     assert [source.upstream_md5 for source in sources] == ["b" * 32, "a" * 32, "c" * 32]
+
+
+def test_pattern_file_class_applies_to_every_resolved_source() -> None:
+    seqset = SeqsetConfig(
+        "rna", "refseq", url_pattern=BASE + "human.*.rna.fna.gz",
+        checksum_manifest_url=MANIFEST, file_class="rna",
+    )
+    manifest = "\n".join(
+        f"{value * 32}  human.{index}.rna.fna.gz"
+        for index, value in ((1, "a"), (2, "b"))
+    )
+    sources = resolve_sources([], [seqset], lambda _: manifest)
+    assert [source.file_class for source in sources] == ["rna", "rna"]
+    with pytest.raises(ValueError, match="only one file class mode"):
+        SeqsetConfig(
+            "bad", "refseq", urls=["https://x/a"], file_class="rna",
+            file_classes=["rna"],
+        )
 
 
 def test_pattern_empty_match_is_an_error() -> None:
@@ -91,6 +133,20 @@ def test_lock_classifies_membership_and_same_url_md5_change() -> None:
     assert result.only_in_lock == [BASE + "human.9.rna.fna.gz"]
     assert result.upstream_changed == [(live[0].url, "a" * 32, "b" * 32)]
     assert result.drift
+
+
+def test_lock_records_ncbi_md5_as_generic_provider_checksum(tmp_path: Path) -> None:
+    source = ResolvedSource(
+        "seqset", "rna", BASE + "human.1.rna.fna.gz", "a" * 32,
+        checksum_url=MANIFEST,
+    )
+    target = build_store.mirror_cache_path(tmp_path, source.url)
+    target.parent.mkdir(parents=True)
+    target.write_bytes(b"cached")
+    record = build_lock.source_record(source, tmp_path, {}, hash_files=False)
+    assert record["upstream_md5"] == "a" * 32
+    assert record["provider_checksum"] == "a" * 32
+    assert record["provider_checksum_algorithm"] == "md5"
 
 
 def test_locked_sources_uses_v2_concrete_urls_without_resolution(tmp_path: Path) -> None:
@@ -220,9 +276,12 @@ def test_locked_sources_with_force_download_remains_offline(
     )
     seen: list[bool] = []
 
-    def ingest(_store, entry, _cache, _provenance, refresh_derived=False):
+    def ingest(_store, entry, _cache, _provenance, refresh_derived=False,
+               alias_sink=None):
         seen.append(refresh_derived)
-        return build_store.SeqsetStats(entry.name, entry.namespace)
+        stats = build_store.SeqsetStats(entry.name, entry.namespace)
+        stats.shards_processed = 1
+        return stats
 
     monkeypatch.setattr(build_store, "process_seqset", ingest)
 
@@ -236,6 +295,8 @@ def test_locked_sources_with_force_download_remains_offline(
         def stats(): return {}
         @staticmethod
         def list_sequence_alias_namespaces(): return []
+        @staticmethod
+        def list_sequence_aliases(_namespace): return []
         @staticmethod
         def list_collection_alias_namespaces(): return []
 
@@ -295,8 +356,337 @@ def test_checked_in_config_loads_and_resolves_without_duplicates(monkeypatch: py
         ]),
         "refseqgene.files.installed": "c" * 32 + "  refseqgene.1.genomic.fna.gz",
     }
-    sources = resolve_sources(assemblies, seqsets,
-                              lambda url: manifests[Path(url).name])
+    md5_files: dict[str, set[str]] = {}
+    for assembly in assemblies:
+        if assembly.checksum_manifest_url:
+            bucket = md5_files.setdefault(assembly.checksum_manifest_url, set())
+            bucket.add(Path(assembly.report_url).name)
+            if assembly.fasta_url:
+                bucket.add(Path(assembly.fasta_url).name)
+    for seqset in seqsets:
+        if seqset.md5_manifest_urls:
+            for url, checksum_url in zip(seqset.urls or [], seqset.md5_manifest_urls):
+                md5_files.setdefault(checksum_url, set()).add(Path(url).name)
+
+    def manifest_for(url: str) -> str:
+        if Path(url).name == "md5checksums.txt":
+            return "\n".join(
+                f"{'d' * 32}  ./{name}" for name in sorted(md5_files[url])
+            )
+        if Path(url).name != "CHECKSUMS":
+            return manifests[Path(url).name]
+        match = build_store.re.search(r"release-(\d+)", url)
+        assert match
+        release = int(match.group(1))
+        assembly = "GRCh37.75" if release == 75 else "GRCh38"
+        directory = Path(build_store.urlsplit(url).path).parent.name
+        suffix = {
+            "dna": "dna.toplevel.fa.gz", "cdna": "cdna.all.fa.gz",
+            "ncrna": "ncrna.fa.gz", "pep": "pep.all.fa.gz",
+        }[directory]
+        return f"1 1 Homo_sapiens.{assembly}.{suffix}\n"
+
+    sources = resolve_sources(assemblies, seqsets, manifest_for)
     urls = [source.url for source in sources]
     assert len(urls) == len(set(urls))
     assert all("//" not in url.split("://", 1)[1] for url in urls)
+    ensembl = [source for source in sources if source.owner.startswith("ensembl_release_")]
+    assert len(ensembl) == 42 * 4
+    assert {source.file_class for source in ensembl} == {
+        "dna.toplevel", "cdna", "ncrna", "pep"
+    }
+
+
+def test_release_groups_are_chronological_atomic_and_replace_rolling_namespace(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    entries = [
+        SeqsetConfig("r2", "ensembl-2", urls=["https://x/r2.fa"],
+                     file_classes=["x"], release=2, rolling_namespace="ensembl"),
+        SeqsetConfig("r1", "ensembl-1", urls=["https://x/r1.fa"],
+                     file_classes=["x"], release=1, rolling_namespace="ensembl"),
+    ]
+    seen: list[str] = []
+
+    def ingest(_store, entry, _cache, _provenance=None, _refresh=False,
+               alias_sink=None):
+        seen.append(entry.name)
+        alias_sink.update({"shared": f"digest-{entry.release}"})
+        if entry.release == 1:
+            alias_sink["retired"] = "old"
+        stats = build_store.SeqsetStats(entry.name, entry.namespace)
+        stats.shards_processed = 1
+        return stats
+
+    monkeypatch.setattr(build_store, "process_seqset", ingest)
+
+    class Store:
+        def __init__(self): self.aliases = {}
+        def list_sequence_aliases(self, namespace):
+            return list(self.aliases.get(namespace, {}))
+        def load_sequence_aliases(self, namespace, path):
+            rows = dict(line.rstrip().split("\t") for line in Path(path).read_text().splitlines())
+            self.aliases.setdefault(namespace, {}).update(rows)
+            return len(rows)
+
+    store = Store()
+    build_store.process_release_groups(store, entries, tmp_path, tmp_path / "store")
+    assert seen == ["r1", "r2"]
+    assert store.aliases["ensembl-1"] == {"retired": "old", "shared": "digest-1"}
+    assert store.aliases["ensembl-2"] == {"shared": "digest-2"}
+    rolling = (tmp_path / "store/aliases/sequences/ensembl.tsv").read_text()
+    assert rolling == "shared\tdigest-2\n"
+
+
+def test_release_group_rejects_conflicting_aliases(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    entries = [
+        SeqsetConfig("a", "ensembl-1", urls=["https://x/a"], file_classes=["a"],
+                     release=1, rolling_namespace="ensembl"),
+        SeqsetConfig("b", "ensembl-1", urls=["https://x/b"], file_classes=["b"],
+                     release=1, rolling_namespace="ensembl"),
+    ]
+    def ingest(_store, entry, _cache, _provenance=None, _refresh=False,
+               alias_sink=None):
+        digest = "one" if entry.name == "a" else "two"
+        previous = alias_sink.get("same")
+        if previous is not None and previous != digest:
+            raise ValueError("release 1: alias 'same' maps to both digests")
+        alias_sink["same"] = digest
+        stats = build_store.SeqsetStats(entry.name, entry.namespace)
+        stats.shards_processed = 1
+        return stats
+    monkeypatch.setattr(build_store, "process_seqset", ingest)
+    with pytest.raises(ValueError, match="maps to both"):
+        build_store.process_release_groups(object(), entries, tmp_path, tmp_path / "store")
+
+
+def test_release_group_does_not_publish_partial_release(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    entry = SeqsetConfig(
+        "r1", "ensembl-1", urls=["https://x/a"], file_classes=["x"],
+        release=1, rolling_namespace="ensembl",
+    )
+    def incomplete(*_args, **_kwargs):
+        stats = build_store.SeqsetStats(entry.name, entry.namespace)
+        stats.warnings = 1
+        return stats
+    monkeypatch.setattr(build_store, "process_seqset", incomplete)
+    class Store:
+        @staticmethod
+        def list_sequence_alias_namespaces(): return []
+    with pytest.raises(RuntimeError, match="aliases not published"):
+        build_store.process_release_groups(
+            Store(), [entry], tmp_path, tmp_path / "store"
+        )
+    assert not (tmp_path / "store/aliases/sequences/ensembl.tsv").exists()
+
+
+def test_load_config_rejects_incomplete_ensembl_release(tmp_path: Path) -> None:
+    config = tmp_path / "sources.toml"
+    config.write_text(
+        '[[seqset]]\nname="r75"\nnamespace="ensembl-75"\nrelease=75\n'
+        'rolling_namespace="ensembl"\nurls=["https://x/cdna"]\n'
+        'file_classes=["cdna"]\n'
+    )
+    with pytest.raises(ValueError, match="expected file classes"):
+        load_config(config)
+
+
+def test_immutable_alias_loader_rejects_existing_digest_change() -> None:
+    class Store:
+        @staticmethod
+        def list_sequence_aliases(_namespace): return ["A.1"]
+        @staticmethod
+        def get_sequence_metadata_by_alias(_namespace, _alias):
+            return type("Metadata", (), {"sha512t24u": "old"})()
+
+    with pytest.raises(ValueError, match="immutable alias collision"):
+        build_store.load_immutable_aliases(Store(), "refseq", {"A.1": "new"})
+
+
+def test_real_store_release_aliases_survive_write_and_reopen(tmp_path: Path) -> None:
+    cache = tmp_path / "cache"
+    store_path = tmp_path / "store"
+    entries = []
+    for release, fasta in (
+        (1, b">shared\nA\n>retired\nC\n"),
+        (2, b">shared\nG\n"),
+    ):
+        url = f"https://example.test/r{release}.fa"
+        target = build_store.mirror_cache_path(cache, url)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(fasta)
+        entries.append(SeqsetConfig(
+            f"r{release}", f"ensembl-{release}", urls=[url],
+            file_classes=["x"], release=release, rolling_namespace="ensembl",
+        ))
+    store = build_store.RefgetStore.on_disk(str(store_path))
+    build_store.process_release_groups(store, entries, cache, store_path)
+    store.write()
+    reopened = build_store.RefgetStore.open_local(str(store_path))
+    reopened.pull_aliases()
+    assert reopened.get_sequence_by_alias("ensembl-1", "retired") is not None
+    assert reopened.get_sequence_by_alias("ensembl", "retired") is None
+    rolling = reopened.get_sequence_by_alias("ensembl", "shared")
+    immutable = reopened.get_sequence_by_alias("ensembl-2", "shared")
+    assert rolling is not None and immutable is not None
+    assert rolling.metadata.sha512t24u == immutable.metadata.sha512t24u
+
+
+def _lrg_member(locus: str, extra: str = "", trailing_newline: bool = True) -> bytes:
+    text = (
+        f">{locus}g (genomic sequence)\nACGT\n"
+        f">{locus}t1 (transcript t1 of {locus})\nACG\n"
+        f">{locus}p1 (protein translated from transcript t1 of {locus})\nMA\n"
+        f"{extra}"
+    )
+    return text.encode() if trailing_newline else text.rstrip("\n").encode()
+
+
+def _write_lrg_zip(path: Path, members: dict[str, bytes]) -> Path:
+    with zipfile.ZipFile(path, "w") as archive:
+        for name, payload in members.items():
+            archive.writestr(name, payload)
+    return path
+
+
+def test_lrg_zip_conversion_is_ordered_newline_safe_and_complete(tmp_path: Path) -> None:
+    # Deliberately archived in the wrong order, and LRG_2 both lacks a trailing
+    # newline and carries a second transcript/protein pair.
+    zip_path = _write_lrg_zip(tmp_path / "bundle.zip", {
+        "LRG_10.fasta": _lrg_member("LRG_10"),
+        "LRG_2.fasta": _lrg_member(
+            "LRG_2",
+            extra=(
+                ">LRG_2t2 (transcript t2 of LRG_2)\nAC\n"
+                ">LRG_2p2 (protein translated from transcript t2 of LRG_2)\nM\n"
+            ),
+            trailing_newline=False,
+        ),
+        "LRG_1.fasta": _lrg_member("LRG_1"),
+    })
+    out = tmp_path / "bundle.fasta"
+
+    assert build_store.lrg_zip_to_fasta(zip_path, out) == (3, 11)
+
+    text = out.read_text()
+    headers = [line[1:].split()[0] for line in text.splitlines() if line.startswith(">")]
+    assert headers == [
+        "LRG_1g", "LRG_1t1", "LRG_1p1",
+        "LRG_2g", "LRG_2t1", "LRG_2p1", "LRG_2t2", "LRG_2p2",
+        "LRG_10g", "LRG_10t1", "LRG_10p1",
+    ]
+    # The newline guard must keep LRG_2p2's sequence and LRG_10g's header on
+    # separate lines; a fused member boundary would leave a mid-line ">".
+    assert all(
+        ">" not in line[1:] and (line.startswith(">") or ">" not in line)
+        for line in text.splitlines()
+    )
+    assert text.endswith("\n")
+    assert not (tmp_path / "bundle.fasta.part").exists()
+
+
+@pytest.mark.parametrize("members, message", [
+    ({}, "no LRG_N.fasta members"),
+    ({"README.txt": b"hello\n"}, "unexpected member"),
+    ({"LRG_1.fasta": b">NG_007400.1\nACGT\n"}, "genomic LRG header"),
+    ({"LRG_1.fasta": b">LRG_1g (genomic sequence)\nACGT\n"}, "expected a genomic"),
+    ({"LRG_1.fasta": b""}, "is empty"),
+])
+def test_lrg_zip_conversion_rejects_malformed_bundles(
+    tmp_path: Path, members: dict[str, bytes], message: str
+) -> None:
+    zip_path = _write_lrg_zip(tmp_path / "bad.zip", members)
+    with pytest.raises(ValueError, match=message):
+        build_store.lrg_zip_to_fasta(zip_path, tmp_path / "bad.fasta")
+
+
+@pytest.mark.parametrize("fmt", ["lrg_zip", "gbff"])
+def test_derived_fasta_is_cached_until_force(tmp_path: Path, fmt: str) -> None:
+    if fmt == "lrg_zip":
+        source = _write_lrg_zip(tmp_path / "b.zip", {"LRG_1.fasta": _lrg_member("LRG_1")})
+    else:
+        source = tmp_path / "b.gbff"
+        source.write_text("VERSION     NM_1.1\nORIGIN\n        1 acgt\n//\n")
+    resolve = build_store.DERIVED_FASTA_RESOLVERS[fmt]
+
+    out = resolve(source, False)
+    assert out == source.parent / (source.name + ".fasta")
+    original = out.read_text()
+
+    out.write_text(">sentinel\nA\n")
+    assert resolve(source, False).read_text() == ">sentinel\nA\n"
+    assert resolve(source, True).read_text() == original
+
+
+def test_lrg_alias_names_expands_only_the_genomic_record() -> None:
+    assert build_store.lrg_alias_names("LRG_1g") == ("LRG_1g", "LRG_1")
+    assert build_store.lrg_alias_names("LRG_123g") == ("LRG_123g", "LRG_123")
+    assert build_store.lrg_alias_names("LRG_1t1") == ("LRG_1t1",)
+    assert build_store.lrg_alias_names("LRG_1p1") == ("LRG_1p1",)
+    assert build_store.lrg_alias_names("NG_007400.1") == ("NG_007400.1",)
+
+
+def test_lrg_seqset_ingest_emits_both_genomic_aliases(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    url = "https://ftp.example.test/lrgex/fasta/LRG_public_fasta_files.zip"
+    target = build_store.mirror_cache_path(tmp_path, url)
+    target.parent.mkdir(parents=True)
+    _write_lrg_zip(target, {"LRG_1.fasta": _lrg_member("LRG_1")})
+    seqset = SeqsetConfig("lrg_public", "lrg", urls=[url], format="lrg_zip")
+
+    monkeypatch.setattr(
+        build_store, "ensure_download",
+        lambda *_args, **_kwargs: pytest.fail("ingestion attempted a download"),
+    )
+
+    class Meta:
+        digest = "collection"
+        n_sequences = 3
+
+    class Store:
+        def add_sequence_collection_from_fasta(self, path):
+            assert Path(path) == target.parent / (target.name + ".fasta")
+            return Meta(), True
+
+        def load_collection(self, _digest): pass
+        def get_collection_level2(self, _digest):
+            return {
+                "names": ["LRG_1g", "LRG_1t1", "LRG_1p1"],
+                "sequences": ["SQ.g", "SQ.t", "SQ.p"],
+            }
+
+    sink: dict[str, str] = {}
+    stats = build_store.process_seqset(Store(), seqset, tmp_path, alias_sink=sink)
+    assert stats.shards_processed == 1
+    # build_name_to_digest_map strips the SQ. prefix.
+    assert sink == {"LRG_1g": "g", "LRG_1": "g", "LRG_1t1": "t", "LRG_1p1": "p"}
+
+
+def test_real_store_ingests_mixed_lrg_nucleotide_and_protein_records(
+    tmp_path: Path
+) -> None:
+    cache = tmp_path / "cache"
+    url = "https://ftp.example.test/lrgex/fasta/LRG_public_fasta_files.zip"
+    target = build_store.mirror_cache_path(cache, url)
+    target.parent.mkdir(parents=True)
+    _write_lrg_zip(target, {
+        "LRG_1.fasta": _lrg_member("LRG_1"),
+        "LRG_2.fasta": _lrg_member("LRG_2"),
+    })
+    seqset = SeqsetConfig("lrg_public", "lrg", urls=[url], format="lrg_zip")
+
+    store = build_store.RefgetStore.in_memory()
+    stats = build_store.process_seqset(store, seqset, cache)
+    assert stats.shards_processed == 1
+    assert stats.sequences_ingested == 6
+
+    genomic = store.get_sequence_metadata_by_alias("lrg", "LRG_1g")
+    assert store.get_sequence_metadata_by_alias(
+        "lrg", "LRG_1"
+    ).sha512t24u == genomic.sha512t24u
+    assert store.get_sequence_metadata_by_alias("lrg", "LRG_2p1") is not None

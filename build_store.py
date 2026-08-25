@@ -10,13 +10,17 @@ from __future__ import annotations
 
 import gzip
 import fnmatch
+import zipfile
 import hashlib
 import logging
 import re
+import subprocess
 import tempfile
 import time
 import tomllib
+import urllib.error
 import urllib.request
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable, Iterator
@@ -33,6 +37,7 @@ DEFAULT_DOWNLOADS = Path(__file__).parent / "downloads"
 
 SQ_PREFIX = "SQ."
 NA_VALUES = {"na", "", "<NA>"}
+SEQSET_FORMATS = ("fasta", "gbff", "lrg_zip")
 
 
 @dataclass
@@ -42,6 +47,7 @@ class AssemblyConfig:
     fasta_url: str | None = None
     load_fasta: bool = True
     fasta_path: str | None = None
+    checksum_manifest_url: str | None = None
 
     def __post_init__(self) -> None:
         if self.load_fasta and not self.fasta_url:
@@ -67,6 +73,12 @@ class SeqsetConfig:
     urls: list[str] | None = None
     url_pattern: str | None = None
     checksum_manifest_url: str | None = None
+    checksum_manifest_urls: list[str] | None = None
+    md5_manifest_urls: list[str] | None = None
+    file_class: str | None = None
+    file_classes: list[str] | None = None
+    release: int | None = None
+    rolling_namespace: str | None = None
     format: str = "fasta"
     resolved_sources: list["ResolvedSource"] | None = field(default=None, init=False)
 
@@ -100,9 +112,51 @@ class SeqsetConfig:
                 raise ValueError(
                     f"seqset {self.name!r}: pattern and checksum manifest must share a directory"
                 )
-        if self.format not in ("fasta", "gbff"):
+        if self.checksum_manifest_urls is not None:
+            if self.urls is None:
+                raise ValueError(
+                    f"seqset {self.name!r}: checksum_manifest_urls requires urls"
+                )
+            if len(self.checksum_manifest_urls) != len(self.urls):
+                raise ValueError(
+                    f"seqset {self.name!r}: checksum_manifest_urls must match urls"
+                )
+            if self.checksum_manifest_url is not None:
+                raise ValueError(
+                    f"seqset {self.name!r}: use only one checksum manifest mode"
+                )
+        if self.md5_manifest_urls is not None:
+            if self.urls is None or len(self.md5_manifest_urls) != len(self.urls):
+                raise ValueError(
+                    f"seqset {self.name!r}: md5_manifest_urls must match urls"
+                )
+            if self.checksum_manifest_urls is not None:
+                raise ValueError(
+                    f"seqset {self.name!r}: use only one explicit checksum mode"
+                )
+        if self.file_class is not None and self.file_classes is not None:
             raise ValueError(
-                f"seqset {self.name!r}: format must be 'fasta' or 'gbff', "
+                f"seqset {self.name!r}: use only one file class mode"
+            )
+        source_count = len(self.urls) if self.urls is not None else 1
+        if self.file_classes is not None and len(self.file_classes) != source_count:
+            raise ValueError(
+                f"seqset {self.name!r}: file_classes must match source URLs"
+            )
+        if (self.release is None) != (self.rolling_namespace is None):
+            raise ValueError(
+                f"seqset {self.name!r}: release and rolling_namespace must be set together"
+            )
+        if self.release is not None:
+            expected = f"{self.rolling_namespace}-{self.release}"
+            if self.namespace != expected:
+                raise ValueError(
+                    f"seqset {self.name!r}: release namespace must be {expected!r}"
+                )
+        if self.format not in SEQSET_FORMATS:
+            raise ValueError(
+                f"seqset {self.name!r}: format must be one of "
+                f"{', '.join(repr(f) for f in SEQSET_FORMATS)}, "
                 f"got {self.format!r}"
             )
 
@@ -132,6 +186,11 @@ class ResolvedSource:
     owner: str
     url: str
     upstream_md5: str | None = None
+    provider_checksum: str | None = None
+    provider_checksum_algorithm: str | None = None
+    provider_checksum_blocks: int | None = None
+    checksum_url: str | None = None
+    file_class: str | None = None
 
 
 _MD5_RECORD = re.compile(r"^([0-9A-Fa-f]{32})[ \t]+([^\s]+)$")
@@ -154,6 +213,78 @@ def parse_checksum_manifest(text: str) -> dict[str, str]:
     return records
 
 
+def parse_ncbi_md5checksums(text: str) -> dict[str, str]:
+    """Parse NCBI directory ``md5checksums.txt`` records by basename."""
+    records: dict[str, str] = {}
+    pattern = re.compile(r"^([0-9A-Fa-f]{32})[ \t]+[*]?(.+)$")
+    for line_number, raw in enumerate(text.splitlines(), 1):
+        match = pattern.fullmatch(raw.strip())
+        if not match:
+            raise ValueError(f"malformed NCBI checksum line {line_number}: {raw!r}")
+        md5, raw_name = match.groups()
+        name = raw_name[2:] if raw_name.startswith("./") else raw_name
+        if not name or name in (".", "..") or "\\" in name:
+            raise ValueError(f"unsafe NCBI checksum filename on line {line_number}")
+        # Assembly manifests recurse into nested auxiliary directories, which
+        # can reuse basenames. Configured FASTA/report inputs live at the
+        # manifest directory root, so nested records are intentionally ignored.
+        if "/" in name:
+            continue
+        basename = Path(name).name
+        if basename in records and records[basename] != md5.lower():
+            raise ValueError(f"conflicting NCBI checksum basename: {basename!r}")
+        records[basename] = md5.lower()
+    return records
+
+
+_ENSEMBL_CHECKSUM_RECORD = re.compile(
+    r"^([0-9]{1,5})[ \t]+([0-9]+)[ \t]+([^\s]+)$"
+)
+
+
+def parse_ensembl_checksum_manifest(text: str) -> dict[str, tuple[str, int]]:
+    """Parse Ensembl's BSD-sum ``CHECKSUMS`` records."""
+    records: dict[str, tuple[str, int]] = {}
+    for line_number, raw in enumerate(text.splitlines(), 1):
+        match = _ENSEMBL_CHECKSUM_RECORD.fullmatch(raw.strip())
+        if not match:
+            raise ValueError(
+                f"malformed Ensembl checksum line {line_number}: {raw!r}"
+            )
+        checksum, blocks, filename = match.groups()
+        if (filename in (".", "..") or Path(filename).name != filename
+                or "\\" in filename or any(char in filename for char in "*?[]")):
+            raise ValueError(
+                f"unsafe Ensembl checksum filename on line {line_number}: {filename!r}"
+            )
+        if filename in records:
+            raise ValueError(f"duplicate Ensembl checksum filename: {filename!r}")
+        records[filename] = (checksum.zfill(5), int(blocks))
+    return records
+
+
+def bsd_sum_file(path: Path) -> tuple[str, int]:
+    """Return Ensembl's 16-bit BSD checksum and 1024-byte block count."""
+    try:
+        result = subprocess.run(
+            ["sum", str(path)], capture_output=True, text=True, check=True
+        )
+        checksum, blocks, *_ = result.stdout.split()
+        return checksum.zfill(5), int(blocks)
+    except (OSError, subprocess.SubprocessError, ValueError):
+        # Portable fallback for minimal environments without POSIX ``sum``.
+        pass
+    checksum = 0
+    size = 0
+    with path.open("rb") as handle:
+        while chunk := handle.read(1 << 20):
+            size += len(chunk)
+            for value in chunk:
+                checksum = ((checksum >> 1) | ((checksum & 1) << 15))
+                checksum = (checksum + value) & 0xFFFF
+    return f"{checksum:05d}", (size + 1023) // 1024
+
+
 def natural_sort_key(value: str) -> tuple:
     return tuple((1, int(part)) if part.isdigit() else (0, part.casefold())
                  for part in re.split(r"(\d+)", value))
@@ -161,8 +292,20 @@ def natural_sort_key(value: str) -> tuple:
 
 def _fetch_text(url: str) -> str:
     request = urllib.request.Request(url, headers={"User-Agent": "gks-refgetstore-builder"})
-    with urllib.request.urlopen(request, timeout=60) as response:  # noqa: S310
-        return response.read().decode("utf-8")
+    for attempt in range(1, 6):
+        try:
+            with urllib.request.urlopen(request, timeout=60) as response:  # noqa: S310
+                return response.read().decode("utf-8")
+        except (urllib.error.URLError, TimeoutError, OSError) as exc:
+            if attempt == 5:
+                raise
+            delay = attempt * 2
+            logger.warning(
+                "checksum fetch failed (%s); retrying %s in %ds",
+                exc, url, delay,
+            )
+            time.sleep(delay)
+    raise AssertionError("unreachable")
 
 
 def resolve_sources(
@@ -172,7 +315,28 @@ def resolve_sources(
 ) -> list[ResolvedSource]:
     """Resolve every config entry once, sharing fetched manifests by URL."""
     manifest_cache: dict[str, dict[str, str]] = {}
-    fetch_text = fetch_text or _fetch_text
+    ncbi_manifest_cache: dict[str, dict[str, str]] = {}
+    ensembl_manifest_cache: dict[str, dict[str, tuple[str, int]]] = {}
+    if fetch_text is None:
+        manifest_urls = {
+            url
+            for seqset in seqsets
+            for url in (
+                ([seqset.checksum_manifest_url]
+                 if seqset.checksum_manifest_url else [])
+                + (seqset.checksum_manifest_urls or [])
+                + (seqset.md5_manifest_urls or [])
+            )
+        }
+        manifest_urls.update(
+            assembly.checksum_manifest_url
+            for assembly in assemblies if assembly.checksum_manifest_url
+        )
+        with ThreadPoolExecutor(max_workers=6) as executor:
+            fetched = dict(zip(
+                sorted(manifest_urls), executor.map(_fetch_text, sorted(manifest_urls))
+            ))
+        fetch_text = fetched.__getitem__
     resolved: list[ResolvedSource] = []
     for seqset in seqsets:
         seq_sources: list[ResolvedSource] = []
@@ -188,20 +352,95 @@ def resolve_sources(
                 raise ValueError(f"seqset {seqset.name!r}: url_pattern matched no manifest files")
             base = seqset.url_pattern.rsplit("/", 1)[0] + "/"
             for name, md5 in sorted(matches, key=lambda item: natural_sort_key(item[0])):
-                seq_sources.append(ResolvedSource("seqset", seqset.name,
-                                                  urljoin(base, name), md5))
+                seq_sources.append(ResolvedSource(
+                    "seqset", seqset.name, urljoin(base, name), md5,
+                    file_class=seqset.file_class,
+                ))
         else:
-            for _, url in seqset.iter_shard_urls():
-                seq_sources.append(ResolvedSource("seqset", seqset.name, url))
+            urls = list(seqset.iter_shard_urls())
+            for index, (_, url) in enumerate(urls):
+                md5_url = (
+                    seqset.md5_manifest_urls[index]
+                    if seqset.md5_manifest_urls is not None else None
+                )
+                checksum_url = (
+                    seqset.checksum_manifest_urls[index]
+                    if seqset.checksum_manifest_urls is not None else None
+                )
+                checksum = None
+                blocks = None
+                upstream_md5 = None
+                if md5_url is not None:
+                    if md5_url not in ncbi_manifest_cache:
+                        ncbi_manifest_cache[md5_url] = parse_ncbi_md5checksums(
+                            fetch_text(md5_url)
+                        )
+                    basename = Path(urlsplit(url).path).name
+                    try:
+                        upstream_md5 = ncbi_manifest_cache[md5_url][basename]
+                    except KeyError as exc:
+                        raise ValueError(
+                            f"seqset {seqset.name!r}: {basename!r} absent from "
+                            f"{md5_url}"
+                        ) from exc
+                if checksum_url is not None:
+                    if checksum_url not in ensembl_manifest_cache:
+                        ensembl_manifest_cache[checksum_url] = (
+                            parse_ensembl_checksum_manifest(fetch_text(checksum_url))
+                        )
+                    basename = Path(urlsplit(url).path).name
+                    try:
+                        checksum, blocks = ensembl_manifest_cache[checksum_url][basename]
+                    except KeyError as exc:
+                        raise ValueError(
+                            f"seqset {seqset.name!r}: {basename!r} absent from "
+                            f"{checksum_url}"
+                        ) from exc
+                file_class = (
+                    seqset.file_classes[index]
+                    if seqset.file_classes is not None else seqset.file_class
+                )
+                seq_sources.append(ResolvedSource(
+                    "seqset", seqset.name, url,
+                    upstream_md5=upstream_md5,
+                    provider_checksum=checksum,
+                    provider_checksum_algorithm="bsd-sum" if checksum else None,
+                    provider_checksum_blocks=blocks,
+                    checksum_url=checksum_url or md5_url,
+                    file_class=file_class,
+                ))
         seqset.resolved_sources = seq_sources
         resolved.extend(seq_sources)
     for assembly in assemblies:
+        checksums: dict[str, str] = {}
+        if assembly.checksum_manifest_url is not None:
+            checksum_url = assembly.checksum_manifest_url
+            if checksum_url not in ncbi_manifest_cache:
+                ncbi_manifest_cache[checksum_url] = parse_ncbi_md5checksums(
+                    fetch_text(checksum_url)
+                )
+            checksums = ncbi_manifest_cache[checksum_url]
         if assembly.load_fasta and not assembly.fasta_path:
             assert assembly.fasta_url is not None
-            resolved.append(ResolvedSource("assembly_fasta", assembly.namespace,
-                                           assembly.fasta_url))
-        resolved.append(ResolvedSource("assembly_report", assembly.namespace,
-                                       assembly.report_url))
+            basename = Path(urlsplit(assembly.fasta_url).path).name
+            if assembly.checksum_manifest_url is not None and basename not in checksums:
+                raise ValueError(
+                    f"assembly {assembly.namespace!r}: {basename!r} absent from "
+                    f"{assembly.checksum_manifest_url}"
+                )
+            resolved.append(ResolvedSource(
+                "assembly_fasta", assembly.namespace, assembly.fasta_url,
+                checksums.get(basename), checksum_url=assembly.checksum_manifest_url,
+                file_class="genomic",
+            ))
+        report_basename = Path(urlsplit(assembly.report_url).path).name
+        report_md5 = checksums.get(report_basename)
+        resolved.append(ResolvedSource(
+            "assembly_report", assembly.namespace, assembly.report_url,
+            report_md5,
+            checksum_url=(assembly.checksum_manifest_url if report_md5 else None),
+            file_class="assembly_report",
+        ))
     urls = [source.url for source in resolved]
     if len(urls) != len(set(urls)):
         duplicate = next(url for url in urls if urls.count(url) > 1)
@@ -213,8 +452,12 @@ def apply_locked_sources(seqsets: list[SeqsetConfig], lock: dict) -> list[Resolv
     """Use concrete v2 lock entries without performing live discovery."""
     if lock.get("schema") != "gks-refgetstore-build-lock/2":
         raise ValueError("--locked-sources requires a v2 build lock")
-    sources = [ResolvedSource(s["kind"], s["owner"], s["url"], s.get("upstream_md5"))
-               for s in lock.get("sources", [])]
+    sources = [ResolvedSource(
+        s["kind"], s["owner"], s["url"], s.get("upstream_md5"),
+        s.get("provider_checksum"), s.get("provider_checksum_algorithm"),
+        s.get("provider_checksum_blocks"), s.get("checksum_url"),
+        s.get("file_class"),
+    ) for s in lock.get("sources", [])]
     by_owner: dict[str, list[ResolvedSource]] = {}
     for source in sources:
         if source.kind == "seqset":
@@ -278,6 +521,35 @@ def load_config(
         data = tomllib.load(fh)
     assemblies = [AssemblyConfig(**entry) for entry in data.get("assembly", [])]
     seqsets = [SeqsetConfig(**entry) for entry in data.get("seqset", [])]
+    names = [entry.name for entry in seqsets]
+    if len(names) != len(set(names)):
+        duplicate = next(name for name in names if names.count(name) > 1)
+        raise ValueError(f"duplicate seqset name: {duplicate!r}")
+    release_groups: dict[tuple[str, int], list[SeqsetConfig]] = {}
+    for entry in seqsets:
+        if entry.release is not None and entry.rolling_namespace is not None:
+            release_groups.setdefault(
+                (entry.rolling_namespace, entry.release), []
+            ).append(entry)
+    expected_ensembl_classes = {"dna.toplevel", "cdna", "ncrna", "pep"}
+    for (provider, release), entries in release_groups.items():
+        classes = [
+            file_class
+            for entry in entries
+                for file_class in (
+                    entry.file_classes
+                    or ([entry.file_class] if entry.file_class is not None else [])
+                )
+        ]
+        if len(classes) != len(set(classes)):
+            raise ValueError(
+                f"{provider} release {release}: duplicate file class"
+            )
+        if provider == "ensembl" and set(classes) != expected_ensembl_classes:
+            raise ValueError(
+                f"ensembl release {release}: expected file classes "
+                f"{sorted(expected_ensembl_classes)}, got {sorted(classes)}"
+            )
     return assemblies, seqsets
 
 
@@ -351,6 +623,117 @@ def resolve_gbff_fasta(gbff_path: Path, force: bool) -> Path:
     return out_path
 
 
+LRG_MEMBER_RE = re.compile(r"^(?:.*/)?(LRG_\d+)\.fasta$")
+_LRG_GENOMIC_HEADER_RE = re.compile(rb"^>LRG_\d+g\b")
+
+
+def lrg_zip_to_fasta(zip_path: Path, out_path: Path) -> tuple[int, int]:
+    """Concatenate every ``LRG_N.fasta`` member of an EBI LRG bundle into one FASTA.
+
+    EBI publishes the public LRG set both as 1325 standalone per-locus FASTAs and
+    as one aggregate zip of the same bytes. Ingesting the aggregate pins a single
+    immutable artifact instead of 1325 URLs, so this renders it back into the flat
+    FASTA gtars expects.
+
+    Members are emitted byte-faithfully — headers are *not* rewritten, so the
+    resulting collection digest is a pure function of the upstream bytes plus the
+    documented ordering. Members are ordered by ``natural_sort_key`` on the locus
+    id so the digest does not depend on the archive's physical member order, and a
+    newline is inserted where a member does not end in one so records cannot fuse
+    across a member boundary.
+
+    Returns ``(members, records)``.
+    """
+    tmp = out_path.with_suffix(out_path.suffix + ".part")
+    tmp.parent.mkdir(parents=True, exist_ok=True)
+    members: list[tuple[str, zipfile.ZipInfo]] = []
+    seen: set[str] = set()
+    with zipfile.ZipFile(zip_path) as archive:
+        for info in archive.infolist():
+            if info.is_dir():
+                continue
+            match = LRG_MEMBER_RE.match(info.filename)
+            if match is None:
+                # A silent skip would let an upstream repack change the ingested
+                # contents without any signal.
+                raise ValueError(
+                    f"{zip_path.name}: unexpected member {info.filename!r}"
+                )
+            locus = match.group(1)
+            if locus in seen:
+                raise ValueError(f"{zip_path.name}: duplicate member {locus}.fasta")
+            seen.add(locus)
+            members.append((locus, info))
+        if not members:
+            raise ValueError(f"{zip_path.name}: no LRG_N.fasta members")
+        members.sort(key=lambda item: natural_sort_key(item[0]))
+
+        records = 0
+        with tmp.open("wb") as out:
+            for locus, info in members:
+                member_records = 0
+                first_chunk = True
+                last_byte = b""
+                with archive.open(info) as handle:
+                    while chunk := handle.read(1 << 20):
+                        if first_chunk:
+                            if not _LRG_GENOMIC_HEADER_RE.match(chunk):
+                                raise ValueError(
+                                    f"{zip_path.name}: {locus}.fasta does not start "
+                                    "with a genomic LRG header"
+                                )
+                            first_chunk = False
+                        if last_byte == b"\n" and chunk.startswith(b">"):
+                            member_records += 1  # header split across the boundary
+                        member_records += chunk.count(b"\n>")
+                        out.write(chunk)
+                        last_byte = chunk[-1:]
+                if first_chunk:
+                    raise ValueError(f"{zip_path.name}: {locus}.fasta is empty")
+                member_records += 1  # the leading header, which has no preceding \n
+                if member_records < 2:
+                    raise ValueError(
+                        f"{zip_path.name}: {locus}.fasta has {member_records} record(s), "
+                        "expected a genomic record plus at least one transcript"
+                    )
+                if last_byte != b"\n":
+                    out.write(b"\n")
+                records += member_records
+    tmp.replace(out_path)
+    return len(members), records
+
+
+def resolve_lrg_fasta(zip_path: Path, force: bool) -> Path:
+    """Return a cached FASTA rendering of an LRG bundle, unpacking if needed."""
+    out_path = zip_path.parent / (zip_path.name + ".fasta")
+    if out_path.exists() and out_path.stat().st_size > 0 and not force:
+        logger.info("using cached lrg->fasta %s", out_path)
+        return out_path
+    logger.info("converting lrg zip -> fasta %s", zip_path)
+    members, records = lrg_zip_to_fasta(zip_path, out_path)
+    logger.info(
+        "  wrote %d records from %d members to %s", records, members, out_path
+    )
+    return out_path
+
+
+DERIVED_FASTA_RESOLVERS: dict[str, Callable[[Path, bool], Path]] = {
+    "gbff": resolve_gbff_fasta,
+    "lrg_zip": resolve_lrg_fasta,
+}
+
+
+def lrg_alias_names(name: str) -> tuple[str, ...]:
+    """LRG_1g is EBI's record id; HGVS/ClinVar spell the genomic record LRG_1."""
+    match = re.fullmatch(r"(LRG_\d+)g", name)
+    return (name, match.group(1)) if match else (name,)
+
+
+SEQSET_ALIAS_EXPANDERS: dict[str, Callable[[str], tuple[str, ...]]] = {
+    "lrg_zip": lrg_alias_names,
+}
+
+
 def iter_source_urls(
     assemblies: list[AssemblyConfig], seqsets: list[SeqsetConfig]
 ) -> Iterator[tuple[str, str, str]]:
@@ -378,11 +761,29 @@ def md5_file(path: Path) -> str:
     return digest.hexdigest()
 
 
+def provider_checksum_matches(path: Path, source: ResolvedSource) -> bool:
+    """Validate any provider checksum attached to a resolved source."""
+    if source.provider_checksum_algorithm == "md5":
+        return md5_file(path) == source.provider_checksum
+    if source.upstream_md5 is not None:
+        return md5_file(path) == source.upstream_md5
+    if source.provider_checksum_algorithm == "bsd-sum":
+        return bsd_sum_file(path) == (
+            source.provider_checksum, source.provider_checksum_blocks
+        )
+    return source.provider_checksum is None
+
+
 def ensure_download(url: str, target: Path, force: bool,
-                    expected_md5: str | None = None) -> Path:
+                    expected_md5: str | None = None,
+                    source: ResolvedSource | None = None) -> Path:
     target.parent.mkdir(parents=True, exist_ok=True)
     if target.exists() and not force:
-        if expected_md5 is None or md5_file(target) == expected_md5:
+        if source is not None:
+            checksum_ok = provider_checksum_matches(target, source)
+        else:
+            checksum_ok = expected_md5 is None or md5_file(target) == expected_md5
+        if checksum_ok:
             logger.info("using cached %s", target)
             return target
         logger.warning("cached provider checksum mismatch; re-downloading %s", target)
@@ -392,6 +793,9 @@ def ensure_download(url: str, target: Path, force: bool,
     if expected_md5 is not None and md5_file(tmp) != expected_md5:
         tmp.unlink(missing_ok=True)
         raise ValueError(f"NCBI MD5 mismatch for {url}")
+    if source is not None and not provider_checksum_matches(tmp, source):
+        tmp.unlink(missing_ok=True)
+        raise ValueError(f"provider checksum mismatch for {url}")
     tmp.replace(target)
     return target
 
@@ -543,7 +947,21 @@ class ReportAliasAccumulator:
         self, namespace: str, alias: str, digest: str, stats: AssemblyStats
     ) -> bool:
         pending = self.sequence.setdefault(namespace, {})
-        if alias in self._sequence_aliases(namespace) or alias in pending:
+        if alias in pending:
+            if pending[alias][0] != digest:
+                raise ValueError(
+                    f"immutable alias collision {namespace}:{alias}: "
+                    f"{pending[alias][0]} != {digest}"
+                )
+            stats.sequence_aliases_skipped += 1
+            return False
+        if alias in self._sequence_aliases(namespace):
+            metadata = self.store.get_sequence_metadata_by_alias(namespace, alias)
+            if metadata.sha512t24u != digest:
+                raise ValueError(
+                    f"immutable alias collision {namespace}:{alias}: "
+                    f"{metadata.sha512t24u} != {digest}"
+                )
             stats.sequence_aliases_skipped += 1
             return False
         pending[alias] = (digest, stats)
@@ -553,7 +971,18 @@ class ReportAliasAccumulator:
         self, namespace: str, alias: str, digest: str, stats: AssemblyStats
     ) -> bool:
         pending = self.collection.setdefault(namespace, {})
-        if alias in self._collection_aliases(namespace) or alias in pending:
+        if alias in pending:
+            if pending[alias][0] != digest:
+                raise ValueError(
+                    f"immutable collection alias collision {namespace}:{alias}"
+                )
+            return False
+        if alias in self._collection_aliases(namespace):
+            metadata = self.store.get_collection_metadata_by_alias(namespace, alias)
+            if metadata.digest != digest:
+                raise ValueError(
+                    f"immutable collection alias collision {namespace}:{alias}"
+                )
             return False
         pending[alias] = (digest, stats)
         return True
@@ -815,6 +1244,7 @@ def process_seqset(
     download_dir: Path,
     provenance: dict[str, dict] | None = None,
     refresh_derived: bool = False,
+    alias_sink: dict[str, str] | None = None,
 ) -> SeqsetStats:
     """Ingest a flat/sharded seqset and alias every header name.
 
@@ -834,8 +1264,8 @@ def process_seqset(
     stats = SeqsetStats(name=entry.name, namespace=entry.namespace)
     logger.info("=== seqset %s ===", entry.name)
 
-    # alias -> digest; later entries win on collision. setdefault() preserves
-    # the first digest seen (matches the old add_unique_alias behavior).
+    # alias -> digest. Repeated identical mappings are harmless; a conflicting
+    # mapping is rejected so immutable namespaces never depend on source order.
     pending: dict[str, str] = {}
 
     for shard_label, url in entry.iter_shard_urls():
@@ -852,11 +1282,14 @@ def process_seqset(
             stats.warnings += 1
             continue
 
-        if entry.format == "gbff":
+        resolver = DERIVED_FASTA_RESOLVERS.get(entry.format)
+        if resolver is not None:
             try:
-                fasta_path = resolve_gbff_fasta(fasta_path, refresh_derived)
+                fasta_path = resolver(fasta_path, refresh_derived)
             except Exception as exc:  # noqa: BLE001
-                logger.warning("gbff conversion failed for %s: %s", fasta_path, exc)
+                logger.warning(
+                    "%s conversion failed for %s: %s", entry.format, fasta_path, exc
+                )
                 stats.warnings += 1
                 continue
 
@@ -878,16 +1311,36 @@ def process_seqset(
         stats.shards_processed += 1
         stats.sequences_ingested += coll_meta.n_sequences
         if provenance is not None:
-            # key by the source cache path (the .gbff.gz for GBFF, not the
-            # converted .fasta) so it matches iter_source_urls at lock time
+            # key by the source cache path (the downloaded artifact for derived
+            # formats, not the converted .fasta) so it matches iter_source_urls
+            # at lock time
             provenance[str(target)] = {
                 "collection_digest": coll_meta.digest,
                 "n_sequences": coll_meta.n_sequences,
             }
 
         name_to_digest = build_name_to_digest_map(store, coll_meta.digest)
+        expand = SEQSET_ALIAS_EXPANDERS.get(entry.format, lambda name: (name,))
         for name, digest in name_to_digest.items():
-            pending.setdefault(name, digest)
+            for alias in expand(name):
+                previous = pending.get(alias)
+                if previous is not None and previous != digest:
+                    raise ValueError(
+                        f"seqset {entry.name!r}: alias {alias!r} maps to both "
+                        f"{previous} and {digest}"
+                    )
+                pending[alias] = digest
+
+    if alias_sink is not None:
+        for alias, digest in pending.items():
+            previous = alias_sink.get(alias)
+            if previous is not None and previous != digest:
+                raise ValueError(
+                    f"release {entry.release}: alias {alias!r} maps to both "
+                    f"{previous} and {digest}"
+                )
+            alias_sink[alias] = digest
+        return stats
 
     if pending:
         # Drop anything already aliased in this namespace (may be left over
@@ -916,6 +1369,134 @@ def process_seqset(
             finally:
                 tmp_path.unlink(missing_ok=True)
 
+    return stats
+
+
+def _write_alias_tsv(path: Path, aliases: dict[str, str]) -> None:
+    """Atomically write a complete, deterministically ordered alias namespace."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile(
+        mode="w", suffix=".tsv", dir=path.parent, delete=False
+    ) as tmp:
+        for alias, digest in sorted(aliases.items()):
+            tmp.write(f"{alias}\t{digest}\n")
+        tmp_path = Path(tmp.name)
+    tmp_path.replace(path)
+
+
+def load_immutable_aliases(
+    store: RefgetStore, namespace: str, aliases: dict[str, str]
+) -> tuple[int, int]:
+    """Load immutable aliases, rejecting an existing conflicting mapping."""
+    existing = set(store.list_sequence_aliases(namespace) or [])
+    additions: dict[str, str] = {}
+    for alias, digest in aliases.items():
+        if alias not in existing:
+            additions[alias] = digest
+            continue
+        metadata = store.get_sequence_metadata_by_alias(namespace, alias)
+        if metadata.sha512t24u != digest:
+            raise ValueError(
+                f"immutable alias collision {namespace}:{alias}: "
+                f"{metadata.sha512t24u} != {digest}"
+            )
+    if not additions:
+        return 0, len(aliases)
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".tsv", delete=False) as tmp:
+        for alias, digest in sorted(additions.items()):
+            tmp.write(f"{alias}\t{digest}\n")
+        tmp_path = Path(tmp.name)
+    try:
+        loaded = store.load_sequence_aliases(namespace, str(tmp_path))
+    finally:
+        tmp_path.unlink(missing_ok=True)
+    if loaded != len(additions):
+        raise RuntimeError(
+            f"immutable alias batch mismatch for {namespace}: "
+            f"planned {len(additions)}, loaded {loaded}"
+        )
+    return loaded, len(aliases) - loaded
+
+
+def process_release_groups(
+    store: RefgetStore,
+    entries: list[SeqsetConfig],
+    download_dir: Path,
+    store_dir: Path,
+    provenance: dict[str, dict] | None = None,
+    refresh_derived: bool = False,
+) -> list[SeqsetStats]:
+    """Ingest provider releases oldest-first and publish complete alias snapshots.
+
+    Every source in a release is accumulated before aliases become visible.
+    ``provider-N`` namespaces are immutable. The rolling provider namespace is
+    atomically replaced with exactly the newest processed release, so retired
+    names and changed mappings cannot leak forward.
+    """
+    grouped: dict[str, dict[int, list[SeqsetConfig]]] = {}
+    for entry in entries:
+        if entry.release is None or entry.rolling_namespace is None:
+            raise ValueError(f"seqset {entry.name!r} is not release-scoped")
+        grouped.setdefault(entry.rolling_namespace, {}).setdefault(
+            entry.release, []
+        ).append(entry)
+
+    stats: list[SeqsetStats] = []
+    for rolling_namespace in sorted(grouped):
+        list_namespaces = getattr(store, "list_sequence_alias_namespaces", lambda: [])
+        registered_namespaces = set(list_namespaces())
+        for release in sorted(grouped[rolling_namespace]):
+            release_entries = grouped[rolling_namespace][release]
+            immutable_namespace = f"{rolling_namespace}-{release}"
+            if any(entry.namespace != immutable_namespace for entry in release_entries):
+                raise ValueError(
+                    f"release {release}: all entries must use {immutable_namespace!r}"
+                )
+            pending: dict[str, str] = {}
+            logger.info(
+                "=== %s release %d (%d source groups) ===",
+                rolling_namespace, release, len(release_entries),
+            )
+            for entry in release_entries:
+                entry_stats = process_seqset(
+                    store, entry, download_dir, provenance, refresh_derived,
+                    alias_sink=pending,
+                )
+                expected_sources = sum(1 for _ in entry.iter_shard_urls())
+                if (entry_stats.warnings
+                        or entry_stats.shards_processed != expected_sources):
+                    raise RuntimeError(
+                        f"{immutable_namespace}: release source group {entry.name!r} "
+                        f"processed {entry_stats.shards_processed}/{expected_sources} "
+                        f"files with {entry_stats.warnings} warning(s); aliases not published"
+                    )
+                stats.append(entry_stats)
+            added, skipped = load_immutable_aliases(
+                store, immutable_namespace, pending
+            )
+            logger.info(
+                "  %s: loaded=%d existing=%d", immutable_namespace, added, skipped
+            )
+            if not re.fullmatch(r"[A-Za-z0-9_.-]+", rolling_namespace):
+                raise ValueError(f"unsafe rolling namespace: {rolling_namespace!r}")
+            rolling_path = (
+                store_dir / "aliases" / "sequences" / f"{rolling_namespace}.tsv"
+            )
+            _write_alias_tsv(rolling_path, pending)
+            if rolling_namespace not in registered_namespaces:
+                loaded = store.load_sequence_aliases(
+                    rolling_namespace, str(rolling_path)
+                )
+                if loaded != len(pending):
+                    raise RuntimeError(
+                        f"rolling alias registration mismatch for "
+                        f"{rolling_namespace}: planned {len(pending)}, loaded {loaded}"
+                    )
+                registered_namespaces.add(rolling_namespace)
+            logger.info(
+                "  %s: replaced complete namespace with %d aliases",
+                rolling_namespace, len(pending),
+            )
     return stats
 
 
@@ -1078,7 +1659,10 @@ def run_build(args) -> int:
             if build_lock.sha256_file(target) != locked.get("sha256"):
                 raise SystemExit(f"locked source SHA-256 mismatch: {source.url}")
         else:
-            ensure_download(source.url, target, args.force_download, source.upstream_md5)
+            ensure_download(
+                source.url, target, args.force_download, source.upstream_md5,
+                source,
+            )
 
     check: build_lock.LockCheck | None = None
     membership_check: build_lock.LockCheck | None = None
@@ -1122,13 +1706,38 @@ def run_build(args) -> int:
         deferred_reports.append(
             ingest_assembly(store, entry, args.cache_dir, provenance)
         )
-    for entry in sel_seqsets:
-        seqset_stats.append(
-            process_seqset(
-                store, entry, args.cache_dir, provenance,
-                refresh_derived=args.force_download,
-            )
+    ordinary_seqsets = [entry for entry in sel_seqsets if entry.release is None]
+    release_seqsets = [entry for entry in sel_seqsets if entry.release is not None]
+    ordinary_aliases: dict[str, dict[str, str]] = {}
+    for entry in ordinary_seqsets:
+        entry_stats = process_seqset(
+            store, entry, args.cache_dir, provenance,
+            refresh_derived=args.force_download,
+            alias_sink=ordinary_aliases.setdefault(entry.namespace, {}),
         )
+        if entry_stats.warnings:
+            raise RuntimeError(
+                f"seqset {entry.name!r} completed with "
+                f"{entry_stats.warnings} warning(s); refusing partial publication"
+            )
+        seqset_stats.append(entry_stats)
+    for namespace, pending in ordinary_aliases.items():
+        added, skipped = load_immutable_aliases(store, namespace, pending)
+        logger.info(
+            "immutable seqset namespace %s: loaded=%d existing=%d",
+            namespace, added, skipped,
+        )
+    if release_seqsets:
+        seqset_stats.extend(process_release_groups(
+            store, release_seqsets, args.cache_dir, args.store_dir, provenance,
+            refresh_derived=args.force_download,
+        ))
+        # The rolling namespace is replaced as a complete on-disk snapshot.
+        # Reopen so subsequent summaries and lock metadata see that snapshot,
+        # rather than the alias manager state from before its atomic replacement.
+        store.write()
+        store = RefgetStore.open_local(str(args.store_dir))
+        store.pull_aliases()
 
     # Phase 2: apply reports only after every sequence source is ingested.
     # Report-only patch releases may reference exact accessions supplied by a

@@ -118,6 +118,12 @@ class FakeStore:
     def list_sequence_alias_namespaces(self):
         return []
 
+    def list_sequence_aliases(self, _namespace):
+        return []
+
+    def load_sequence_aliases(self, _namespace, path):
+        return len(Path(path).read_text().splitlines())
+
     def list_collection_alias_namespaces(self):
         return []
 
@@ -141,14 +147,17 @@ def test_report_only_lookup_uses_refseq_index_without_sequence_scan() -> None:
 
 
 class BatchStore:
-    def __init__(self, sequence_existing=(), collection_existing=()):
-        self.sequence_existing = set(sequence_existing)
+    def __init__(self, sequence_existing=None, collection_existing=()):
+        self.sequence_existing = dict(sequence_existing or {})
         self.collection_existing = set(collection_existing)
         self.sequence_loads: list[tuple[str, list[str]]] = []
         self.collection_loads: list[tuple[str, list[str]]] = []
 
     def list_sequence_aliases(self, _namespace):
         return list(self.sequence_existing)
+
+    def get_sequence_metadata_by_alias(self, _namespace, alias):
+        return SimpleNamespace(sha512t24u=self.sequence_existing[alias])
 
     def list_collection_aliases(self, _namespace):
         return list(self.collection_existing)
@@ -171,14 +180,14 @@ class BatchStore:
 
 
 def test_report_alias_batches_are_first_seen_and_count_originating_stats() -> None:
-    store = BatchStore(sequence_existing={"existing"})
+    store = BatchStore(sequence_existing={"existing": "old"})
     aliases = build_store.ReportAliasAccumulator(store)
     first = build_store.AssemblyStats("first")
     second = build_store.AssemblyStats("second")
 
     assert not aliases.add_sequence("refseq", "existing", "old", first)
     assert aliases.add_sequence("refseq", "shared", "first-digest", first)
-    assert not aliases.add_sequence("refseq", "shared", "second-digest", second)
+    assert not aliases.add_sequence("refseq", "shared", "first-digest", second)
     assert aliases.add_sequence("refseq", "unique", "unique-digest", second)
     aliases.add_collection("refseq", "GCF_1", "collection", first)
     aliases.add_collection("insdc", "GCA_1", "collection", first)
@@ -194,6 +203,14 @@ def test_report_alias_batches_are_first_seen_and_count_originating_stats() -> No
         ("refseq", ["shared\tfirst-digest", "unique\tunique-digest"])
     ]
     assert {namespace for namespace, _ in store.collection_loads} == {"refseq", "insdc"}
+
+
+def test_report_alias_batch_rejects_conflicting_immutable_mapping() -> None:
+    aliases = build_store.ReportAliasAccumulator(BatchStore())
+    stats = build_store.AssemblyStats("asm")
+    assert aliases.add_sequence("refseq", "A.1", "one", stats)
+    with pytest.raises(ValueError, match="immutable alias collision"):
+        aliases.add_sequence("refseq", "A.1", "two", stats)
 
 
 def test_report_alias_batch_count_mismatch_fails() -> None:
@@ -253,7 +270,8 @@ def test_build_phase_order_and_partial_modes(
             entry, Path("report"), build_store.AssemblyStats(entry.namespace), "coll"
         )
 
-    def seq(_store, entry, _cache, _provenance, refresh_derived=False):
+    def seq(_store, entry, _cache, _provenance, refresh_derived=False,
+            alias_sink=None):
         events.append(f"seq:{entry.name}")
         return build_store.SeqsetStats(entry.name, entry.namespace)
 

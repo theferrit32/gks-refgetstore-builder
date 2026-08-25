@@ -42,6 +42,15 @@
 #   url_pattern  HTTPS URL with a glob in its basename. Requires the companion
 #                checksum_manifest_url in the same directory.
 #   checksum_manifest_url  NCBI *.files.installed file used for discovery + MD5.
+#   md5_manifest_urls      Per-URL NCBI md5checksums.txt manifests.
+#   checksum_manifest_urls Per-URL Ensembl BSD-sum CHECKSUMS manifests.
+#   format                 Source encoding: "fasta" (default), "gbff", or
+#                          "lrg_zip". Non-FASTA formats are converted to a
+#                          cached derived FASTA beside the downloaded artifact.
+#   file_class             One representation label for all resolved files.
+#   file_classes           Per-URL representation labels for attribution.
+#   release                Ordered provider release number.
+#   rolling_namespace      Namespace replaced completely after that release.
 
 # ---------------------------------------------------------------------------
 # NCBI human reference assembly releases
@@ -58,78 +67,99 @@
 namespace = "GRCh38"
 fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.26_GRCh38/GCF_000001405.26_GRCh38_genomic.fna.gz"
 report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.26_GRCh38/GCF_000001405.26_GRCh38_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.26_GRCh38/md5checksums.txt"
 load_fasta = true
 
 [[assembly]]
 namespace = "GRCh38.p1"
 fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.27_GRCh38.p1/GCF_000001405.27_GRCh38.p1_genomic.fna.gz"
 report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.27_GRCh38.p1/GCF_000001405.27_GRCh38.p1_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.27_GRCh38.p1/md5checksums.txt"
 load_fasta = true
 
 [[assembly]]
 namespace = "GRCh38.p2"
 fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.28_GRCh38.p2/GCF_000001405.28_GRCh38.p2_genomic.fna.gz"
 report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.28_GRCh38.p2/GCF_000001405.28_GRCh38.p2_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.28_GRCh38.p2/md5checksums.txt"
 load_fasta = true
 
 [[assembly]]
 namespace = "GRCh38.p3"
 fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.29_GRCh38.p3/GCF_000001405.29_GRCh38.p3_genomic.fna.gz"
 report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.29_GRCh38.p3/GCF_000001405.29_GRCh38.p3_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.29_GRCh38.p3/md5checksums.txt"
 load_fasta = true
 
 [[assembly]]
 namespace = "GRCh38.p4"
 fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.30_GRCh38.p4/GCF_000001405.30_GRCh38.p4_genomic.fna.gz"
 report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.30_GRCh38.p4/GCF_000001405.30_GRCh38.p4_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.30_GRCh38.p4/md5checksums.txt"
 load_fasta = true
 
 [[assembly]]
 namespace = "GRCh38.p5"
 fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.31_GRCh38.p5/GCF_000001405.31_GRCh38.p5_genomic.fna.gz"
 report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.31_GRCh38.p5/GCF_000001405.31_GRCh38.p5_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.31_GRCh38.p5/md5checksums.txt"
 load_fasta = true
 
 [[assembly]]
 namespace = "GRCh38.p6"
 fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.32_GRCh38.p6/GCF_000001405.32_GRCh38.p6_genomic.fna.gz"
 report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.32_GRCh38.p6/GCF_000001405.32_GRCh38.p6_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.32_GRCh38.p6/md5checksums.txt"
 load_fasta = true
 
 [[assembly]]
 namespace = "GRCh38.p7"
 fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.33_GRCh38.p7/GCF_000001405.33_GRCh38.p7_genomic.fna.gz"
 report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.33_GRCh38.p7/GCF_000001405.33_GRCh38.p7_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.33_GRCh38.p7/md5checksums.txt"
 load_fasta = true
 
 [[assembly]]
 namespace = "GRCh38.p8"
 fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.34_GRCh38.p8/GCF_000001405.34_GRCh38.p8_genomic.fna.gz"
 report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.34_GRCh38.p8/GCF_000001405.34_GRCh38.p8_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.34_GRCh38.p8/md5checksums.txt"
 load_fasta = true
 
 [[assembly]]
 namespace = "GRCh38.p9"
 fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.35_GRCh38.p9/GCF_000001405.35_GRCh38.p9_genomic.fna.gz"
 report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.35_GRCh38.p9/GCF_000001405.35_GRCh38.p9_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.35_GRCh38.p9/md5checksums.txt"
 load_fasta = true
 
 [[assembly]]
 namespace = "GRCh38.p10"
 fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.36_GRCh38.p10/GCF_000001405.36_GRCh38.p10_genomic.fna.gz"
 report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.36_GRCh38.p10/GCF_000001405.36_GRCh38.p10_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.36_GRCh38.p10/md5checksums.txt"
 load_fasta = true
 
 [[assembly]]
 namespace = "GRCh38.p11"
 fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.37_GRCh38.p11/GCF_000001405.37_GRCh38.p11_genomic.fna.gz"
 report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.37_GRCh38.p11/GCF_000001405.37_GRCh38.p11_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.37_GRCh38.p11/md5checksums.txt"
 load_fasta = true
 
 [[assembly]]
 namespace = "GRCh38.p12"
 fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.38_GRCh38.p12/GCF_000001405.38_GRCh38.p12_genomic.fna.gz"
 report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.38_GRCh38.p12/GCF_000001405.38_GRCh38.p12_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.38_GRCh38.p12/md5checksums.txt"
+load_fasta = true
+
+# GRCh38.p13 genomic assembly release.
+[[assembly]]
+namespace = "GRCh38.p13"
+fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_genomic.fna.gz"
+report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.39_GRCh38.p13/md5checksums.txt"
 load_fasta = true
 
 # GRCh38.p14 is the current configured GRCh38 patch release. The GRCh38.p13
@@ -140,6 +170,7 @@ load_fasta = true
 namespace = "GRCh38.p14"
 fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_genomic.fna.gz"
 report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.40_GRCh38.p14/md5checksums.txt"
 load_fasta = true
 
 # GRCh37: original release followed by available patch releases.
@@ -147,40 +178,47 @@ load_fasta = true
 namespace = "GRCh37"
 fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.13_GRCh37/GCF_000001405.13_GRCh37_genomic.fna.gz"
 report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.13_GRCh37/GCF_000001405.13_GRCh37_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.13_GRCh37/md5checksums.txt"
 load_fasta = true
 
 [[assembly]]
 namespace = "GRCh37.p2"
 fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.14_GRCh37.p2/GCF_000001405.14_GRCh37.p2_genomic.fna.gz"
 report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.14_GRCh37.p2/GCF_000001405.14_GRCh37.p2_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.14_GRCh37.p2/md5checksums.txt"
 load_fasta = true
 
 [[assembly]]
 namespace = "GRCh37.p5"
 fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.17_GRCh37.p5/GCF_000001405.17_GRCh37.p5_genomic.fna.gz"
 report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.17_GRCh37.p5/GCF_000001405.17_GRCh37.p5_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.17_GRCh37.p5/md5checksums.txt"
 load_fasta = true
 
 [[assembly]]
 namespace = "GRCh37.p9"
 fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.21_GRCh37.p9/GCF_000001405.21_GRCh37.p9_genomic.fna.gz"
 report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.21_GRCh37.p9/GCF_000001405.21_GRCh37.p9_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.21_GRCh37.p9/md5checksums.txt"
 load_fasta = true
 
 [[assembly]]
 namespace = "GRCh37.p10"
 fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.22_GRCh37.p10/GCF_000001405.22_GRCh37.p10_genomic.fna.gz"
 report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.22_GRCh37.p10/GCF_000001405.22_GRCh37.p10_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.22_GRCh37.p10/md5checksums.txt"
 load_fasta = true
 
 [[assembly]]
 namespace = "GRCh37.p11"
 report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.23_GRCh37.p11/GCF_000001405.23_GRCh37.p11_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.23_GRCh37.p11/md5checksums.txt"
 load_fasta = false
 
 [[assembly]]
 namespace = "GRCh37.p12"
 report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.24_GRCh37.p12/GCF_000001405.24_GRCh37.p12_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.24_GRCh37.p12/md5checksums.txt"
 load_fasta = false
 
 # GRCh37.p13 is the current GRCh37 patch release.
@@ -188,6 +226,7 @@ load_fasta = false
 namespace = "GRCh37.p13"
 fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.25_GRCh37.p13/GCF_000001405.25_GRCh37.p13_genomic.fna.gz"
 report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.25_GRCh37.p13/GCF_000001405.25_GRCh37.p13_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.25_GRCh37.p13/md5checksums.txt"
 load_fasta = true
 
 [[seqset]]
@@ -195,12 +234,14 @@ name = "refseq_human_rna"
 namespace = "refseq"
 url_pattern = "https://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.*.rna.fna.gz"
 checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.files.installed"
+file_class = "rna"
 
 [[seqset]]
 name = "refseq_human_protein"
 namespace = "refseq"
 url_pattern = "https://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.*.protein.faa.gz"
 checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.files.installed"
+file_class = "protein"
 
 # NCBI RefSeqGene genomic sequences (NG_ accessions). These are gene-region
 # reference sequences NOT present in the mRNA_Prot shards above; seqrepo's NCBI
@@ -210,6 +251,36 @@ name = "refseq_human_refseqgene"
 namespace = "refseq"
 url_pattern = "https://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/RefSeqGene/refseqgene.*.genomic.fna.gz"
 checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/RefSeqGene/refseqgene.files.installed"
+file_class = "genomic"
+
+# ---------------------------------------------------------------------------
+# EBI Locus Reference Genomic (LRG)
+# ---------------------------------------------------------------------------
+# LRG ids are the stable, frozen reference spellings used by HGVS and ClinVar
+# ("LRG_1:g.", "LRG_199t1:c."), so they are required for clients resolving those
+# expressions. This is net-new coverage rather than a seqrepo parity gap:
+# seqrepo has no LRG namespace at all.
+#
+# EBI publishes the public set as 1325 standalone LRG_N.fasta files and as one
+# aggregate zip of byte-identical members. The aggregate is used so the build
+# pins a single immutable artifact instead of 1325 URLs; build_store unpacks it
+# to a cached derived FASTA in natural-sorted member order without rewriting any
+# header. The set is frozen at release 810 (2021-03-31).
+#
+# EBI publishes no checksum manifest for this directory, so the lock's SHA-256
+# of the downloaded zip is the integrity anchor, as for the refseq_history_*
+# entries. Only the public set is ingested — not pending/, stalled/, or
+# suppressed/.
+#
+# Each member holds a genomic record plus its transcripts and proteins. The
+# genomic record is ingested as "LRG_1g" (EBI's record id) and additionally
+# aliased as "LRG_1", which is how ClinVar and HGVS spell it.
+[[seqset]]
+name = "lrg_public"
+namespace = "lrg"
+urls = ["https://ftp.ebi.ac.uk/pub/databases/lrgex/fasta/LRG_public_fasta_files.zip"]
+file_class = "lrg_bundle"
+format = "lrg_zip"
 
 # ---------------------------------------------------------------------------
 # Historical RefSeq transcript and protein versions
@@ -219,115 +290,1022 @@ checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/RefSeqGen
 # and protein versions for compatibility with clients that request them.
 # Identical sequences are deduplicated when the store is built.
 
+# ---------------------------------------------------------------------------
+# Complete NCBI GRCh37/GRCh38 RNA and protein release history
+# ---------------------------------------------------------------------------
+# Generated from the official assembly summaries and complete taxid 9606
+# annotation-release index. Every discoverable assembly and annotation snapshot
+# is retained. Each URL is paired with its directory md5checksums.txt.
+
+[[seqset]]
+name = "refseq_history_grch37_rna"
+namespace = "refseq"
+urls = [
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.13_GRCh37/GCF_000001405.13_GRCh37_rna.fna.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.14_GRCh37.p2/GCF_000001405.14_GRCh37.p2_rna.fna.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.17_GRCh37.p5/GCF_000001405.17_GRCh37.p5_rna.fna.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.21_GRCh37.p9/GCF_000001405.21_GRCh37.p9_rna.fna.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.22_GRCh37.p10/GCF_000001405.22_GRCh37.p10_rna.fna.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.25_GRCh37.p13/GCF_000001405.25_GRCh37.p13_rna.fna.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/105.20190906/GCF_000001405.25_GRCh37.p13/GCF_000001405.25_GRCh37.p13_rna.fna.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/105.20201022/GCF_000001405.25_GRCh37.p13/GCF_000001405.25_GRCh37.p13_rna.fna.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/105.20220307/GCF_000001405.25_GRCh37.p13/GCF_000001405.25_GRCh37.p13_rna.fna.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/GCF_000001405.25-RS_2024_09/GCF_000001405.25_GRCh37.p13_rna.fna.gz",
+]
+md5_manifest_urls = [
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.13_GRCh37/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.14_GRCh37.p2/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.17_GRCh37.p5/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.21_GRCh37.p9/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.22_GRCh37.p10/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.25_GRCh37.p13/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/105.20190906/GCF_000001405.25_GRCh37.p13/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/105.20201022/GCF_000001405.25_GRCh37.p13/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/105.20220307/GCF_000001405.25_GRCh37.p13/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/GCF_000001405.25-RS_2024_09/md5checksums.txt",
+]
+file_classes = ["rna", "rna", "rna", "rna", "rna", "rna", "rna", "rna", "rna", "rna"]
+
+[[seqset]]
+name = "refseq_history_grch37_protein"
+namespace = "refseq"
+urls = [
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.13_GRCh37/GCF_000001405.13_GRCh37_protein.faa.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.14_GRCh37.p2/GCF_000001405.14_GRCh37.p2_protein.faa.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.17_GRCh37.p5/GCF_000001405.17_GRCh37.p5_protein.faa.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.21_GRCh37.p9/GCF_000001405.21_GRCh37.p9_protein.faa.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.22_GRCh37.p10/GCF_000001405.22_GRCh37.p10_protein.faa.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.25_GRCh37.p13/GCF_000001405.25_GRCh37.p13_protein.faa.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/105.20190906/GCF_000001405.25_GRCh37.p13/GCF_000001405.25_GRCh37.p13_protein.faa.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/105.20201022/GCF_000001405.25_GRCh37.p13/GCF_000001405.25_GRCh37.p13_protein.faa.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/105.20220307/GCF_000001405.25_GRCh37.p13/GCF_000001405.25_GRCh37.p13_protein.faa.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/GCF_000001405.25-RS_2024_09/GCF_000001405.25_GRCh37.p13_protein.faa.gz",
+]
+md5_manifest_urls = [
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.13_GRCh37/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.14_GRCh37.p2/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.17_GRCh37.p5/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.21_GRCh37.p9/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.22_GRCh37.p10/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.25_GRCh37.p13/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/105.20190906/GCF_000001405.25_GRCh37.p13/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/105.20201022/GCF_000001405.25_GRCh37.p13/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/105.20220307/GCF_000001405.25_GRCh37.p13/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/GCF_000001405.25-RS_2024_09/md5checksums.txt",
+]
+file_classes = ["protein", "protein", "protein", "protein", "protein", "protein", "protein", "protein", "protein", "protein"]
+
 [[seqset]]
 name = "refseq_history_grch38_rna"
 namespace = "refseq"
 urls = [
   "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.26_GRCh38/GCF_000001405.26_GRCh38_rna.fna.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.27_GRCh38.p1/GCF_000001405.27_GRCh38.p1_rna.fna.gz",
   "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.28_GRCh38.p2/GCF_000001405.28_GRCh38.p2_rna.fna.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.29_GRCh38.p3/GCF_000001405.29_GRCh38.p3_rna.fna.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.30_GRCh38.p4/GCF_000001405.30_GRCh38.p4_rna.fna.gz",
   "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.31_GRCh38.p5/GCF_000001405.31_GRCh38.p5_rna.fna.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.32_GRCh38.p6/GCF_000001405.32_GRCh38.p6_rna.fna.gz",
   "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.33_GRCh38.p7/GCF_000001405.33_GRCh38.p7_rna.fna.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.34_GRCh38.p8/GCF_000001405.34_GRCh38.p8_rna.fna.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.35_GRCh38.p9/GCF_000001405.35_GRCh38.p9_rna.fna.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.36_GRCh38.p10/GCF_000001405.36_GRCh38.p10_rna.fna.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.37_GRCh38.p11/GCF_000001405.37_GRCh38.p11_rna.fna.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.38_GRCh38.p12/GCF_000001405.38_GRCh38.p12_rna.fna.gz",
   "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109/GCF_000001405.38_GRCh38.p12/GCF_000001405.38_GRCh38.p12_rna.fna.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_rna.fna.gz",
   "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20190607/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_rna.fna.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20190905/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_rna.fna.gz",
   "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20191205/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_rna.fna.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20200228/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_rna.fna.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20200522/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_rna.fna.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20200815/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_rna.fna.gz",
   "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20201120/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_rna.fna.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20210226/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_rna.fna.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20210514/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_rna.fna.gz",
   "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20211119/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_rna.fna.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_rna.fna.gz",
   "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/110/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_rna.fna.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/GCF_000001405.40-RS_2023_03/GCF_000001405.40_GRCh38.p14_rna.fna.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/GCF_000001405.40-RS_2023_10/GCF_000001405.40_GRCh38.p14_rna.fna.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/GCF_000001405.40-RS_2024_08/GCF_000001405.40_GRCh38.p14_rna.fna.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/GCF_000001405.40-RS_2025_08/GCF_000001405.40_GRCh38.p14_rna.fna.gz",
 ]
+md5_manifest_urls = [
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.26_GRCh38/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.27_GRCh38.p1/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.28_GRCh38.p2/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.29_GRCh38.p3/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.30_GRCh38.p4/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.31_GRCh38.p5/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.32_GRCh38.p6/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.33_GRCh38.p7/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.34_GRCh38.p8/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.35_GRCh38.p9/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.36_GRCh38.p10/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.37_GRCh38.p11/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.38_GRCh38.p12/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109/GCF_000001405.38_GRCh38.p12/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.39_GRCh38.p13/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20190607/GCF_000001405.39_GRCh38.p13/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20190905/GCF_000001405.39_GRCh38.p13/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20191205/GCF_000001405.39_GRCh38.p13/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20200228/GCF_000001405.39_GRCh38.p13/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20200522/GCF_000001405.39_GRCh38.p13/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20200815/GCF_000001405.39_GRCh38.p13/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20201120/GCF_000001405.39_GRCh38.p13/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20210226/GCF_000001405.39_GRCh38.p13/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20210514/GCF_000001405.39_GRCh38.p13/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20211119/GCF_000001405.39_GRCh38.p13/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.40_GRCh38.p14/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/110/GCF_000001405.40_GRCh38.p14/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/GCF_000001405.40-RS_2023_03/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/GCF_000001405.40-RS_2023_10/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/GCF_000001405.40-RS_2024_08/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/GCF_000001405.40-RS_2025_08/md5checksums.txt",
+]
+file_classes = ["rna", "rna", "rna", "rna", "rna", "rna", "rna", "rna", "rna", "rna", "rna", "rna", "rna", "rna", "rna", "rna", "rna", "rna", "rna", "rna", "rna", "rna", "rna", "rna", "rna", "rna", "rna", "rna", "rna", "rna", "rna"]
 
 [[seqset]]
 name = "refseq_history_grch38_protein"
 namespace = "refseq"
 urls = [
   "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.26_GRCh38/GCF_000001405.26_GRCh38_protein.faa.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.27_GRCh38.p1/GCF_000001405.27_GRCh38.p1_protein.faa.gz",
   "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.28_GRCh38.p2/GCF_000001405.28_GRCh38.p2_protein.faa.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.29_GRCh38.p3/GCF_000001405.29_GRCh38.p3_protein.faa.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.30_GRCh38.p4/GCF_000001405.30_GRCh38.p4_protein.faa.gz",
   "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.31_GRCh38.p5/GCF_000001405.31_GRCh38.p5_protein.faa.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.32_GRCh38.p6/GCF_000001405.32_GRCh38.p6_protein.faa.gz",
   "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.33_GRCh38.p7/GCF_000001405.33_GRCh38.p7_protein.faa.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.34_GRCh38.p8/GCF_000001405.34_GRCh38.p8_protein.faa.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.35_GRCh38.p9/GCF_000001405.35_GRCh38.p9_protein.faa.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.36_GRCh38.p10/GCF_000001405.36_GRCh38.p10_protein.faa.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.37_GRCh38.p11/GCF_000001405.37_GRCh38.p11_protein.faa.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.38_GRCh38.p12/GCF_000001405.38_GRCh38.p12_protein.faa.gz",
   "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109/GCF_000001405.38_GRCh38.p12/GCF_000001405.38_GRCh38.p12_protein.faa.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_protein.faa.gz",
   "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20190607/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_protein.faa.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20190905/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_protein.faa.gz",
   "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20191205/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_protein.faa.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20200228/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_protein.faa.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20200522/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_protein.faa.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20200815/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_protein.faa.gz",
   "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20201120/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_protein.faa.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20210226/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_protein.faa.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20210514/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_protein.faa.gz",
   "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20211119/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_protein.faa.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_protein.faa.gz",
   "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/110/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_protein.faa.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/GCF_000001405.40-RS_2023_03/GCF_000001405.40_GRCh38.p14_protein.faa.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/GCF_000001405.40-RS_2023_10/GCF_000001405.40_GRCh38.p14_protein.faa.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/GCF_000001405.40-RS_2024_08/GCF_000001405.40_GRCh38.p14_protein.faa.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/GCF_000001405.40-RS_2025_08/GCF_000001405.40_GRCh38.p14_protein.faa.gz",
 ]
+md5_manifest_urls = [
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.26_GRCh38/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.27_GRCh38.p1/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.28_GRCh38.p2/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.29_GRCh38.p3/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.30_GRCh38.p4/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.31_GRCh38.p5/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.32_GRCh38.p6/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.33_GRCh38.p7/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.34_GRCh38.p8/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.35_GRCh38.p9/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.36_GRCh38.p10/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.37_GRCh38.p11/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.38_GRCh38.p12/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109/GCF_000001405.38_GRCh38.p12/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.39_GRCh38.p13/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20190607/GCF_000001405.39_GRCh38.p13/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20190905/GCF_000001405.39_GRCh38.p13/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20191205/GCF_000001405.39_GRCh38.p13/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20200228/GCF_000001405.39_GRCh38.p13/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20200522/GCF_000001405.39_GRCh38.p13/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20200815/GCF_000001405.39_GRCh38.p13/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20201120/GCF_000001405.39_GRCh38.p13/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20210226/GCF_000001405.39_GRCh38.p13/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20210514/GCF_000001405.39_GRCh38.p13/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20211119/GCF_000001405.39_GRCh38.p13/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.40_GRCh38.p14/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/110/GCF_000001405.40_GRCh38.p14/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/GCF_000001405.40-RS_2023_03/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/GCF_000001405.40-RS_2023_10/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/GCF_000001405.40-RS_2024_08/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/GCF_000001405.40-RS_2025_08/md5checksums.txt",
+]
+file_classes = ["protein", "protein", "protein", "protein", "protein", "protein", "protein", "protein", "protein", "protein", "protein", "protein", "protein", "protein", "protein", "protein", "protein", "protein", "protein", "protein", "protein", "protein", "protein", "protein", "protein", "protein", "protein", "protein", "protein", "protein", "protein"]
 
 # An undocumented knownrefseq GBFF file is intentionally excluded. Backfill a
 # missing accession.version through an authoritative per-accession service
 # rather than adding an undocumented bulk artifact.
 
-# Ensembl human GRCh38 transcripts + proteins, pinned to release 113
-# (October 2024). Bump the release number in all three URLs to update.
-# Archive index: https://www.ensembl.org/info/website/archives/
-# ENST.N / ENSP.N accessions are content-addressable, so the digests are
-# stable across releases; only the version suffixes change.
-#
-# cdna/ ships protein-coding transcripts; ncrna/ ships non-coding
-# transcripts (disjoint ENST space). cds/ is intentionally NOT loaded —
-# it reuses the same ENST accessions as cdna/ but with UTRs stripped,
-# which would collide in the bulk alias merge.
-
-[[seqset]]
-name = "ensembl_human_cdna"
-namespace = "ensembl"
-url_template = "https://ftp.ensembl.org/pub/release-113/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz"
-
-[[seqset]]
-name = "ensembl_human_ncrna"
-namespace = "ensembl"
-url_template = "https://ftp.ensembl.org/pub/release-113/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz"
-
-[[seqset]]
-name = "ensembl_human_pep"
-namespace = "ensembl"
-url_template = "https://ftp.ensembl.org/pub/release-113/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz"
-
 # ---------------------------------------------------------------------------
-# Historical Ensembl transcript and protein versions
+# Ensembl human releases 75-116
 # ---------------------------------------------------------------------------
-# Release 113 provides current ENST/ENSP versions. These official Ensembl
-# archives retain selected older versions, including release 75 for GRCh37.
-# Identical sequences are deduplicated when the store is built.
+# Releases are intentionally listed oldest to newest. Each release is one
+# transactional seqset containing the four canonical, non-redundant FASTA
+# representations: unmasked dna.toplevel, cDNA, ncRNA, and peptide. The build
+# publishes the complete release under ensembl-N and atomically replaces the
+# generic ensembl namespace only after all four files have been ingested.
+# Ensembl CHECKSUMS files publish BSD-sum checksums and 1 KiB block counts.
+# CDS, masked DNA, and chromosome/primary-assembly subsets are excluded.
 
 [[seqset]]
-name = "ensembl_history_cdna"
-namespace = "ensembl"
+name = "ensembl_release_75"
+namespace = "ensembl-75"
+release = 75
+rolling_namespace = "ensembl"
 urls = [
+  "https://ftp.ensembl.org/pub/release-75/fasta/homo_sapiens/dna/Homo_sapiens.GRCh37.75.dna.toplevel.fa.gz",
   "https://ftp.ensembl.org/pub/release-75/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh37.75.cdna.all.fa.gz",
-  "https://ftp.ensembl.org/pub/release-76/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
-  "https://ftp.ensembl.org/pub/release-85/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
-  "https://ftp.ensembl.org/pub/release-90/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
-  "https://ftp.ensembl.org/pub/release-95/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
-  "https://ftp.ensembl.org/pub/release-100/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
-  "https://ftp.ensembl.org/pub/release-105/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
-  "https://ftp.ensembl.org/pub/release-110/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
-  "https://ftp.ensembl.org/pub/release-112/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
-]
-
-[[seqset]]
-name = "ensembl_history_ncrna"
-namespace = "ensembl"
-urls = [
-  "https://ftp.ensembl.org/pub/release-76/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
-  "https://ftp.ensembl.org/pub/release-85/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
-  "https://ftp.ensembl.org/pub/release-90/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
-  "https://ftp.ensembl.org/pub/release-95/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
-  "https://ftp.ensembl.org/pub/release-100/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
-  "https://ftp.ensembl.org/pub/release-105/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
-  "https://ftp.ensembl.org/pub/release-110/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
-  "https://ftp.ensembl.org/pub/release-112/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
-]
-
-[[seqset]]
-name = "ensembl_history_pep"
-namespace = "ensembl"
-urls = [
+  "https://ftp.ensembl.org/pub/release-75/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh37.75.ncrna.fa.gz",
   "https://ftp.ensembl.org/pub/release-75/fasta/homo_sapiens/pep/Homo_sapiens.GRCh37.75.pep.all.fa.gz",
+]
+file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+checksum_manifest_urls = [
+  "https://ftp.ensembl.org/pub/release-75/fasta/homo_sapiens/dna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-75/fasta/homo_sapiens/cdna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-75/fasta/homo_sapiens/ncrna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-75/fasta/homo_sapiens/pep/CHECKSUMS",
+]
+
+[[seqset]]
+name = "ensembl_release_76"
+namespace = "ensembl-76"
+release = 76
+rolling_namespace = "ensembl"
+urls = [
+  "https://ftp.ensembl.org/pub/release-76/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.toplevel.fa.gz",
+  "https://ftp.ensembl.org/pub/release-76/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
+  "https://ftp.ensembl.org/pub/release-76/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
   "https://ftp.ensembl.org/pub/release-76/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
+]
+file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+checksum_manifest_urls = [
+  "https://ftp.ensembl.org/pub/release-76/fasta/homo_sapiens/dna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-76/fasta/homo_sapiens/cdna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-76/fasta/homo_sapiens/ncrna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-76/fasta/homo_sapiens/pep/CHECKSUMS",
+]
+
+[[seqset]]
+name = "ensembl_release_77"
+namespace = "ensembl-77"
+release = 77
+rolling_namespace = "ensembl"
+urls = [
+  "https://ftp.ensembl.org/pub/release-77/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.toplevel.fa.gz",
+  "https://ftp.ensembl.org/pub/release-77/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
+  "https://ftp.ensembl.org/pub/release-77/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
+  "https://ftp.ensembl.org/pub/release-77/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
+]
+file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+checksum_manifest_urls = [
+  "https://ftp.ensembl.org/pub/release-77/fasta/homo_sapiens/dna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-77/fasta/homo_sapiens/cdna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-77/fasta/homo_sapiens/ncrna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-77/fasta/homo_sapiens/pep/CHECKSUMS",
+]
+
+[[seqset]]
+name = "ensembl_release_78"
+namespace = "ensembl-78"
+release = 78
+rolling_namespace = "ensembl"
+urls = [
+  "https://ftp.ensembl.org/pub/release-78/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.toplevel.fa.gz",
+  "https://ftp.ensembl.org/pub/release-78/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
+  "https://ftp.ensembl.org/pub/release-78/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
+  "https://ftp.ensembl.org/pub/release-78/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
+]
+file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+checksum_manifest_urls = [
+  "https://ftp.ensembl.org/pub/release-78/fasta/homo_sapiens/dna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-78/fasta/homo_sapiens/cdna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-78/fasta/homo_sapiens/ncrna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-78/fasta/homo_sapiens/pep/CHECKSUMS",
+]
+
+[[seqset]]
+name = "ensembl_release_79"
+namespace = "ensembl-79"
+release = 79
+rolling_namespace = "ensembl"
+urls = [
+  "https://ftp.ensembl.org/pub/release-79/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.toplevel.fa.gz",
+  "https://ftp.ensembl.org/pub/release-79/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
+  "https://ftp.ensembl.org/pub/release-79/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
+  "https://ftp.ensembl.org/pub/release-79/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
+]
+file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+checksum_manifest_urls = [
+  "https://ftp.ensembl.org/pub/release-79/fasta/homo_sapiens/dna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-79/fasta/homo_sapiens/cdna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-79/fasta/homo_sapiens/ncrna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-79/fasta/homo_sapiens/pep/CHECKSUMS",
+]
+
+[[seqset]]
+name = "ensembl_release_80"
+namespace = "ensembl-80"
+release = 80
+rolling_namespace = "ensembl"
+urls = [
+  "https://ftp.ensembl.org/pub/release-80/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.toplevel.fa.gz",
+  "https://ftp.ensembl.org/pub/release-80/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
+  "https://ftp.ensembl.org/pub/release-80/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
+  "https://ftp.ensembl.org/pub/release-80/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
+]
+file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+checksum_manifest_urls = [
+  "https://ftp.ensembl.org/pub/release-80/fasta/homo_sapiens/dna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-80/fasta/homo_sapiens/cdna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-80/fasta/homo_sapiens/ncrna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-80/fasta/homo_sapiens/pep/CHECKSUMS",
+]
+
+[[seqset]]
+name = "ensembl_release_81"
+namespace = "ensembl-81"
+release = 81
+rolling_namespace = "ensembl"
+urls = [
+  "https://ftp.ensembl.org/pub/release-81/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.toplevel.fa.gz",
+  "https://ftp.ensembl.org/pub/release-81/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
+  "https://ftp.ensembl.org/pub/release-81/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
+  "https://ftp.ensembl.org/pub/release-81/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
+]
+file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+checksum_manifest_urls = [
+  "https://ftp.ensembl.org/pub/release-81/fasta/homo_sapiens/dna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-81/fasta/homo_sapiens/cdna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-81/fasta/homo_sapiens/ncrna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-81/fasta/homo_sapiens/pep/CHECKSUMS",
+]
+
+[[seqset]]
+name = "ensembl_release_82"
+namespace = "ensembl-82"
+release = 82
+rolling_namespace = "ensembl"
+urls = [
+  "https://ftp.ensembl.org/pub/release-82/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.toplevel.fa.gz",
+  "https://ftp.ensembl.org/pub/release-82/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
+  "https://ftp.ensembl.org/pub/release-82/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
+  "https://ftp.ensembl.org/pub/release-82/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
+]
+file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+checksum_manifest_urls = [
+  "https://ftp.ensembl.org/pub/release-82/fasta/homo_sapiens/dna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-82/fasta/homo_sapiens/cdna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-82/fasta/homo_sapiens/ncrna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-82/fasta/homo_sapiens/pep/CHECKSUMS",
+]
+
+[[seqset]]
+name = "ensembl_release_83"
+namespace = "ensembl-83"
+release = 83
+rolling_namespace = "ensembl"
+urls = [
+  "https://ftp.ensembl.org/pub/release-83/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.toplevel.fa.gz",
+  "https://ftp.ensembl.org/pub/release-83/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
+  "https://ftp.ensembl.org/pub/release-83/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
+  "https://ftp.ensembl.org/pub/release-83/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
+]
+file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+checksum_manifest_urls = [
+  "https://ftp.ensembl.org/pub/release-83/fasta/homo_sapiens/dna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-83/fasta/homo_sapiens/cdna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-83/fasta/homo_sapiens/ncrna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-83/fasta/homo_sapiens/pep/CHECKSUMS",
+]
+
+[[seqset]]
+name = "ensembl_release_84"
+namespace = "ensembl-84"
+release = 84
+rolling_namespace = "ensembl"
+urls = [
+  "https://ftp.ensembl.org/pub/release-84/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.toplevel.fa.gz",
+  "https://ftp.ensembl.org/pub/release-84/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
+  "https://ftp.ensembl.org/pub/release-84/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
+  "https://ftp.ensembl.org/pub/release-84/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
+]
+file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+checksum_manifest_urls = [
+  "https://ftp.ensembl.org/pub/release-84/fasta/homo_sapiens/dna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-84/fasta/homo_sapiens/cdna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-84/fasta/homo_sapiens/ncrna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-84/fasta/homo_sapiens/pep/CHECKSUMS",
+]
+
+[[seqset]]
+name = "ensembl_release_85"
+namespace = "ensembl-85"
+release = 85
+rolling_namespace = "ensembl"
+urls = [
+  "https://ftp.ensembl.org/pub/release-85/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.toplevel.fa.gz",
+  "https://ftp.ensembl.org/pub/release-85/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
+  "https://ftp.ensembl.org/pub/release-85/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
   "https://ftp.ensembl.org/pub/release-85/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
+]
+file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+checksum_manifest_urls = [
+  "https://ftp.ensembl.org/pub/release-85/fasta/homo_sapiens/dna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-85/fasta/homo_sapiens/cdna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-85/fasta/homo_sapiens/ncrna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-85/fasta/homo_sapiens/pep/CHECKSUMS",
+]
+
+[[seqset]]
+name = "ensembl_release_86"
+namespace = "ensembl-86"
+release = 86
+rolling_namespace = "ensembl"
+urls = [
+  "https://ftp.ensembl.org/pub/release-86/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.toplevel.fa.gz",
+  "https://ftp.ensembl.org/pub/release-86/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
+  "https://ftp.ensembl.org/pub/release-86/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
+  "https://ftp.ensembl.org/pub/release-86/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
+]
+file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+checksum_manifest_urls = [
+  "https://ftp.ensembl.org/pub/release-86/fasta/homo_sapiens/dna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-86/fasta/homo_sapiens/cdna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-86/fasta/homo_sapiens/ncrna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-86/fasta/homo_sapiens/pep/CHECKSUMS",
+]
+
+[[seqset]]
+name = "ensembl_release_87"
+namespace = "ensembl-87"
+release = 87
+rolling_namespace = "ensembl"
+urls = [
+  "https://ftp.ensembl.org/pub/release-87/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.toplevel.fa.gz",
+  "https://ftp.ensembl.org/pub/release-87/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
+  "https://ftp.ensembl.org/pub/release-87/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
+  "https://ftp.ensembl.org/pub/release-87/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
+]
+file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+checksum_manifest_urls = [
+  "https://ftp.ensembl.org/pub/release-87/fasta/homo_sapiens/dna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-87/fasta/homo_sapiens/cdna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-87/fasta/homo_sapiens/ncrna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-87/fasta/homo_sapiens/pep/CHECKSUMS",
+]
+
+[[seqset]]
+name = "ensembl_release_88"
+namespace = "ensembl-88"
+release = 88
+rolling_namespace = "ensembl"
+urls = [
+  "https://ftp.ensembl.org/pub/release-88/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.toplevel.fa.gz",
+  "https://ftp.ensembl.org/pub/release-88/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
+  "https://ftp.ensembl.org/pub/release-88/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
+  "https://ftp.ensembl.org/pub/release-88/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
+]
+file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+checksum_manifest_urls = [
+  "https://ftp.ensembl.org/pub/release-88/fasta/homo_sapiens/dna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-88/fasta/homo_sapiens/cdna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-88/fasta/homo_sapiens/ncrna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-88/fasta/homo_sapiens/pep/CHECKSUMS",
+]
+
+[[seqset]]
+name = "ensembl_release_89"
+namespace = "ensembl-89"
+release = 89
+rolling_namespace = "ensembl"
+urls = [
+  "https://ftp.ensembl.org/pub/release-89/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.toplevel.fa.gz",
+  "https://ftp.ensembl.org/pub/release-89/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
+  "https://ftp.ensembl.org/pub/release-89/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
+  "https://ftp.ensembl.org/pub/release-89/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
+]
+file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+checksum_manifest_urls = [
+  "https://ftp.ensembl.org/pub/release-89/fasta/homo_sapiens/dna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-89/fasta/homo_sapiens/cdna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-89/fasta/homo_sapiens/ncrna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-89/fasta/homo_sapiens/pep/CHECKSUMS",
+]
+
+[[seqset]]
+name = "ensembl_release_90"
+namespace = "ensembl-90"
+release = 90
+rolling_namespace = "ensembl"
+urls = [
+  "https://ftp.ensembl.org/pub/release-90/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.toplevel.fa.gz",
+  "https://ftp.ensembl.org/pub/release-90/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
+  "https://ftp.ensembl.org/pub/release-90/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
   "https://ftp.ensembl.org/pub/release-90/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
+]
+file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+checksum_manifest_urls = [
+  "https://ftp.ensembl.org/pub/release-90/fasta/homo_sapiens/dna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-90/fasta/homo_sapiens/cdna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-90/fasta/homo_sapiens/ncrna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-90/fasta/homo_sapiens/pep/CHECKSUMS",
+]
+
+[[seqset]]
+name = "ensembl_release_91"
+namespace = "ensembl-91"
+release = 91
+rolling_namespace = "ensembl"
+urls = [
+  "https://ftp.ensembl.org/pub/release-91/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.toplevel.fa.gz",
+  "https://ftp.ensembl.org/pub/release-91/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
+  "https://ftp.ensembl.org/pub/release-91/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
+  "https://ftp.ensembl.org/pub/release-91/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
+]
+file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+checksum_manifest_urls = [
+  "https://ftp.ensembl.org/pub/release-91/fasta/homo_sapiens/dna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-91/fasta/homo_sapiens/cdna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-91/fasta/homo_sapiens/ncrna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-91/fasta/homo_sapiens/pep/CHECKSUMS",
+]
+
+[[seqset]]
+name = "ensembl_release_92"
+namespace = "ensembl-92"
+release = 92
+rolling_namespace = "ensembl"
+urls = [
+  "https://ftp.ensembl.org/pub/release-92/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.toplevel.fa.gz",
+  "https://ftp.ensembl.org/pub/release-92/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
+  "https://ftp.ensembl.org/pub/release-92/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
+  "https://ftp.ensembl.org/pub/release-92/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
+]
+file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+checksum_manifest_urls = [
+  "https://ftp.ensembl.org/pub/release-92/fasta/homo_sapiens/dna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-92/fasta/homo_sapiens/cdna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-92/fasta/homo_sapiens/ncrna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-92/fasta/homo_sapiens/pep/CHECKSUMS",
+]
+
+[[seqset]]
+name = "ensembl_release_93"
+namespace = "ensembl-93"
+release = 93
+rolling_namespace = "ensembl"
+urls = [
+  "https://ftp.ensembl.org/pub/release-93/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.toplevel.fa.gz",
+  "https://ftp.ensembl.org/pub/release-93/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
+  "https://ftp.ensembl.org/pub/release-93/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
+  "https://ftp.ensembl.org/pub/release-93/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
+]
+file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+checksum_manifest_urls = [
+  "https://ftp.ensembl.org/pub/release-93/fasta/homo_sapiens/dna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-93/fasta/homo_sapiens/cdna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-93/fasta/homo_sapiens/ncrna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-93/fasta/homo_sapiens/pep/CHECKSUMS",
+]
+
+[[seqset]]
+name = "ensembl_release_94"
+namespace = "ensembl-94"
+release = 94
+rolling_namespace = "ensembl"
+urls = [
+  "https://ftp.ensembl.org/pub/release-94/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.toplevel.fa.gz",
+  "https://ftp.ensembl.org/pub/release-94/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
+  "https://ftp.ensembl.org/pub/release-94/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
+  "https://ftp.ensembl.org/pub/release-94/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
+]
+file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+checksum_manifest_urls = [
+  "https://ftp.ensembl.org/pub/release-94/fasta/homo_sapiens/dna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-94/fasta/homo_sapiens/cdna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-94/fasta/homo_sapiens/ncrna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-94/fasta/homo_sapiens/pep/CHECKSUMS",
+]
+
+[[seqset]]
+name = "ensembl_release_95"
+namespace = "ensembl-95"
+release = 95
+rolling_namespace = "ensembl"
+urls = [
+  "https://ftp.ensembl.org/pub/release-95/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.toplevel.fa.gz",
+  "https://ftp.ensembl.org/pub/release-95/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
+  "https://ftp.ensembl.org/pub/release-95/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
   "https://ftp.ensembl.org/pub/release-95/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
+]
+file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+checksum_manifest_urls = [
+  "https://ftp.ensembl.org/pub/release-95/fasta/homo_sapiens/dna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-95/fasta/homo_sapiens/cdna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-95/fasta/homo_sapiens/ncrna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-95/fasta/homo_sapiens/pep/CHECKSUMS",
+]
+
+[[seqset]]
+name = "ensembl_release_96"
+namespace = "ensembl-96"
+release = 96
+rolling_namespace = "ensembl"
+urls = [
+  "https://ftp.ensembl.org/pub/release-96/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.toplevel.fa.gz",
+  "https://ftp.ensembl.org/pub/release-96/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
+  "https://ftp.ensembl.org/pub/release-96/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
+  "https://ftp.ensembl.org/pub/release-96/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
+]
+file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+checksum_manifest_urls = [
+  "https://ftp.ensembl.org/pub/release-96/fasta/homo_sapiens/dna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-96/fasta/homo_sapiens/cdna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-96/fasta/homo_sapiens/ncrna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-96/fasta/homo_sapiens/pep/CHECKSUMS",
+]
+
+[[seqset]]
+name = "ensembl_release_97"
+namespace = "ensembl-97"
+release = 97
+rolling_namespace = "ensembl"
+urls = [
+  "https://ftp.ensembl.org/pub/release-97/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.toplevel.fa.gz",
+  "https://ftp.ensembl.org/pub/release-97/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
+  "https://ftp.ensembl.org/pub/release-97/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
+  "https://ftp.ensembl.org/pub/release-97/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
+]
+file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+checksum_manifest_urls = [
+  "https://ftp.ensembl.org/pub/release-97/fasta/homo_sapiens/dna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-97/fasta/homo_sapiens/cdna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-97/fasta/homo_sapiens/ncrna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-97/fasta/homo_sapiens/pep/CHECKSUMS",
+]
+
+[[seqset]]
+name = "ensembl_release_98"
+namespace = "ensembl-98"
+release = 98
+rolling_namespace = "ensembl"
+urls = [
+  "https://ftp.ensembl.org/pub/release-98/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.toplevel.fa.gz",
+  "https://ftp.ensembl.org/pub/release-98/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
+  "https://ftp.ensembl.org/pub/release-98/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
+  "https://ftp.ensembl.org/pub/release-98/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
+]
+file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+checksum_manifest_urls = [
+  "https://ftp.ensembl.org/pub/release-98/fasta/homo_sapiens/dna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-98/fasta/homo_sapiens/cdna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-98/fasta/homo_sapiens/ncrna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-98/fasta/homo_sapiens/pep/CHECKSUMS",
+]
+
+[[seqset]]
+name = "ensembl_release_99"
+namespace = "ensembl-99"
+release = 99
+rolling_namespace = "ensembl"
+urls = [
+  "https://ftp.ensembl.org/pub/release-99/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.toplevel.fa.gz",
+  "https://ftp.ensembl.org/pub/release-99/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
+  "https://ftp.ensembl.org/pub/release-99/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
+  "https://ftp.ensembl.org/pub/release-99/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
+]
+file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+checksum_manifest_urls = [
+  "https://ftp.ensembl.org/pub/release-99/fasta/homo_sapiens/dna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-99/fasta/homo_sapiens/cdna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-99/fasta/homo_sapiens/ncrna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-99/fasta/homo_sapiens/pep/CHECKSUMS",
+]
+
+[[seqset]]
+name = "ensembl_release_100"
+namespace = "ensembl-100"
+release = 100
+rolling_namespace = "ensembl"
+urls = [
+  "https://ftp.ensembl.org/pub/release-100/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.toplevel.fa.gz",
+  "https://ftp.ensembl.org/pub/release-100/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
+  "https://ftp.ensembl.org/pub/release-100/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
   "https://ftp.ensembl.org/pub/release-100/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
+]
+file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+checksum_manifest_urls = [
+  "https://ftp.ensembl.org/pub/release-100/fasta/homo_sapiens/dna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-100/fasta/homo_sapiens/cdna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-100/fasta/homo_sapiens/ncrna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-100/fasta/homo_sapiens/pep/CHECKSUMS",
+]
+
+[[seqset]]
+name = "ensembl_release_101"
+namespace = "ensembl-101"
+release = 101
+rolling_namespace = "ensembl"
+urls = [
+  "https://ftp.ensembl.org/pub/release-101/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.toplevel.fa.gz",
+  "https://ftp.ensembl.org/pub/release-101/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
+  "https://ftp.ensembl.org/pub/release-101/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
+  "https://ftp.ensembl.org/pub/release-101/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
+]
+file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+checksum_manifest_urls = [
+  "https://ftp.ensembl.org/pub/release-101/fasta/homo_sapiens/dna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-101/fasta/homo_sapiens/cdna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-101/fasta/homo_sapiens/ncrna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-101/fasta/homo_sapiens/pep/CHECKSUMS",
+]
+
+[[seqset]]
+name = "ensembl_release_102"
+namespace = "ensembl-102"
+release = 102
+rolling_namespace = "ensembl"
+urls = [
+  "https://ftp.ensembl.org/pub/release-102/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.toplevel.fa.gz",
+  "https://ftp.ensembl.org/pub/release-102/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
+  "https://ftp.ensembl.org/pub/release-102/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
+  "https://ftp.ensembl.org/pub/release-102/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
+]
+file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+checksum_manifest_urls = [
+  "https://ftp.ensembl.org/pub/release-102/fasta/homo_sapiens/dna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-102/fasta/homo_sapiens/cdna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-102/fasta/homo_sapiens/ncrna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-102/fasta/homo_sapiens/pep/CHECKSUMS",
+]
+
+[[seqset]]
+name = "ensembl_release_103"
+namespace = "ensembl-103"
+release = 103
+rolling_namespace = "ensembl"
+urls = [
+  "https://ftp.ensembl.org/pub/release-103/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.toplevel.fa.gz",
+  "https://ftp.ensembl.org/pub/release-103/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
+  "https://ftp.ensembl.org/pub/release-103/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
+  "https://ftp.ensembl.org/pub/release-103/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
+]
+file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+checksum_manifest_urls = [
+  "https://ftp.ensembl.org/pub/release-103/fasta/homo_sapiens/dna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-103/fasta/homo_sapiens/cdna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-103/fasta/homo_sapiens/ncrna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-103/fasta/homo_sapiens/pep/CHECKSUMS",
+]
+
+[[seqset]]
+name = "ensembl_release_104"
+namespace = "ensembl-104"
+release = 104
+rolling_namespace = "ensembl"
+urls = [
+  "https://ftp.ensembl.org/pub/release-104/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.toplevel.fa.gz",
+  "https://ftp.ensembl.org/pub/release-104/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
+  "https://ftp.ensembl.org/pub/release-104/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
+  "https://ftp.ensembl.org/pub/release-104/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
+]
+file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+checksum_manifest_urls = [
+  "https://ftp.ensembl.org/pub/release-104/fasta/homo_sapiens/dna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-104/fasta/homo_sapiens/cdna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-104/fasta/homo_sapiens/ncrna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-104/fasta/homo_sapiens/pep/CHECKSUMS",
+]
+
+[[seqset]]
+name = "ensembl_release_105"
+namespace = "ensembl-105"
+release = 105
+rolling_namespace = "ensembl"
+urls = [
+  "https://ftp.ensembl.org/pub/release-105/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.toplevel.fa.gz",
+  "https://ftp.ensembl.org/pub/release-105/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
+  "https://ftp.ensembl.org/pub/release-105/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
   "https://ftp.ensembl.org/pub/release-105/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
+]
+file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+checksum_manifest_urls = [
+  "https://ftp.ensembl.org/pub/release-105/fasta/homo_sapiens/dna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-105/fasta/homo_sapiens/cdna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-105/fasta/homo_sapiens/ncrna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-105/fasta/homo_sapiens/pep/CHECKSUMS",
+]
+
+[[seqset]]
+name = "ensembl_release_106"
+namespace = "ensembl-106"
+release = 106
+rolling_namespace = "ensembl"
+urls = [
+  "https://ftp.ensembl.org/pub/release-106/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.toplevel.fa.gz",
+  "https://ftp.ensembl.org/pub/release-106/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
+  "https://ftp.ensembl.org/pub/release-106/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
+  "https://ftp.ensembl.org/pub/release-106/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
+]
+file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+checksum_manifest_urls = [
+  "https://ftp.ensembl.org/pub/release-106/fasta/homo_sapiens/dna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-106/fasta/homo_sapiens/cdna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-106/fasta/homo_sapiens/ncrna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-106/fasta/homo_sapiens/pep/CHECKSUMS",
+]
+
+[[seqset]]
+name = "ensembl_release_107"
+namespace = "ensembl-107"
+release = 107
+rolling_namespace = "ensembl"
+urls = [
+  "https://ftp.ensembl.org/pub/release-107/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.toplevel.fa.gz",
+  "https://ftp.ensembl.org/pub/release-107/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
+  "https://ftp.ensembl.org/pub/release-107/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
+  "https://ftp.ensembl.org/pub/release-107/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
+]
+file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+checksum_manifest_urls = [
+  "https://ftp.ensembl.org/pub/release-107/fasta/homo_sapiens/dna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-107/fasta/homo_sapiens/cdna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-107/fasta/homo_sapiens/ncrna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-107/fasta/homo_sapiens/pep/CHECKSUMS",
+]
+
+[[seqset]]
+name = "ensembl_release_108"
+namespace = "ensembl-108"
+release = 108
+rolling_namespace = "ensembl"
+urls = [
+  "https://ftp.ensembl.org/pub/release-108/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.toplevel.fa.gz",
+  "https://ftp.ensembl.org/pub/release-108/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
+  "https://ftp.ensembl.org/pub/release-108/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
+  "https://ftp.ensembl.org/pub/release-108/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
+]
+file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+checksum_manifest_urls = [
+  "https://ftp.ensembl.org/pub/release-108/fasta/homo_sapiens/dna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-108/fasta/homo_sapiens/cdna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-108/fasta/homo_sapiens/ncrna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-108/fasta/homo_sapiens/pep/CHECKSUMS",
+]
+
+[[seqset]]
+name = "ensembl_release_109"
+namespace = "ensembl-109"
+release = 109
+rolling_namespace = "ensembl"
+urls = [
+  "https://ftp.ensembl.org/pub/release-109/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.toplevel.fa.gz",
+  "https://ftp.ensembl.org/pub/release-109/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
+  "https://ftp.ensembl.org/pub/release-109/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
+  "https://ftp.ensembl.org/pub/release-109/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
+]
+file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+checksum_manifest_urls = [
+  "https://ftp.ensembl.org/pub/release-109/fasta/homo_sapiens/dna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-109/fasta/homo_sapiens/cdna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-109/fasta/homo_sapiens/ncrna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-109/fasta/homo_sapiens/pep/CHECKSUMS",
+]
+
+[[seqset]]
+name = "ensembl_release_110"
+namespace = "ensembl-110"
+release = 110
+rolling_namespace = "ensembl"
+urls = [
+  "https://ftp.ensembl.org/pub/release-110/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.toplevel.fa.gz",
+  "https://ftp.ensembl.org/pub/release-110/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
+  "https://ftp.ensembl.org/pub/release-110/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
   "https://ftp.ensembl.org/pub/release-110/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
+]
+file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+checksum_manifest_urls = [
+  "https://ftp.ensembl.org/pub/release-110/fasta/homo_sapiens/dna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-110/fasta/homo_sapiens/cdna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-110/fasta/homo_sapiens/ncrna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-110/fasta/homo_sapiens/pep/CHECKSUMS",
+]
+
+[[seqset]]
+name = "ensembl_release_111"
+namespace = "ensembl-111"
+release = 111
+rolling_namespace = "ensembl"
+urls = [
+  "https://ftp.ensembl.org/pub/release-111/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.toplevel.fa.gz",
+  "https://ftp.ensembl.org/pub/release-111/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
+  "https://ftp.ensembl.org/pub/release-111/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
+  "https://ftp.ensembl.org/pub/release-111/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
+]
+file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+checksum_manifest_urls = [
+  "https://ftp.ensembl.org/pub/release-111/fasta/homo_sapiens/dna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-111/fasta/homo_sapiens/cdna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-111/fasta/homo_sapiens/ncrna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-111/fasta/homo_sapiens/pep/CHECKSUMS",
+]
+
+[[seqset]]
+name = "ensembl_release_112"
+namespace = "ensembl-112"
+release = 112
+rolling_namespace = "ensembl"
+urls = [
+  "https://ftp.ensembl.org/pub/release-112/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.toplevel.fa.gz",
+  "https://ftp.ensembl.org/pub/release-112/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
+  "https://ftp.ensembl.org/pub/release-112/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
   "https://ftp.ensembl.org/pub/release-112/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
+]
+file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+checksum_manifest_urls = [
+  "https://ftp.ensembl.org/pub/release-112/fasta/homo_sapiens/dna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-112/fasta/homo_sapiens/cdna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-112/fasta/homo_sapiens/ncrna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-112/fasta/homo_sapiens/pep/CHECKSUMS",
+]
+
+[[seqset]]
+name = "ensembl_release_113"
+namespace = "ensembl-113"
+release = 113
+rolling_namespace = "ensembl"
+urls = [
+  "https://ftp.ensembl.org/pub/release-113/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.toplevel.fa.gz",
+  "https://ftp.ensembl.org/pub/release-113/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
+  "https://ftp.ensembl.org/pub/release-113/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
+  "https://ftp.ensembl.org/pub/release-113/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
+]
+file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+checksum_manifest_urls = [
+  "https://ftp.ensembl.org/pub/release-113/fasta/homo_sapiens/dna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-113/fasta/homo_sapiens/cdna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-113/fasta/homo_sapiens/ncrna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-113/fasta/homo_sapiens/pep/CHECKSUMS",
+]
+
+[[seqset]]
+name = "ensembl_release_114"
+namespace = "ensembl-114"
+release = 114
+rolling_namespace = "ensembl"
+urls = [
+  "https://ftp.ensembl.org/pub/release-114/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.toplevel.fa.gz",
+  "https://ftp.ensembl.org/pub/release-114/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
+  "https://ftp.ensembl.org/pub/release-114/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
+  "https://ftp.ensembl.org/pub/release-114/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
+]
+file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+checksum_manifest_urls = [
+  "https://ftp.ensembl.org/pub/release-114/fasta/homo_sapiens/dna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-114/fasta/homo_sapiens/cdna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-114/fasta/homo_sapiens/ncrna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-114/fasta/homo_sapiens/pep/CHECKSUMS",
+]
+
+[[seqset]]
+name = "ensembl_release_115"
+namespace = "ensembl-115"
+release = 115
+rolling_namespace = "ensembl"
+urls = [
+  "https://ftp.ensembl.org/pub/release-115/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.toplevel.fa.gz",
+  "https://ftp.ensembl.org/pub/release-115/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
+  "https://ftp.ensembl.org/pub/release-115/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
+  "https://ftp.ensembl.org/pub/release-115/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
+]
+file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+checksum_manifest_urls = [
+  "https://ftp.ensembl.org/pub/release-115/fasta/homo_sapiens/dna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-115/fasta/homo_sapiens/cdna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-115/fasta/homo_sapiens/ncrna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-115/fasta/homo_sapiens/pep/CHECKSUMS",
+]
+
+[[seqset]]
+name = "ensembl_release_116"
+namespace = "ensembl-116"
+release = 116
+rolling_namespace = "ensembl"
+urls = [
+  "https://ftp.ensembl.org/pub/release-116/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.toplevel.fa.gz",
+  "https://ftp.ensembl.org/pub/release-116/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
+  "https://ftp.ensembl.org/pub/release-116/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
+  "https://ftp.ensembl.org/pub/release-116/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
+]
+file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+checksum_manifest_urls = [
+  "https://ftp.ensembl.org/pub/release-116/fasta/homo_sapiens/dna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-116/fasta/homo_sapiens/cdna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-116/fasta/homo_sapiens/ncrna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-116/fasta/homo_sapiens/pep/CHECKSUMS",
 ]

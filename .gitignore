@@ -15,7 +15,16 @@ sources.toml.bak.*
 
 # Run records are retained, but reproducible bulk tables/caches are not.
 /runs/**/parity_by_digest.tsv
+/runs/**/parity_by_alias.tsv
 /runs/**/build_gaps.tsv
+/runs/**/categorized_build_gaps.tsv
+/runs/**/shared_alias_mismatches.tsv
+/runs/**/mismatch-diagnosis.tsv
+/runs/**/store_only_contributions.tsv
+/runs/**/source_contribution_summary.tsv
+/runs/**/source-inventory.tsv
+/runs/**/ncbi-source-catalog.jsonl
+/runs/**/*.log
 /runs/**/.probe_cache/
 /runs/**/*.fasta
 /runs/**/*.fa

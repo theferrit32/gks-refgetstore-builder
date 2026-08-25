@@ -13,9 +13,10 @@ The store maps human-readable accessions to GA4GH sequence digests across:
 - Collection-level: `refseq:GCF_*`, `insdc:GCA_*`.
 - **NCBI RefSeq transcripts + proteins**: `refseq:NM_000551.3`,
   `refseq:NP_000542.1`, etc., loaded from NCBI RefSeq mRNA/Prot shards.
-- **Ensembl transcripts + proteins**: `ensembl:ENST00000256474.3`,
-  `ensembl:ENSP00000256474.3`, etc., loaded from Ensembl release cdna /
-  ncrna / pep FASTAs (release is pinned in `sources.toml`).
+- **Ensembl genomic, transcript, and protein sequences** from releases 75–116.
+  Immutable aliases live under `ensembl-N`; `ensembl` is an exact rolling
+  snapshot of release 116. Each release includes unmasked `dna.toplevel`, cDNA,
+  ncRNA, and peptide FASTAs.
 
 No dependency on `bioutils` or `biocommons.seqrepo` — the loader reads NCBI
 assembly reports directly and derives transcript/protein aliases from FASTA
@@ -32,8 +33,9 @@ header names. The only runtime dependency is `gtars`.
 - `gtars` (installed via `uv sync`).
 - Network access to `ftp.ncbi.nlm.nih.gov` and `ftp.ensembl.org` (or
   pre-populated cache dirs).
-- Disk: the default manifest includes 22 NCBI assembly releases, current
-  RefSeq and Ensembl files, and selected historical RefSeq/Ensembl archives.
+- Disk: the default manifest includes 23 NCBI assembly releases, complete
+  published GRCh37/GRCh38 RefSeq release history, and all four canonical FASTA
+  classes for Ensembl releases 75–116.
   Its cache and store therefore need substantially more capacity than a
   current-only build. Use `gks-refgetstore fetch --dry-run` to enumerate the
   selected files before provisioning storage.
@@ -49,6 +51,7 @@ header names. The only runtime dependency is `gtars`.
     build_store.py                 # build engine + shared helpers (config, cache paths, ingest)
     build_lock.py                  # build-lock + cache-verification core (used by build & verify)
     fetch_sources.py               # cache pre-fetch (fetch subcommand)
+    inventory_sources.py           # exact remote sizes + pre-download space-budget gate
     provenance.py                  # file <-> refget-digest queries from the lock + store
     build.lock.json                # provenance lock for the most recent build (see below)
     verify_store.py                # post-build gtars self-checks (standalone)
@@ -100,7 +103,7 @@ scratch, delete the store dir first.
 
     gks-refgetstore fetch                # download every manifest source
     gks-refgetstore fetch --dry-run      # list what would be pulled
-    gks-refgetstore fetch --only ensembl_human_cdna   # just one source's files
+    gks-refgetstore fetch --only ensembl_release_116  # one complete release
     gks-refgetstore fetch --kinds assembly_report     # just the small reports
     gks-refgetstore fetch --locked-sources            # offline lock/cache check
 
@@ -143,8 +146,8 @@ for a build that already ran.
 ## Build lock & cache verification
 
 A full build writes **`build.lock.json`** — a provenance record of exactly what
-that build consumed: every source's URL, provider MD5 (when supplied), cached
-path, byte length, `sha256`, and
+that build consumed: every source's URL, provider checksum and algorithm (when
+supplied), checksum source, cached path, byte length, `sha256`, file class, and
 the collection digest it produced, plus build metadata (timestamp, git commit,
 gtars version, `sources.toml` hash, store counts). It is small and committed.
 
@@ -159,11 +162,11 @@ build; `verify` handles the interim gap gracefully.)
 **Two uses:**
 
 1. **Reproducibility / drift detection** — a live build resolves dynamic feeds,
-   downloads and validates all inputs, then compares URL membership, upstream
-   MD5 values, and cached SHA-256 values before opening the store. Any change is
-   fatal unless `--force-lock` explicitly accepts a new baseline. NCBI's MD5
-   verifies provider delivery; the lock's SHA-256 identifies the exact bytes
-   consumed by the build.
+   downloads and validates all inputs, then compares URL membership, provider
+   checksum values, and cached SHA-256 values before opening the store. Any
+   change is fatal unless `--force-lock` explicitly accepts a new baseline.
+   NCBI MD5 and Ensembl BSD checksums verify provider delivery; the lock's
+   SHA-256 identifies the exact bytes consumed by the build.
 2. **Provenance** — because each ingested file becomes exactly one collection and
    the store records collection membership, the lock's `url → collection_digest`
    is enough to answer file↔digest questions on demand:
@@ -214,6 +217,7 @@ Each `[[assembly]]` block:
 | `report_url` | yes | URL of the corresponding `*_assembly_report.txt`. |
 | `load_fasta` | no, default `true` | If false, do not ingest a FASTA; the assembly report adds aliases only for digests already in the store. Use this for a report-only release or a deliberate alias-only namespace. |
 | `fasta_path` | no | Local path overriding the downloaded FASTA (relative to repo root). |
+| `checksum_manifest_url` | no | NCBI directory `md5checksums.txt`; genomic FASTA MD5 is required when configured. Some assembly reports have no provider MD5 and are pinned by lock SHA-256. |
 
 Each `[[seqset]]` block (flat FASTA where the header name is the accession):
 
@@ -225,8 +229,14 @@ Each `[[seqset]]` block (flat FASTA where the header name is the accession):
 | `urls` | one of | Explicit list of URLs (alternative to `url_template`; not valid with `shard_range`). |
 | `url_pattern` | one of | HTTPS URL whose basename contains a glob; requires `checksum_manifest_url`. |
 | `checksum_manifest_url` | with `url_pattern` | HTTPS NCBI `*.files.installed` URL in the same directory. |
+| `md5_manifest_urls` | no | Per-URL NCBI `md5checksums.txt` list for explicit historical inputs. |
+| `checksum_manifest_urls` | no | Per-URL Ensembl `CHECKSUMS` list; BSD checksum and 1 KiB block count are validated. |
+| `file_class` | no | One source class applied to every resolved file (useful for dynamic patterns). |
+| `file_classes` | no | Per-URL source classes used for validation and contribution analysis; mutually exclusive with `file_class`. |
+| `release` | release groups | Integer provider release. Release groups are processed numerically oldest-first. |
+| `rolling_namespace` | with `release` | Namespace replaced in full after a release succeeds; the immutable namespace must be `<rolling_namespace>-<release>`. |
 | `shard_range` | no | `[min, max]` inclusive substituted into `{shard}` in `url_template`. |
-| `format` | no, default `fasta` | `fasta`, or `gbff` to convert a GenBank flat file to FASTA before ingest. |
+| `format` | no, default `fasta` | `fasta`; `gbff` to convert a GenBank flat file to FASTA before ingest; or `lrg_zip` to concatenate the `LRG_N.fasta` members of an EBI LRG bundle, in natural-sorted member order, into one FASTA. Non-FASTA formats are cached as `<artifact>.fasta` beside the download and regenerate offline. |
 
 Exactly one of `url_template`, `urls`, or `url_pattern` is required.
 `shard_range` is valid only with `url_template`; `checksum_manifest_url` is
@@ -269,6 +279,16 @@ Per seqset run, the loader adds:
 - Per-sequence aliases under `<namespace>` using each FASTA header's first
   token (e.g. `refseq:NM_000551.3`, `ensembl:ENST00000256474.3`,
   `ensembl:ENSP00000256474.3`).
+- For the `lrg_zip` seqset, one extra alias per genomic record: the ingested
+  header is EBI's record id `lrg:LRG_1g`, and `lrg:LRG_1` is emitted alongside
+  it because HGVS and ClinVar spell the genomic record bare (`LRG_1:g.5596del`)
+  and never `LRG_1g`. Transcript and protein records (`LRG_1t1`, `LRG_1p1`) are
+  already spelled identically upstream and downstream, so they get one alias.
+
+Release-scoped seqsets accumulate every configured file class before publishing
+aliases. Conflicting alias-to-digest mappings within a release fail the build.
+Immutable `ensembl-N` namespaces are retained, while the complete `ensembl`
+TSV is atomically replaced after each release, removing retired aliases.
 
 Aliases for `sha512t24u:…` and `ga4gh:SQ.…` are intentionally NOT written —
 they are the raw digest with a prefix and are synthesized at query time by the
@@ -282,17 +302,21 @@ membership of mutable current RefSeq feeds from official checksum manifests. It 
 - **NCBI assemblies:** the original GRCh38 and GRCh37 releases, their listed
   patch releases, and their matching assembly reports. GRCh37.p11 and p12 are
   report-only because NCBI does not publish genomic FASTAs for them.
-- **NCBI RefSeq:** current mRNA, protein, and RefSeqGene shards, plus selected
-  official per-patch and annotation-release archives for older transcript and
-  protein versions.
-- **Ensembl:** current release **113** files and selected official historical
-  releases for older ENST/ENSP versions.
-
-This is curated historical coverage, not a complete copy of every version ever
-published or loaded by seqrepo. A caller can still receive a `KeyError` for an
-older accession.version absent from the selected archives. Backfill such a
-version from an authoritative per-accession service such as NCBI E-utilities or
-INSDC instead of adding an undocumented bulk file.
+- **NCBI RefSeq:** current mRNA, protein, and RefSeqGene shards, plus every RNA
+  and protein FASTA discoverable in the official GRCh37/GRCh38 assembly and
+  taxid-9606 annotation-release histories.
+- **Ensembl:** releases **75–116**, each with unmasked `dna.toplevel`, cDNA,
+  ncRNA, and peptide FASTAs. CDS, masked DNA, and redundant chromosome or
+  primary-assembly subsets are deliberately excluded.
+- **EBI LRG:** the complete public Locus Reference Genomic set — 1,325 genomic,
+  1,634 transcript, and 1,624 protein records across 1,325 loci — from the single
+  aggregate `LRG_public_fasta_files.zip`. The set is frozen at release 810
+  (2021-03-31); `pending/`, `stalled/`, and `suppressed/` records are excluded.
+  Most LRG sequences are byte-identical to their RefSeq counterparts
+  (`LRG_1g` == `NG_007400.1`) and are deduplicated by digest, so this adds
+  ~442 new sequences and 5,905 `lrg` aliases (4,580 distinct record ids — LRG_321
+  repeats two protein ids across transcripts upstream — plus 1,325 bare genomic
+  ids).
 
 ### Verifying backwards-compatibility against a seqrepo snapshot
 
@@ -318,11 +342,10 @@ The current published artifact is the preserved `store.2026-07-22/` build:
 manifest remains inside that store; the compact audit record is
 [`runs/2026-07-22-published-store/`](runs/2026-07-22-published-store/).
 
-The local `store/` may be a build target or experiment playground. It currently
-contains the isolated Ensembl release-116 genomic experiment and is explicitly
-**not publishable**; see
+The local `store/` is a build target and is not published automatically. The
+prior isolated release-116 experiment is documented at
 [`runs/2026-07-23-ensembl-r116-genomic-experiment/`](runs/2026-07-23-ensembl-r116-genomic-experiment/).
-Do not infer publication status from the presence of a local store directory.
+Do not infer publication status from a local store directory.
 
 Use [`RUNBOOK.md`](RUNBOOK.md) for new reproducible runs and browse
 [`runs/`](runs/) for retained historical evidence.

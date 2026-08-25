@@ -11,6 +11,7 @@ on its own line; final line is OVERALL PASS or OVERALL FAIL.
 
 from __future__ import annotations
 
+import argparse
 import sys
 from pathlib import Path
 
@@ -54,21 +55,19 @@ EXPECTED_COLL_REFSEQ_ALIASES = {
     "GCF_000001405.25",
 }
 
-# (namespace, alias) -> (sha512t24u, length). Captured from the build_store.py
-# run that ingested Ensembl release 113 FASTAs. These are the canonical
-# latest versions in release 113 for a few well-known genes across all three
-# biotypes we load (cdna, ncrna, pep). Bumping the Ensembl release will
-# likely invalidate some of these — update after the rebuild.
+# (namespace, alias) -> (sha512t24u, length). Captured from Ensembl release 113
+# and checked against its immutable release namespace even after newer releases
+# advance the rolling ``ensembl`` namespace.
 ENSEMBL_GROUND_TRUTH: dict[tuple[str, str], tuple[str, int]] = {
     # cdna (protein-coding transcript)
-    ("ensembl", "ENST00000256474.3"): ("xBKOKptLLDr-k4hTyCetvARn16pDS_rW", 4414),  # VHL
-    ("ensembl", "ENST00000357654.9"): ("oR9jzdHf6J23TozeyuvTXtwlm6PpUHHl", 7088),  # BRCA1
+    ("ensembl-113", "ENST00000256474.3"): ("xBKOKptLLDr-k4hTyCetvARn16pDS_rW", 4414),  # VHL
+    ("ensembl-113", "ENST00000357654.9"): ("oR9jzdHf6J23TozeyuvTXtwlm6PpUHHl", 7088),  # BRCA1
     # ncrna (non-coding transcript)
-    ("ensembl", "ENST00000429829.6"): ("FHnP3_NSzX0WZLjoHIPFjv89fSl18Xwk", 19245),  # XIST lncRNA
+    ("ensembl-113", "ENST00000429829.6"): ("FHnP3_NSzX0WZLjoHIPFjv89fSl18Xwk", 19245),  # XIST lncRNA
     # pep (protein)
-    ("ensembl", "ENSP00000256474.3"): ("z-Oa0pZkJ6GHJHOYM7h5mY_umc0SJzTu", 213),   # VHL
-    ("ensembl", "ENSP00000350283.3"): ("nUzIPnHMyQV52hzgBbKl5vlbSwx8M8_Y", 1863),  # BRCA1
-    ("ensembl", "ENSP00000269305.4"): ("KAxM06sYzBF6zFftFaYq9E_18wsnn7al", 393),   # TP53
+    ("ensembl-113", "ENSP00000256474.3"): ("z-Oa0pZkJ6GHJHOYM7h5mY_umc0SJzTu", 213),   # VHL
+    ("ensembl-113", "ENSP00000350283.3"): ("nUzIPnHMyQV52hzgBbKl5vlbSwx8M8_Y", 1863),  # BRCA1
+    ("ensembl-113", "ENSP00000269305.4"): ("KAxM06sYzBF6zFftFaYq9E_18wsnn7al", 393),   # TP53
 }
 
 
@@ -129,6 +128,7 @@ def expected_sequence_namespaces() -> set[str]:
     return {
         *(entry.namespace for entry in assemblies),
         *(entry.namespace for entry in seqsets),
+        *(entry.rolling_namespace for entry in seqsets if entry.rolling_namespace),
         "refseq",
         "insdc",
     }
@@ -383,26 +383,29 @@ def section_ensembl(store: RefgetStore, r: Report) -> None:
     ``RefgetSequenceDataProxy._ensure_sequence_loaded``).
     """
     print("\n[H] Ensembl coverage smoke test")
+    available = set(store.list_sequence_alias_namespaces())
     for (ns, alias), (expected_digest, expected_length) in ENSEMBL_GROUND_TRUTH.items():
-        rec = store.get_sequence_by_alias(ns, alias)
+        effective_ns = ns if ns in available else "ensembl"
+        rec = store.get_sequence_by_alias(effective_ns, alias)
         if rec is None:
-            r.check(f"{ns}:{alias}", False, "record not found")
+            r.check(f"{effective_ns}:{alias}", False, "record not found")
             continue
         md = rec.metadata
         r.check(
-            f"{ns}:{alias} digest",
+            f"{effective_ns}:{alias} digest",
             md.sha512t24u == expected_digest,
             f"expected {expected_digest}, got {md.sha512t24u}",
         )
         r.check(
-            f"{ns}:{alias} length == {expected_length}",
+            f"{effective_ns}:{alias} length == {expected_length}",
             md.length == expected_length,
             f"got {md.length}",
         )
 
     # Sequence bytes smoke test on VHL cDNA — proves the FASTA payload
     # made it to disk for an Ensembl-loaded seqset, not just the alias row.
-    rec = store.get_sequence_by_alias("ensembl", "ENST00000256474.3")
+    validation_ns = "ensembl-113" if "ensembl-113" in available else "ensembl"
+    rec = store.get_sequence_by_alias(validation_ns, "ENST00000256474.3")
     if rec is None:
         r.check("VHL cDNA byte fetch", False, "record not found")
         return
@@ -460,8 +463,10 @@ def section_known_divergent(store: RefgetStore, r: Report) -> None:
 
     # Spot-check first 10 entries: verify each resolves with expected digest
     checked = 0
+    available = set(store.list_sequence_alias_namespaces())
+    validation_ns = "ensembl-113" if "ensembl-113" in available else "ensembl"
     for accession, expected_digest in entries[:10]:
-        rec = store.get_sequence_by_alias("ensembl", accession)
+        rec = store.get_sequence_by_alias(validation_ns, accession)
         if rec is None:
             r.check(f"{accession} resolves", False, "not found in store")
             continue
@@ -480,7 +485,15 @@ def section_known_divergent(store: RefgetStore, r: Report) -> None:
 
 
 def main() -> int:
-    store_path = Path(sys.argv[1]) if len(sys.argv) > 1 else STORE_PATH
+    global CONFIG_PATH, DOWNLOAD_DIR
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("store", type=Path, nargs="?", default=STORE_PATH)
+    parser.add_argument("--config", type=Path, default=CONFIG_PATH)
+    parser.add_argument("--downloads", type=Path, default=DOWNLOAD_DIR)
+    args = parser.parse_args()
+    CONFIG_PATH = args.config
+    DOWNLOAD_DIR = args.downloads
+    store_path = args.store
     if not store_path.exists():
         print(f"ERROR: store not found at {store_path}", file=sys.stderr)
         return 2

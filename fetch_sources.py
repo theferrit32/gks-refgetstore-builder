@@ -35,8 +35,8 @@ import urllib.request
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from build_store import (apply_locked_sources, load_config, md5_file,
-                         mirror_cache_path, resolve_sources)  # noqa: E402
+from build_store import (apply_locked_sources, load_config, mirror_cache_path,
+                         provider_checksum_matches, resolve_sources)  # noqa: E402
 from build_lock import load_lock, sha256_file  # noqa: E402
 
 CHUNK = 1 << 20  # 1 MiB
@@ -89,12 +89,13 @@ def run_fetch(args) -> int:
     produce a nonzero result; insufficient free disk space stops further fetches.
     """
     assemblies, seqsets = load_config(args.config)
+    if args.only:
+        want = set(args.only)
+        assemblies = [entry for entry in assemblies if entry.namespace in want]
+        seqsets = [entry for entry in seqsets if entry.name in want]
     lock = load_lock(args.lock) if args.locked_sources else None
     sources = (apply_locked_sources(seqsets, lock) if lock is not None
                else resolve_sources(assemblies, seqsets))
-    if args.only:
-        want = set(args.only)
-        sources = [s for s in sources if s.owner in want]
     if args.kinds:
         kinds = set(args.kinds.split(","))
         sources = [s for s in sources if s.kind in kinds]
@@ -127,7 +128,7 @@ def run_fetch(args) -> int:
                 print(f"[{i}/{len(sources)}] LOCK  {owner}  {rel}")
             continue
         if target.exists() and target.stat().st_size > 0:
-            if source.upstream_md5 and md5_file(target) != source.upstream_md5:
+            if not provider_checksum_matches(target, source):
                 print(f"[{i}/{len(sources)}] stale {owner}  {rel}")
             else:
                 skipped += 1
@@ -144,9 +145,9 @@ def run_fetch(args) -> int:
         print(f"[{i}/{len(sources)}] get   {owner}  {rel}", flush=True)
         try:
             n = download(url, target, args.timeout, args.retries)
-            if source.upstream_md5 and md5_file(target) != source.upstream_md5:
+            if not provider_checksum_matches(target, source):
                 target.unlink(missing_ok=True)
-                raise RuntimeError("NCBI MD5 mismatch")
+                raise RuntimeError("provider checksum mismatch")
             fetched += 1
             total_bytes += n
             print(f"           {human(n)}  (cache free {free_gb(args.cache_dir):.1f}GB)")

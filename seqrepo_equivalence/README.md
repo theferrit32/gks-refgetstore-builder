@@ -8,6 +8,10 @@ loads authoritative current sources, and seqrepo accumulates historical
 versions, so some divergence is expected and documented here rather than treated
 as a build defect.
 
+The store's `lrg` namespace is store-only by design and is expected to land
+entirely in `refget_only`: the `2024-12-20` seqrepo snapshot has no LRG namespace
+at all, so `NAMESPACE_MAP` deliberately omits an `LRG` entry.
+
 ## Contents
 
 - `verify_seqrepo_equivalence.py` — exhaustively compares a store against a
@@ -24,6 +28,9 @@ as a build defect.
   **This fixture corresponds to the biocommons seqrepo `2024-12-20` snapshot.**
 - `parity_membership.py` — emits the exhaustive digest-membership table and a
   compact Markdown summary.
+- `full_parity.py` — emits the exhaustive biological alias-union table, every
+  missing/mismatched SeqRepo alias, shared-alias mismatches, and earliest-source
+  attribution for every store-only digest.
 - `probe_source_coverage.py` — measures candidate-source coverage against a
   verifier gap table while caching compact accession lists.
 
@@ -42,6 +49,7 @@ If you point this at a different seqrepo snapshot, regenerate
 `ensembl_known_divergent.txt` for that version — the set of `*`-divergent
 accessions can change between snapshots.
 
-Bulk `build_gaps.tsv` and `parity_by_digest.tsv` outputs are reproducible and
-ignored. Retain their schema, row count, byte size, SHA-256, and headline
-categories in the relevant run README rather than committing the tables.
+Bulk parity, gap, mismatch, contribution, and inventory TSV outputs are
+reproducible and ignored. Retain them locally and record their schemas, row
+counts, byte sizes, SHA-256 values, generator commands, and headline categories
+in the relevant run manifest.

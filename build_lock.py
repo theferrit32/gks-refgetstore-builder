@@ -14,7 +14,7 @@ Two roles:
     `url -> collection_digest` is all `provenance.py` needs to answer
     `file -> digests` / `digest -> files` on demand (no giant table stored).
 
-Some sources are mutable upstream. Live builds treat any URL, provider-MD5, or
+Some sources are mutable upstream. Live builds treat any URL, provider checksum, or
 cached-SHA drift as fatal before ingestion unless ``--force-lock`` explicitly
 accepts a new baseline. ``--locked-sources`` instead performs no discovery and
 requires the exact cached SHA-256 bytes recorded here.
@@ -34,8 +34,8 @@ from pathlib import Path
 
 # build_store imports this module lazily (inside run_build) to avoid a circular
 # import, so importing from it at module load is safe here.
-from build_store import (ResolvedSource, load_config, md5_file, mirror_cache_path,
-                         resolve_sources)
+from build_store import (ResolvedSource, load_config, mirror_cache_path,
+                         provider_checksum_matches, resolve_sources)
 
 SCHEMA = "gks-refgetstore-build-lock/2"
 V1_SCHEMA = "gks-refgetstore-build-lock/1"
@@ -173,6 +173,14 @@ def source_record(
         "kind": kind, "owner": owner, "url": url,
         "cache_path": _rel(download_dir, cache_path), "mutable": is_mutable(url),
         "upstream_md5": source.upstream_md5,
+        "provider_checksum": source.provider_checksum or source.upstream_md5,
+        "provider_checksum_algorithm": (
+            source.provider_checksum_algorithm
+            or ("md5" if source.upstream_md5 else None)
+        ),
+        "provider_checksum_blocks": source.provider_checksum_blocks,
+        "checksum_url": source.checksum_url,
+        "file_class": source.file_class,
     }
     if cache_path.exists() and cache_path.stat().st_size > 0:
         rec["bytes"] = cache_path.stat().st_size
@@ -307,10 +315,13 @@ def evaluate_sources_vs_lock(sources: list[ResolvedSource], lock: dict) -> LockC
     result.new = sorted(set(live) - set(locked))
     result.only_in_lock = sorted(set(locked) - set(live))
     for url in sorted(set(live) & set(locked)):
-        old_md5 = locked[url].get("upstream_md5")
-        new_md5 = live[url].upstream_md5
-        if old_md5 != new_md5:
-            result.upstream_changed.append((url, old_md5, new_md5))
+        old_checksum = (
+            locked[url].get("upstream_md5")
+            or locked[url].get("provider_checksum")
+        )
+        new_checksum = live[url].upstream_md5 or live[url].provider_checksum
+        if old_checksum != new_checksum:
+            result.upstream_changed.append((url, old_checksum, new_checksum))
     return result
 
 
@@ -385,8 +396,8 @@ def _verify_integrity(args) -> int:
             if not good:
                 problems.append(f"gzip: {msg}")
                 corrupt.append(rel)
-        if source.upstream_md5 and md5_file(target) != source.upstream_md5:
-            problems.append("provider MD5 mismatch")
+        if not provider_checksum_matches(target, source):
+            problems.append("provider checksum mismatch")
             checksum_mismatch.append(rel)
         if args.check_remote:
             rsize = remote_size(url, args.timeout)
@@ -402,10 +413,10 @@ def _verify_integrity(args) -> int:
             ok += 1
 
     print(f"\nchecked={len(sources)} ok={ok} missing={len(missing)} "
-          f"corrupt={len(corrupt)} md5_mismatch={len(checksum_mismatch)} "
+          f"corrupt={len(corrupt)} checksum_mismatch={len(checksum_mismatch)} "
           f"size_mismatch={len(size_mismatch)}", file=sys.stderr)
     for label, items in (("MISSING", missing), ("CORRUPT", corrupt),
-                         ("MD5 MISMATCH", checksum_mismatch),
+                         ("PROVIDER CHECKSUM MISMATCH", checksum_mismatch),
                          ("SIZE MISMATCH", size_mismatch)):
         if items:
             print(f"{label}:", file=sys.stderr)
