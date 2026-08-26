@@ -10,6 +10,8 @@ from __future__ import annotations
 
 import gzip
 import fnmatch
+import os
+import shutil
 import zipfile
 import hashlib
 import logging
@@ -38,6 +40,12 @@ DEFAULT_DOWNLOADS = Path(__file__).parent / "downloads"
 SQ_PREFIX = "SQ."
 NA_VALUES = {"na", "", "<NA>"}
 SEQSET_FORMATS = ("fasta", "gbff", "lrg_zip")
+
+# Files imported concurrently per batched ingest call. Capped well below the
+# core count because peak RSS grows with concurrency on the largest inputs
+# (~0.45 GiB per additional in-flight Ensembl ``dna.toplevel``), and the
+# throughput gain flattens out long before the memory cost does.
+INGEST_JOBS_DEFAULT = min(8, os.cpu_count() or 4)
 
 
 @dataclass
@@ -551,6 +559,51 @@ def load_config(
                 f"{sorted(expected_ensembl_classes)}, got {sorted(classes)}"
             )
     return assemblies, seqsets
+
+
+def free_gib(path: Path) -> float:
+    """Free space in GiB on the filesystem holding ``path``."""
+    usage = shutil.disk_usage(path)
+    return usage.free / 2**30
+
+
+# Rough store-size multiplier over the compressed bytes of the ingested
+# sources. Sequences are 2-bit encoded and deduplicated across collections,
+# but the per-sequence and per-collection indexes add overhead, and the whole
+# thing lands in the same order of magnitude as the gzipped inputs. This is a
+# ballpark for a preflight warning, not an accounting.
+STORE_SIZE_FACTOR = 1.2
+
+
+def check_free_space(cache_dir: Path, store_dir: Path,
+                     sources: list[ResolvedSource], min_free_gb: float) -> None:
+    """Warn about the projected store size and stop if the disk is already tight.
+
+    Checked once up front rather than monitored during the build: a full build
+    runs for hours, and finding out at the end that the volume filled is far
+    worse than being told at the start that it will.
+    """
+    cached = sum(
+        path.stat().st_size
+        for path in (mirror_cache_path(cache_dir, s.url) for s in sources)
+        if path.exists()
+    ) / 2**30
+    projected = cached * STORE_SIZE_FACTOR
+    free = free_gib(store_dir if store_dir.exists() else store_dir.parent)
+    logger.info(
+        "disk preflight: %.1f GiB of sources -> ~%.0f GiB store (rough); "
+        "%.1f GiB free", cached, projected, free,
+    )
+    if free < min_free_gb:
+        raise SystemExit(
+            f"only {free:.1f} GiB free, below --min-free-gb {min_free_gb}; "
+            "free space or lower the threshold"
+        )
+    if free < projected:
+        logger.warning(
+            "projected store (~%.0f GiB) exceeds free space (%.1f GiB); the "
+            "build may run out part-way", projected, free,
+        )
 
 
 def mirror_cache_path(cache_root: Path, url: str) -> Path:
@@ -1238,6 +1291,72 @@ def apply_assembly_report(
     return stats
 
 
+def _ingest_serial(
+    store: RefgetStore, paths: list[Path], stats: SeqsetStats
+) -> list[tuple | None]:
+    """Import one file at a time, warning on each failure. Used as a fallback."""
+    results: list[tuple | None] = []
+    for path in paths:
+        try:
+            results.append(store.add_sequence_collection_from_fasta(str(path)))
+        except Exception as exc:  # noqa: BLE001
+            logger.warning("ingest failed for %s: %s", path, exc)
+            stats.warnings += 1
+            results.append(None)
+    return results
+
+
+def ingest_fastas(
+    store: RefgetStore, paths: list[Path], stats: SeqsetStats, jobs: int
+) -> list[tuple | None]:
+    """Import ``paths`` in one batched call, aligned to the input order.
+
+    Returns one ``(metadata, was_new)`` per input path, or ``None`` where that
+    file failed.
+
+    Batching is what makes a full build tractable. gtars persists the global
+    sequence index per import call, so importing N files one at a time is
+    O(N^2) in store size — measured at 9.9x slower for identical work against a
+    32 MB index versus an empty one, and the production index exceeds 90 MB.
+    One call per seqset amortizes that persist (3.4x on eight shards) and
+    ``jobs`` then parallelizes the decompress/digest work, which is what
+    dominates the large Ensembl inputs (3.0x on ``dna.toplevel`` at jobs=3).
+
+    Ordering is preserved and the resulting store is byte-identical to serial
+    ingestion: sequences are content-addressed, so collection digests do not
+    depend on import order. gtars documents ``jobs`` as affecting neither
+    ordering nor the resulting store.
+
+    A batch failure aborts the whole call without naming a file, so any failure
+    falls back to serial ingestion to attribute the error to a specific input
+    and preserve per-file warn-and-continue semantics. Re-importing an
+    already-added collection is a no-op (``force=False`` skips duplicates), so
+    the retry is safe after a partially applied batch.
+    """
+    if not paths:
+        return []
+    try:
+        results = store.add_sequence_collections_from_fastas(
+            [str(p) for p in paths], jobs=jobs
+        )
+    except Exception as exc:  # noqa: BLE001
+        logger.warning(
+            "batched ingest of %d file(s) failed (%s); retrying serially to "
+            "isolate the offending input", len(paths), exc,
+        )
+        return _ingest_serial(store, paths, stats)
+    # gtars de-duplicates its expanded input list. Distinct URLs cannot collide
+    # in the mirrored cache, so a length mismatch means an assumption broke;
+    # fall back rather than mis-align results to shards.
+    if len(results) != len(paths):
+        logger.warning(
+            "batched ingest returned %d result(s) for %d input(s); retrying "
+            "serially", len(results), len(paths),
+        )
+        return _ingest_serial(store, paths, stats)
+    return list(results)
+
+
 def process_seqset(
     store: RefgetStore,
     entry: SeqsetConfig,
@@ -1245,13 +1364,16 @@ def process_seqset(
     provenance: dict[str, dict] | None = None,
     refresh_derived: bool = False,
     alias_sink: dict[str, str] | None = None,
+    jobs: int = INGEST_JOBS_DEFAULT,
 ) -> SeqsetStats:
     """Ingest a flat/sharded seqset and alias every header name.
 
-    For each shard FASTA:
-      1. Open the source prepared and validated by build preflight.
-      2. ``add_sequence_collection_from_fasta`` -> collection digest.
-      3. Walk collection level-2 contents; collect ``(name, digest)`` pairs.
+    Runs in three phases:
+      1. Resolve every shard to a readable FASTA (preflight-prepared source,
+         plus any derived-format conversion) before touching the store.
+      2. Import them all in ONE batched call — see ``ingest_fastas`` for why
+         per-file imports are O(N^2) in store size.
+      3. Walk each collection's level-2 contents; collect ``(name, digest)``.
 
     Aliases are written in bulk via ``store.load_sequence_aliases`` after all
     shards have been ingested. ``add_sequence_alias`` rewrites the full
@@ -1260,6 +1382,12 @@ def process_seqset(
     ``load_sequence_aliases`` merges a whole TSV into the in-memory alias
     map and triggers exactly one persist, dropping the per-alias cost from
     ~7.5 ms to ~5 µs.
+
+    The seqset is the batching unit deliberately. Batching more widely (across
+    releases, or the whole manifest) measured only ~4% faster, while
+    ``process_release_groups`` depends on releases being ingested and published
+    oldest-first so the rolling namespace ends up holding exactly the newest
+    release.
     """
     stats = SeqsetStats(name=entry.name, namespace=entry.namespace)
     logger.info("=== seqset %s ===", entry.name)
@@ -1268,6 +1396,8 @@ def process_seqset(
     # mapping is rejected so immutable namespaces never depend on source order.
     pending: dict[str, str] = {}
 
+    # Phase 1: resolve every shard before importing any of them.
+    resolved: list[tuple[Path, Path]] = []  # (source cache path, FASTA to ingest)
     for shard_label, url in entry.iter_shard_urls():
         target = mirror_cache_path(download_dir, url)
         logger.info(
@@ -1293,14 +1423,20 @@ def process_seqset(
                 stats.warnings += 1
                 continue
 
-        try:
-            coll_meta, was_new = store.add_sequence_collection_from_fasta(
-                str(fasta_path)
-            )
-        except Exception as exc:  # noqa: BLE001
-            logger.warning("ingest failed for %s: %s", fasta_path, exc)
-            stats.warnings += 1
+        resolved.append((target, fasta_path))
+
+    # Phase 2: one batched import for the whole seqset.
+    if resolved:
+        logger.info(
+            "  importing %d file(s) (jobs=%d)", len(resolved), jobs
+        )
+    results = ingest_fastas(store, [f for _, f in resolved], stats, jobs)
+
+    # Phase 3: attribute each per-file result back to its shard.
+    for (target, fasta_path), result in zip(resolved, results):
+        if result is None:
             continue
+        coll_meta, was_new = result
 
         logger.info(
             "  collection %s (%s, %d sequences)",
@@ -1425,6 +1561,7 @@ def process_release_groups(
     store_dir: Path,
     provenance: dict[str, dict] | None = None,
     refresh_derived: bool = False,
+    jobs: int = INGEST_JOBS_DEFAULT,
 ) -> list[SeqsetStats]:
     """Ingest provider releases oldest-first and publish complete alias snapshots.
 
@@ -1460,7 +1597,7 @@ def process_release_groups(
             for entry in release_entries:
                 entry_stats = process_seqset(
                     store, entry, download_dir, provenance, refresh_derived,
-                    alias_sink=pending,
+                    alias_sink=pending, jobs=jobs,
                 )
                 expected_sources = sum(1 for _ in entry.iter_shard_urls())
                 if (entry_stats.warnings
@@ -1692,6 +1829,8 @@ def run_build(args) -> int:
                 "source drift detected before ingestion: " + "; ".join(details)
             )
 
+    check_free_space(args.cache_dir, args.store_dir, run_sources, args.min_free_gb)
+
     args.store_dir.mkdir(parents=True, exist_ok=True)
     store = RefgetStore.on_disk(str(args.store_dir))
     logger.info("opened store at %s (mode=%s)", args.store_dir, store.storage_mode)
@@ -1714,6 +1853,7 @@ def run_build(args) -> int:
             store, entry, args.cache_dir, provenance,
             refresh_derived=args.force_download,
             alias_sink=ordinary_aliases.setdefault(entry.namespace, {}),
+            jobs=args.ingest_jobs,
         )
         if entry_stats.warnings:
             raise RuntimeError(
@@ -1731,6 +1871,7 @@ def run_build(args) -> int:
         seqset_stats.extend(process_release_groups(
             store, release_seqsets, args.cache_dir, args.store_dir, provenance,
             refresh_derived=args.force_download,
+            jobs=args.ingest_jobs,
         ))
         # The rolling namespace is replaced as a complete on-disk snapshot.
         # Reopen so subsequent summaries and lock metadata see that snapshot,

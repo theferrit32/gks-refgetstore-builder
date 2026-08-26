@@ -89,6 +89,8 @@ is fetched on demand. Writes/refreshes the build lock at the end (see
     --assembly NAME        only this assembly namespace; --seqset NAME only this seqset
     --skip-assemblies / --skip-seqsets
     --force-download       re-fetch even if cached
+    --ingest-jobs N        FASTAs imported concurrently per seqset (default: min(8, cores))
+    --min-free-gb N        refuse to start if free disk is below this (default 25)
     --lock PATH            build-lock to check against + write (default ./build.lock.json)
     --lock-check-mode {strict,subset,ignore}   pre-flight check vs the lock (default strict)
     --no-lock              don't write the lock (the pre-flight check still runs)
@@ -98,6 +100,27 @@ is fetched on demand. Writes/refreshes the build lock at the end (see
 
 Building into an existing store **appends** (dedup by digest); to rebuild from
 scratch, delete the store dir first.
+
+Each seqset's shards are imported in **one batched call**. gtars persists the
+global sequence index once per import call, so importing files one at a time is
+O(N²) in store size — measured at 9.9x slower for identical work against a 32 MB
+index than an empty one, and a full build's index exceeds 90 MB. Batching
+amortizes that persist (3.4x on an eight-shard seqset) and `--ingest-jobs`
+parallelizes the decompress/digest work that dominates the large Ensembl inputs
+(3.0x on `dna.toplevel` at 3 jobs). Results are identical either way — sequences
+are content-addressed, so collection digests do not depend on import order.
+
+The seqset is the batching unit deliberately: batching more widely measured only
+~4% faster, while release-scoped seqsets must be ingested and published
+oldest-first for the rolling namespace to end up holding exactly the newest
+release. Lower `--ingest-jobs` if memory is tight; peak RSS grows by roughly
+0.45 GiB per concurrent `dna.toplevel`.
+
+Free space is checked once before ingestion rather than monitored throughout —
+a full build runs for hours, and learning at the end that the volume filled is
+worse than being told at the start. The projection is a rough multiple of the
+compressed source bytes, so it warns rather than blocks; only `--min-free-gb`
+aborts.
 
 ### `fetch` — pre-populate the download cache (no ingest)
 

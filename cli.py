@@ -43,6 +43,15 @@ def _add_build(sub: argparse._SubParsersAction) -> None:
     p.add_argument("--skip-assemblies", action="store_true")
     p.add_argument("--skip-seqsets", action="store_true")
     p.add_argument("--force-download", action="store_true")
+    p.add_argument("--ingest-jobs", type=int,
+                   default=build_store.INGEST_JOBS_DEFAULT,
+                   help="FASTA files imported concurrently per seqset "
+                        f"(default {build_store.INGEST_JOBS_DEFAULT}; 1=serial). "
+                        "Lower it if peak memory is a concern; the largest "
+                        "Ensembl inputs cost ~0.45 GiB per concurrent file")
+    p.add_argument("--min-free-gb", type=float, default=25.0,
+                   help="stop before ingesting if free disk is below this "
+                        "(default 25)")
     p.add_argument("--lock", type=Path, default=DEFAULT_LOCK,
                    help="build-lock path to check against and write/refresh")
     p.add_argument("--no-lock", action="store_true",

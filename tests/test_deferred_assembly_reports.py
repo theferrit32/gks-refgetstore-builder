@@ -51,6 +51,8 @@ def build_args(tmp_path: Path, config: Path, **overrides):
         "force_download": False,
         "force_lock": False,
         "no_lock": True,
+        "ingest_jobs": build_store.INGEST_JOBS_DEFAULT,
+        "min_free_gb": 0.0,
     }
     values.update(overrides)
     return SimpleNamespace(**values)
@@ -271,7 +273,7 @@ def test_build_phase_order_and_partial_modes(
         )
 
     def seq(_store, entry, _cache, _provenance, refresh_derived=False,
-            alias_sink=None):
+            alias_sink=None, jobs=1):
         events.append(f"seq:{entry.name}")
         return build_store.SeqsetStats(entry.name, entry.namespace)
 

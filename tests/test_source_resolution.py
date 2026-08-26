@@ -277,7 +277,7 @@ def test_locked_sources_with_force_download_remains_offline(
     seen: list[bool] = []
 
     def ingest(_store, entry, _cache, _provenance, refresh_derived=False,
-               alias_sink=None):
+               alias_sink=None, jobs=1):
         seen.append(refresh_derived)
         stats = build_store.SeqsetStats(entry.name, entry.namespace)
         stats.shards_processed = 1
@@ -307,6 +307,7 @@ def test_locked_sources_with_force_download_remains_offline(
         "skip_seqsets": False, "assembly": None, "seqset": None,
         "lock_check_mode": "strict", "force_download": True,
         "force_lock": False, "no_lock": True,
+        "ingest_jobs": build_store.INGEST_JOBS_DEFAULT, "min_free_gb": 0.0,
     })()
     assert build_store.run_build(args) == 0
     assert seen == [True]
@@ -409,7 +410,7 @@ def test_release_groups_are_chronological_atomic_and_replace_rolling_namespace(
     seen: list[str] = []
 
     def ingest(_store, entry, _cache, _provenance=None, _refresh=False,
-               alias_sink=None):
+               alias_sink=None, jobs=1):
         seen.append(entry.name)
         alias_sink.update({"shared": f"digest-{entry.release}"})
         if entry.release == 1:
@@ -448,7 +449,7 @@ def test_release_group_rejects_conflicting_aliases(
                      release=1, rolling_namespace="ensembl"),
     ]
     def ingest(_store, entry, _cache, _provenance=None, _refresh=False,
-               alias_sink=None):
+               alias_sink=None, jobs=1):
         digest = "one" if entry.name == "a" else "two"
         previous = alias_sink.get("same")
         if previous is not None and previous != digest:
@@ -690,3 +691,191 @@ def test_real_store_ingests_mixed_lrg_nucleotide_and_protein_records(
         "lrg", "LRG_1"
     ).sha512t24u == genomic.sha512t24u
     assert store.get_sequence_metadata_by_alias("lrg", "LRG_2p1") is not None
+
+
+class BatchStore:
+    """Records how ingestion was invoked: batched vs one file at a time."""
+
+    def __init__(self, batch_error: Exception | None = None,
+                 short_by: int = 0) -> None:
+        self.batch_calls: list[tuple[list[str], int]] = []
+        self.single_calls: list[str] = []
+        self.batch_error = batch_error
+        self.short_by = short_by
+        self.aliases: dict[str, str] = {}
+
+    def _meta(self, path: str):
+        name = Path(path).stem
+        return type("Meta", (), {"digest": f"coll-{name}", "n_sequences": 1})()
+
+    def add_sequence_collections_from_fastas(self, paths, jobs=1):
+        self.batch_calls.append((list(paths), jobs))
+        if self.batch_error is not None:
+            raise self.batch_error
+        kept = paths[: len(paths) - self.short_by] if self.short_by else paths
+        return [(self._meta(p), True) for p in kept]
+
+    def add_sequence_collection_from_fasta(self, path):
+        self.single_calls.append(str(path))
+        if str(path).endswith("bad.fa"):
+            raise RuntimeError("corrupt shard")
+        return self._meta(str(path)), True
+
+    def load_collection(self, _digest): pass
+
+    def get_collection_level2(self, digest):
+        return {"names": [f"n-{digest}"], "sequences": [f"SQ.d-{digest}"]}
+
+    def list_sequence_aliases(self, _ns): return []
+
+    def load_sequence_aliases(self, _ns, path):
+        rows = Path(path).read_text().splitlines()
+        self.aliases.update(dict(r.split("\t") for r in rows if r))
+        return len(rows)
+
+
+def _shard_seqset(tmp_path: Path, names: list[str]) -> SeqsetConfig:
+    urls = []
+    for name in names:
+        url = f"https://example.test/{name}"
+        target = build_store.mirror_cache_path(tmp_path, url)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(b">x\nA\n")
+        urls.append(url)
+    return SeqsetConfig("multi", "ns", urls=urls, file_classes=["c"] * len(urls))
+
+
+def test_seqset_ingests_every_shard_in_one_batched_call(tmp_path: Path) -> None:
+    seqset = _shard_seqset(tmp_path, ["a.fa", "b.fa", "c.fa"])
+    store = BatchStore()
+    provenance: dict[str, dict] = {}
+
+    stats = build_store.process_seqset(
+        store, seqset, tmp_path, provenance, jobs=4
+    )
+
+    assert len(store.batch_calls) == 1, "expected exactly one batched import"
+    paths, jobs = store.batch_calls[0]
+    assert [Path(p).name for p in paths] == ["a.fa", "b.fa", "c.fa"]
+    assert jobs == 4
+    assert store.single_calls == []
+    assert stats.shards_processed == 3
+    # provenance is keyed by source cache path, one entry per shard, in order
+    assert [Path(k).name for k in provenance] == ["a.fa", "b.fa", "c.fa"]
+    assert provenance[
+        str(build_store.mirror_cache_path(tmp_path, "https://example.test/b.fa"))
+    ]["collection_digest"] == "coll-b"
+
+
+def test_batched_ingest_failure_falls_back_to_serial_and_names_the_file(
+    tmp_path: Path,
+) -> None:
+    seqset = _shard_seqset(tmp_path, ["good.fa", "bad.fa", "other.fa"])
+    store = BatchStore(batch_error=RuntimeError("batch blew up"))
+
+    stats = build_store.process_seqset(store, seqset, tmp_path, jobs=4)
+
+    assert len(store.batch_calls) == 1
+    assert [Path(p).name for p in store.single_calls] == [
+        "good.fa", "bad.fa", "other.fa"
+    ]
+    # only the one corrupt shard is lost; its siblings still land
+    assert stats.warnings == 1
+    assert stats.shards_processed == 2
+
+
+def test_batched_result_length_mismatch_falls_back_rather_than_misaligning(
+    tmp_path: Path,
+) -> None:
+    seqset = _shard_seqset(tmp_path, ["a.fa", "b.fa", "c.fa"])
+    store = BatchStore(short_by=1)
+
+    stats = build_store.process_seqset(store, seqset, tmp_path, jobs=2)
+
+    assert len(store.batch_calls) == 1
+    assert len(store.single_calls) == 3, "must re-ingest serially, not mis-map"
+    assert stats.shards_processed == 3
+
+
+def test_unreadable_shard_is_excluded_from_the_batch(tmp_path: Path) -> None:
+    seqset = _shard_seqset(tmp_path, ["a.fa", "b.fa"])
+    missing = "https://example.test/gone.fa"
+    seqset.urls.append(missing)
+    seqset.file_classes.append("c")
+    store = BatchStore()
+
+    stats = build_store.process_seqset(store, seqset, tmp_path, jobs=2)
+
+    paths, _ = store.batch_calls[0]
+    assert [Path(p).name for p in paths] == ["a.fa", "b.fa"]
+    assert stats.warnings == 1 and stats.shards_processed == 2
+
+
+def test_batched_and_serial_ingest_produce_the_same_real_store(
+    tmp_path: Path,
+) -> None:
+    """Batching must not change digests -- sequences are content-addressed."""
+    names = ["s1.fa", "s2.fa"]
+    payloads = [b">one\nACGT\n>two\nGGTT\n", b">three\nTTTT\n"]
+    for cache in ("batched", "serial"):
+        for name, payload in zip(names, payloads):
+            t = build_store.mirror_cache_path(
+                tmp_path / cache, f"https://example.test/{name}"
+            )
+            t.parent.mkdir(parents=True, exist_ok=True)
+            t.write_bytes(payload)
+
+    def run(cache: str, jobs: int) -> list[str]:
+        seqset = SeqsetConfig(
+            "s", "ns",
+            urls=[f"https://example.test/{n}" for n in names],
+            file_classes=["c", "c"],
+        )
+        store = build_store.RefgetStore.in_memory()
+        prov: dict[str, dict] = {}
+        build_store.process_seqset(
+            store, seqset, tmp_path / cache, prov, jobs=jobs
+        )
+        return [v["collection_digest"] for v in prov.values()]
+
+    assert run("batched", 4) == run("serial", 1)
+
+
+def test_disk_preflight_aborts_below_threshold_and_warns_on_tight_projection(
+    tmp_path: Path, caplog: pytest.LogCaptureFixture, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    url = "https://example.test/big.fa.gz"
+    target = build_store.mirror_cache_path(tmp_path, url)
+    target.parent.mkdir(parents=True)
+    target.write_bytes(b"x" * 4096)
+    sources = [ResolvedSource("seqset", "s", url)]
+    store_dir = tmp_path / "store"
+    store_dir.mkdir()
+
+    # Plenty of room: no warning, no abort.
+    monkeypatch.setattr(build_store, "free_gib", lambda _p: 500.0)
+    caplog.set_level("WARNING")
+    build_store.check_free_space(tmp_path, store_dir, sources, min_free_gb=25.0)
+    assert "may run out part-way" not in caplog.text
+
+    # Below the hard threshold: refuse to start a multi-hour build.
+    monkeypatch.setattr(build_store, "free_gib", lambda _p: 3.0)
+    with pytest.raises(SystemExit, match="below --min-free-gb"):
+        build_store.check_free_space(tmp_path, store_dir, sources, min_free_gb=25.0)
+
+    # Above the threshold but under the projection: warn, still proceed.
+    monkeypatch.setattr(build_store, "free_gib", lambda _p: 30.0)
+    monkeypatch.setattr(build_store, "STORE_SIZE_FACTOR", 1e9)
+    caplog.clear()
+    build_store.check_free_space(tmp_path, store_dir, sources, min_free_gb=25.0)
+    assert "may run out part-way" in caplog.text
+
+
+def test_disk_preflight_tolerates_sources_missing_from_cache(tmp_path: Path) -> None:
+    store_dir = tmp_path / "store"
+    store_dir.mkdir()
+    build_store.check_free_space(
+        tmp_path, store_dir,
+        [ResolvedSource("seqset", "s", "https://example.test/absent.fa")],
+        min_free_gb=0.0,
+    )
