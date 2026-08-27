@@ -171,7 +171,12 @@ def cmd_exec(args: argparse.Namespace) -> int:
         with log_path.open("wb") as log:
             process = subprocess.Popen(argv, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             assert process.stdout is not None
-            for chunk in iter(lambda: process.stdout.read(64 * 1024), b""):
+            # read1, not read: read(n) on a blocking pipe waits for the full n
+            # bytes, so a long-running command's output only reached the log in
+            # 64 KiB steps -- and whatever was still pending was lost if the
+            # process was killed. read1 returns whatever is available now, which
+            # is what makes `tail -f` on the log usable during a multi-hour run.
+            for chunk in iter(lambda: process.stdout.read1(64 * 1024), b""):
                 log.write(chunk)
                 log.flush()
                 sys.stdout.buffer.write(chunk)
