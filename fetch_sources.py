@@ -30,6 +30,8 @@ from __future__ import annotations
 import shutil
 import socket
 import sys
+import threading
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import urllib.error
 import urllib.request
 from pathlib import Path
@@ -52,6 +54,32 @@ def human(nbytes: float) -> str:
 
 def free_gb(path: Path) -> float:
     return shutil.disk_usage(path).free / 1e9
+
+
+def find_partials(cache_dir: Path) -> list[Path]:
+    """Return leftover ``.part`` files under the cache, newest last."""
+    return sorted(cache_dir.rglob("*.part"), key=lambda p: p.stat().st_mtime)
+
+
+def sweep_partials(cache_dir: Path, remove: bool) -> tuple[int, int]:
+    """Report (and optionally delete) interrupted downloads. Returns (n, bytes).
+
+    Downloads are atomic — data streams to ``<name>.part`` and only becomes the
+    real filename via ``replace()`` after a complete read — so a leftover
+    ``.part`` can never be mistaken for a finished file. It is dead weight, not
+    corruption.
+
+    Cleanup normally happens in ``download``'s exception handler, but that never
+    runs if the process is killed, which leaks one file per in-flight download.
+    Sweeping at startup keeps an interrupted run from silently accumulating
+    dozens of gigabytes of orphans across retries.
+    """
+    partials = find_partials(cache_dir)
+    total = sum(p.stat().st_size for p in partials)
+    if remove:
+        for path in partials:
+            path.unlink(missing_ok=True)
+    return len(partials), total
 
 
 def download(url: str, target: Path, timeout: int, retries: int) -> int:
@@ -106,14 +134,27 @@ def run_fetch(args) -> int:
     print(f"{len(sources)} source file(s); cache={args.cache_dir} "
           f"free={free_gb(args.cache_dir):.1f}GB", file=sys.stderr)
 
+    # Sweep before starting: a killed run leaves one .part per in-flight
+    # download, and those never get reclaimed otherwise. Dry runs only report,
+    # so the check is available without side effects.
+    n_partial, partial_bytes = sweep_partials(args.cache_dir, remove=not args.dry_run)
+    if n_partial:
+        verb = "found" if args.dry_run else "removed"
+        print(f"{verb} {n_partial} interrupted download(s), {human(partial_bytes)}",
+              file=sys.stderr)
+
     fetched = skipped = failed = 0
     aborted_for_disk_space = False
     total_bytes = 0
     failures: list[tuple[str, str]] = []
     locked_by_url = ({entry["url"]: entry for entry in lock.get("sources", [])}
                      if lock else {})
+
+    # Pass 1 (serial): classify every source. Checksum verification of cached
+    # files is local work, and keeping it ordered keeps the log readable.
+    queued: list[tuple[int, object, Path, Path]] = []
     for i, source in enumerate(sources, 1):
-        kind, owner, url = source.kind, source.owner, source.url
+        owner, url = source.owner, source.url
         target = mirror_cache_path(args.cache_dir, url)
         rel = target.relative_to(args.cache_dir)
         if args.locked_sources:
@@ -137,24 +178,46 @@ def run_fetch(args) -> int:
         if args.dry_run:
             print(f"[{i}/{len(sources)}] FETCH {owner}  {rel}")
             continue
-        if free_gb(args.cache_dir) < args.min_free_gb:
-            print(f"ABORT: free disk {free_gb(args.cache_dir):.1f}GB below "
-                  f"--min-free-gb {args.min_free_gb}", file=sys.stderr)
-            aborted_for_disk_space = True
-            break
-        print(f"[{i}/{len(sources)}] get   {owner}  {rel}", flush=True)
-        try:
-            n = download(url, target, args.timeout, args.retries)
-            if not provider_checksum_matches(target, source):
-                target.unlink(missing_ok=True)
-                raise RuntimeError("provider checksum mismatch")
-            fetched += 1
-            total_bytes += n
-            print(f"           {human(n)}  (cache free {free_gb(args.cache_dir):.1f}GB)")
-        except Exception as exc:  # noqa: BLE001
-            failed += 1
-            failures.append((url, str(exc)))
-            print(f"           FAILED: {exc}", file=sys.stderr)
+        queued.append((i, source, target, rel))
+
+    # Pass 2 (concurrent): providers throttle per connection, not per client --
+    # a second stream measured full speed while the first kept its own. One
+    # serial stream therefore leaves most of the link idle, so downloads run
+    # in a small pool. Kept modest to stay polite to public FTP endpoints.
+    def fetch_one(item):
+        i, source, target, rel = item
+        print(f"[{i}/{len(sources)}] get   {source.owner}  {rel}", flush=True)
+        n = download(source.url, target, args.timeout, args.retries)
+        if not provider_checksum_matches(target, source):
+            target.unlink(missing_ok=True)
+            raise RuntimeError("provider checksum mismatch")
+        return n
+
+    if queued:
+        lock_ = threading.Lock()
+        with ThreadPoolExecutor(max_workers=max(1, args.jobs)) as pool:
+            futures = {}
+            for item in queued:
+                if free_gb(args.cache_dir) < args.min_free_gb:
+                    print(f"ABORT: free disk {free_gb(args.cache_dir):.1f}GB below "
+                          f"--min-free-gb {args.min_free_gb}", file=sys.stderr)
+                    aborted_for_disk_space = True
+                    break
+                futures[pool.submit(fetch_one, item)] = item
+            for future in as_completed(futures):
+                _, source, _, rel = futures[future]
+                try:
+                    n = future.result()
+                except Exception as exc:  # noqa: BLE001
+                    with lock_:
+                        failed += 1
+                        failures.append((source.url, str(exc)))
+                    print(f"           FAILED {rel}: {exc}", file=sys.stderr)
+                    continue
+                with lock_:
+                    fetched += 1
+                    total_bytes += n
+                print(f"           {human(n)}  {rel}")
 
     print(f"\nfetched={fetched} skipped={skipped} failed={failed} "
           f"downloaded={human(total_bytes)}", file=sys.stderr)

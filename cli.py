@@ -100,6 +100,10 @@ def _add_fetch(sub: argparse._SubParsersAction) -> None:
     p.add_argument("--timeout", type=int, default=600)
     p.add_argument("--retries", type=int, default=3)
     p.add_argument("--min-free-gb", type=float, default=10.0)
+    p.add_argument("--jobs", type=int, default=6,
+                   help="concurrent downloads (default 6). Providers throttle "
+                        "per connection, so one stream leaves most of the link "
+                        "idle; keep this modest to stay polite to public FTP")
     p.set_defaults(func=fetch_sources.run_fetch)
 
 

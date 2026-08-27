@@ -879,3 +879,60 @@ def test_disk_preflight_tolerates_sources_missing_from_cache(tmp_path: Path) -> 
         [ResolvedSource("seqset", "s", "https://example.test/absent.fa")],
         min_free_gb=0.0,
     )
+
+
+def test_partial_downloads_are_reported_then_swept(tmp_path: Path) -> None:
+    import fetch_sources
+
+    cache = tmp_path / "cache"
+    (cache / "host/deep").mkdir(parents=True)
+    good = cache / "host/deep/done.fa.gz"
+    good.write_bytes(b"complete")
+    part = cache / "host/deep/busy.fa.gz.part"
+    part.write_bytes(b"x" * 1024)
+
+    # Reporting mode leaves the tree untouched.
+    n, nbytes = fetch_sources.sweep_partials(cache, remove=False)
+    assert (n, nbytes) == (1, 1024)
+    assert part.exists()
+
+    n, nbytes = fetch_sources.sweep_partials(cache, remove=True)
+    assert (n, nbytes) == (1, 1024)
+    assert not part.exists()
+    assert good.read_bytes() == b"complete", "a completed file must survive"
+    assert fetch_sources.sweep_partials(cache, remove=True) == (0, 0)
+
+
+def test_download_renames_atomically_and_cleans_up_on_failure(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A partial must never occupy the real filename."""
+    import fetch_sources
+
+    target = tmp_path / "out.fa.gz"
+    part = target.with_suffix(target.suffix + ".part")
+
+    class Response:
+        def __init__(self): self.chunks = [b"abc", b"def"]
+        def read(self, _n):
+            # the real filename must not exist while bytes are still streaming
+            assert not target.exists(), "target appeared before the rename"
+            return self.chunks.pop(0) if self.chunks else b""
+        def __enter__(self): return self
+        def __exit__(self, *_): return False
+
+    monkeypatch.setattr(fetch_sources.urllib.request, "urlopen",
+                        lambda *_a, **_k: Response())
+    assert fetch_sources.download("https://x/y", target, 10, 2) == 6
+    assert target.read_bytes() == b"abcdef"
+    assert not part.exists()
+
+    def boom(*_a, **_k):
+        raise fetch_sources.urllib.error.URLError("nope")
+
+    monkeypatch.setattr(fetch_sources.urllib.request, "urlopen", boom)
+    other = tmp_path / "fails.fa.gz"
+    with pytest.raises(RuntimeError, match="failed after"):
+        fetch_sources.download("https://x/z", other, 10, 2)
+    assert not other.exists(), "a failed download must not create the target"
+    assert not other.with_suffix(other.suffix + ".part").exists()
