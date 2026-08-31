@@ -24,6 +24,12 @@ sources.toml.bak.*
 /runs/**/source_contribution_summary.tsv
 /runs/**/source-inventory.tsv
 /runs/**/ncbi-source-catalog.jsonl
+# compare_inventories.py: the per-sequence and per-alias listings are bulk; its
+# numbered summary tables (00-03, 07) are small and stay visible.
+/runs/**/04_sequences_seqrepo_only.tsv
+/runs/**/05_sequences_store_only.tsv
+/runs/**/06_sequences_shared.tsv
+/runs/**/08_alias_differences.tsv
 /runs/**/*.log
 /runs/**/.probe_cache/
 /runs/**/*.fasta

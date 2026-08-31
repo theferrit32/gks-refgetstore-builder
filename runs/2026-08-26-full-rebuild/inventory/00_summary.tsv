@@ -1,0 +1,17 @@
+step	metric	value
+1_seqrepo_inventory	namespaces	35
+1_seqrepo_inventory	alias_rows	5,865,328
+1_seqrepo_inventory	distinct_digests	1,144,093
+2_store_inventory	namespaces	69
+2_store_inventory	alias_rows	18,021,075
+2_store_inventory	distinct_digests	1,779,497
+3_namespaces	both	23
+3_namespaces	seqrepo_only	12
+3_namespaces	store_only	46
+4_sequences	in_both	980,664
+4_sequences	seqrepo_only	163,429
+4_sequences	store_only	798,833
+4_sequences	seqrepo_only_with_accession	35,337
+4_sequences	seqrepo_only_digest_only	128,092
+5_aliases	namespace_pairs_compared	23
+5_aliases	difference_rows	1,003,010

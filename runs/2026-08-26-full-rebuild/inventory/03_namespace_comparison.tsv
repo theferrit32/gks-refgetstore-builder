@@ -1,0 +1,82 @@
+canonical_namespace	seqrepo_namespace	store_namespace	status	seqrepo_alias_rows	store_alias_rows	reason
+CHM1_1.1	CHM1_1.1		seqrepo_only	23	0	assembly or source the build deliberately does not load; the sequences may still be present by digest (see step 4)
+GRCh37	GRCh37	GRCh37	both	184	276	corresponding namespaces compared alias-by-alias in step 5
+GRCh37.p10	GRCh37.p10	GRCh37.p10	both	368	643	corresponding namespaces compared alias-by-alias in step 5
+GRCh37.p11	GRCh37.p11	GRCh37.p11	both	373	649	corresponding namespaces compared alias-by-alias in step 5
+GRCh37.p12	GRCh37.p12	GRCh37.p12	both	380	661	corresponding namespaces compared alias-by-alias in step 5
+GRCh37.p13	GRCh37.p13	GRCh37.p13	both	390	687	corresponding namespaces compared alias-by-alias in step 5
+GRCh37.p2	GRCh37.p2	GRCh37.p2	both	256	419	corresponding namespaces compared alias-by-alias in step 5
+GRCh37.p5	GRCh37.p5	GRCh37.p5	both	291	489	corresponding namespaces compared alias-by-alias in step 5
+GRCh37.p9	GRCh37.p9	GRCh37.p9	both	338	583	corresponding namespaces compared alias-by-alias in step 5
+GRCh38	GRCh38	GRCh38	both	910	1365	corresponding namespaces compared alias-by-alias in step 5
+GRCh38.p1	GRCh38.p1	GRCh38.p1	both	926	1397	corresponding namespaces compared alias-by-alias in step 5
+GRCh38.p10	GRCh38.p10	GRCh38.p10	both	998	1569	corresponding namespaces compared alias-by-alias in step 5
+GRCh38.p11	GRCh38.p11	GRCh38.p11	both	998	1611	corresponding namespaces compared alias-by-alias in step 5
+GRCh38.p12	GRCh38.p12	GRCh38.p12	both	996	1642	corresponding namespaces compared alias-by-alias in step 5
+GRCh38.p13		GRCh38.p13	store_only	0	1872	source loaded by the build that seqrepo does not carry
+GRCh38.p14		GRCh38.p14	store_only	0	2115	source loaded by the build that seqrepo does not carry
+GRCh38.p2	GRCh38.p2	GRCh38.p2	both	941	1427	corresponding namespaces compared alias-by-alias in step 5
+GRCh38.p3	GRCh38.p3	GRCh38.p3	both	949	1443	corresponding namespaces compared alias-by-alias in step 5
+GRCh38.p4	GRCh38.p4	GRCh38.p4	both	965	1475	corresponding namespaces compared alias-by-alias in step 5
+GRCh38.p5	GRCh38.p5	GRCh38.p5	both	972	1489	corresponding namespaces compared alias-by-alias in step 5
+GRCh38.p6	GRCh38.p6	GRCh38.p6	both	976	1497	corresponding namespaces compared alias-by-alias in step 5
+GRCh38.p7	GRCh38.p7	GRCh38.p7	both	980	1505	corresponding namespaces compared alias-by-alias in step 5
+GRCh38.p8	GRCh38.p8	GRCh38.p8	both	998	1541	corresponding namespaces compared alias-by-alias in step 5
+GRCh38.p9	GRCh38.p9	GRCh38.p9	both	998	1557	corresponding namespaces compared alias-by-alias in step 5
+JRGv1	JRGv1		seqrepo_only	25	0	assembly or source the build deliberately does not load; the sequences may still be present by digest (see step 4)
+JRGv2	JRGv2		seqrepo_only	25	0	assembly or source the build deliberately does not load; the sequences may still be present by digest (see step 4)
+MD5	MD5		seqrepo_only	1144093	0	digest-synthesis namespace omitted from the store by design: these are 1:1 re-encodings of the sequence digest, derivable on demand, so storing them would duplicate the primary key
+NCBI34	NCBI34		seqrepo_only	3	0	assembly or source the build deliberately does not load; the sequences may still be present by digest (see step 4)
+NCBI35	NCBI35		seqrepo_only	26	0	assembly or source the build deliberately does not load; the sequences may still be present by digest (see step 4)
+NCBI36	NCBI36		seqrepo_only	149	0	assembly or source the build deliberately does not load; the sequences may still be present by digest (see step 4)
+SEGUID	SEGUID		seqrepo_only	1144093	0	digest-synthesis namespace omitted from the store by design: these are 1:1 re-encodings of the sequence digest, derivable on demand, so storing them would duplicate the primary key
+SHA1	SHA1		seqrepo_only	1144093	0	digest-synthesis namespace omitted from the store by design: these are 1:1 re-encodings of the sequence digest, derivable on demand, so storing them would duplicate the primary key
+VMC	VMC		seqrepo_only	1144093	0	digest-synthesis namespace omitted from the store by design: these are 1:1 re-encodings of the sequence digest, derivable on demand, so storing them would duplicate the primary key
+ensembl	Ensembl	ensembl	both	388235	1052681	corresponding namespaces compared alias-by-alias in step 5
+ensembl-100		ensembl-100	store_only	0	360291	immutable per-release Ensembl namespace; seqrepo keeps one rolling Ensembl view, so it has no counterpart
+ensembl-101		ensembl-101	store_only	0	362807	immutable per-release Ensembl namespace; seqrepo keeps one rolling Ensembl view, so it has no counterpart
+ensembl-102		ensembl-102	store_only	0	366968	immutable per-release Ensembl namespace; seqrepo keeps one rolling Ensembl view, so it has no counterpart
+ensembl-103		ensembl-103	store_only	0	370945	immutable per-release Ensembl namespace; seqrepo keeps one rolling Ensembl view, so it has no counterpart
+ensembl-104		ensembl-104	store_only	0	374860	immutable per-release Ensembl namespace; seqrepo keeps one rolling Ensembl view, so it has no counterpart
+ensembl-105		ensembl-105	store_only	0	384028	immutable per-release Ensembl namespace; seqrepo keeps one rolling Ensembl view, so it has no counterpart
+ensembl-106		ensembl-106	store_only	0	386872	immutable per-release Ensembl namespace; seqrepo keeps one rolling Ensembl view, so it has no counterpart
+ensembl-107		ensembl-107	store_only	0	393093	immutable per-release Ensembl namespace; seqrepo keeps one rolling Ensembl view, so it has no counterpart
+ensembl-108		ensembl-108	store_only	0	395109	immutable per-release Ensembl namespace; seqrepo keeps one rolling Ensembl view, so it has no counterpart
+ensembl-109		ensembl-109	store_only	0	395831	immutable per-release Ensembl namespace; seqrepo keeps one rolling Ensembl view, so it has no counterpart
+ensembl-110		ensembl-110	store_only	0	399061	immutable per-release Ensembl namespace; seqrepo keeps one rolling Ensembl view, so it has no counterpart
+ensembl-111		ensembl-111	store_only	0	399303	immutable per-release Ensembl namespace; seqrepo keeps one rolling Ensembl view, so it has no counterpart
+ensembl-112		ensembl-112	store_only	0	401263	immutable per-release Ensembl namespace; seqrepo keeps one rolling Ensembl view, so it has no counterpart
+ensembl-113		ensembl-113	store_only	0	535460	immutable per-release Ensembl namespace; seqrepo keeps one rolling Ensembl view, so it has no counterpart
+ensembl-114		ensembl-114	store_only	0	535513	immutable per-release Ensembl namespace; seqrepo keeps one rolling Ensembl view, so it has no counterpart
+ensembl-115		ensembl-115	store_only	0	778858	immutable per-release Ensembl namespace; seqrepo keeps one rolling Ensembl view, so it has no counterpart
+ensembl-116		ensembl-116	store_only	0	1052681	immutable per-release Ensembl namespace; seqrepo keeps one rolling Ensembl view, so it has no counterpart
+ensembl-75		ensembl-75	store_only	0	320230	immutable per-release Ensembl namespace; seqrepo keeps one rolling Ensembl view, so it has no counterpart
+ensembl-76		ensembl-76	store_only	0	306097	immutable per-release Ensembl namespace; seqrepo keeps one rolling Ensembl view, so it has no counterpart
+ensembl-77		ensembl-77	store_only	0	307058	immutable per-release Ensembl namespace; seqrepo keeps one rolling Ensembl view, so it has no counterpart
+ensembl-78		ensembl-78	store_only	0	307058	immutable per-release Ensembl namespace; seqrepo keeps one rolling Ensembl view, so it has no counterpart
+ensembl-79		ensembl-79	store_only	0	311348	immutable per-release Ensembl namespace; seqrepo keeps one rolling Ensembl view, so it has no counterpart
+ensembl-80		ensembl-80	store_only	0	311348	immutable per-release Ensembl namespace; seqrepo keeps one rolling Ensembl view, so it has no counterpart
+ensembl-81		ensembl-81	store_only	0	314995	immutable per-release Ensembl namespace; seqrepo keeps one rolling Ensembl view, so it has no counterpart
+ensembl-82		ensembl-82	store_only	0	314995	immutable per-release Ensembl namespace; seqrepo keeps one rolling Ensembl view, so it has no counterpart
+ensembl-83		ensembl-83	store_only	0	316819	immutable per-release Ensembl namespace; seqrepo keeps one rolling Ensembl view, so it has no counterpart
+ensembl-84		ensembl-84	store_only	0	319297	immutable per-release Ensembl namespace; seqrepo keeps one rolling Ensembl view, so it has no counterpart
+ensembl-85		ensembl-85	store_only	0	318276	immutable per-release Ensembl namespace; seqrepo keeps one rolling Ensembl view, so it has no counterpart
+ensembl-86		ensembl-86	store_only	0	318276	immutable per-release Ensembl namespace; seqrepo keeps one rolling Ensembl view, so it has no counterpart
+ensembl-87		ensembl-87	store_only	0	318276	immutable per-release Ensembl namespace; seqrepo keeps one rolling Ensembl view, so it has no counterpart
+ensembl-88		ensembl-88	store_only	0	321932	immutable per-release Ensembl namespace; seqrepo keeps one rolling Ensembl view, so it has no counterpart
+ensembl-89		ensembl-89	store_only	0	321932	immutable per-release Ensembl namespace; seqrepo keeps one rolling Ensembl view, so it has no counterpart
+ensembl-90		ensembl-90	store_only	0	323538	immutable per-release Ensembl namespace; seqrepo keeps one rolling Ensembl view, so it has no counterpart
+ensembl-91		ensembl-91	store_only	0	323538	immutable per-release Ensembl namespace; seqrepo keeps one rolling Ensembl view, so it has no counterpart
+ensembl-92		ensembl-92	store_only	0	331804	immutable per-release Ensembl namespace; seqrepo keeps one rolling Ensembl view, so it has no counterpart
+ensembl-93		ensembl-93	store_only	0	331804	immutable per-release Ensembl namespace; seqrepo keeps one rolling Ensembl view, so it has no counterpart
+ensembl-94		ensembl-94	store_only	0	336053	immutable per-release Ensembl namespace; seqrepo keeps one rolling Ensembl view, so it has no counterpart
+ensembl-95		ensembl-95	store_only	0	336053	immutable per-release Ensembl namespace; seqrepo keeps one rolling Ensembl view, so it has no counterpart
+ensembl-96		ensembl-96	store_only	0	338804	immutable per-release Ensembl namespace; seqrepo keeps one rolling Ensembl view, so it has no counterpart
+ensembl-97		ensembl-97	store_only	0	357419	immutable per-release Ensembl namespace; seqrepo keeps one rolling Ensembl view, so it has no counterpart
+ensembl-98		ensembl-98	store_only	0	359438	immutable per-release Ensembl namespace; seqrepo keeps one rolling Ensembl view, so it has no counterpart
+ensembl-99		ensembl-99	store_only	0	360146	immutable per-release Ensembl namespace; seqrepo keeps one rolling Ensembl view, so it has no counterpart
+hs37-1kg	hs37-1kg		seqrepo_only	84	0	assembly or source the build deliberately does not load; the sequences may still be present by digest (see step 4)
+hs37d5	hs37d5		seqrepo_only	86	0	assembly or source the build deliberately does not load; the sequences may still be present by digest (see step 4)
+insdc		insdc	store_only	0	972	source loaded by the build that seqrepo does not carry
+lrg		lrg	store_only	0	5905	EBI LRG; the seqrepo snapshot has no LRG namespace
+refseq	NCBI	refseq	both	885113	914128	corresponding namespaces compared alias-by-alias in step 5
