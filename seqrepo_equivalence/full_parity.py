@@ -18,6 +18,22 @@ from verify_seqrepo_equivalence import (
 )
 
 
+def url_provider(url: str) -> str:
+    """Name the publisher a source URL came from.
+
+    Matched on host, not substring: an "ensembl in url else ncbi" test silently
+    files every non-Ensembl host under ncbi, which mislabels the EBI LRG bundle.
+    """
+    for host, provider in (
+        ("ftp.ensembl.org", "ensembl"),
+        ("ftp.ncbi.nlm.nih.gov", "ncbi"),
+        ("ftp.ebi.ac.uk", "ebi"),
+    ):
+        if host in url:
+            return provider
+    return "other"
+
+
 def source_release(source: dict) -> str:
     owner = source["owner"]
     match = re.fullmatch(r"ensembl_release_(\d+)", owner)
@@ -78,7 +94,7 @@ def source_contributions(
         writer = csv.writer(handle, delimiter="\t", lineterminator="\n")
         writer.writerow(("digest", "provider", "owner", "release", "file_class", "url"))
         for digest, source in sorted(first.items()):
-            provider = "ensembl" if "ensembl" in source["url"] else "ncbi"
+            provider = url_provider(source["url"])
             release = source_release(source)
             file_class = source.get("file_class") or ""
             grouped[(provider, release, file_class)] += 1

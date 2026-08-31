@@ -50,10 +50,10 @@ logger = logging.getLogger("parity_membership")
 HERE = Path(__file__).resolve().parent
 REPO_ROOT = HERE.parent
 DEFAULT_STORE = REPO_ROOT / "store"
-DEFAULT_RUN_DIR = REPO_ROOT / "runs" / "2026-07-02-seqrepo-parity"
+DEFAULT_RUN_DIR = REPO_ROOT / "runs" / "2026-08-26-full-rebuild" / "parity"
 DEFAULT_OUT_TSV = DEFAULT_RUN_DIR / "parity_by_digest.tsv"
 DEFAULT_REPORT = DEFAULT_RUN_DIR / "parity-summary.md"
-DEFAULT_KNOWN_DIVERGENT = HERE / "ensembl_known_divergent.txt"
+DEFAULT_KNOWN_DIVERGENT = HERE / "known_divergence" / "ensembl_vs_seqrepo_digest_divergence.tsv"
 
 
 # --------------------------------------------------------------------------- seqrepo
@@ -152,7 +152,9 @@ def refseq_prefix_breakdown(store_path: Path, namespace: str) -> Counter:
 
 def count_known_divergent(path: Path) -> int:
     if not path.exists():
-        return 0
+        # Silently returning 0 renders "N accessions diverge by design" as a
+        # confident "0" in the report, which reads as good news. It isn't.
+        raise SystemExit(f"known-divergent fixture not found: {path}")
     n = 0
     with path.open() as fh:
         for line in fh:
@@ -298,7 +300,7 @@ GRCh38.p14, the Ensembl superset).
 
 ## Known-divergent note
 
-`ensembl_known_divergent.txt` lists **{known_divergent}** Ensembl accessions whose
+`ensembl_vs_seqrepo_digest_divergence.tsv` lists **{known_divergent}** Ensembl accessions whose
 digests differ from seqrepo by design (mostly `*`-stop-codon normalization). These
 are correct-by-spec differences, not gaps: the sequences are present, only the
 digest differs, so they surface as distinct digests on each side rather than as

@@ -40,7 +40,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 REPO_ROOT = HERE.parent
-DEFAULT_RUN_DIR = REPO_ROOT / "runs" / "2026-07-02-seqrepo-parity"
+DEFAULT_RUN_DIR = REPO_ROOT / "runs" / "2026-08-26-full-rebuild" / "parity"
 
 
 def read_sources(path: Path) -> list[tuple[str, str]]:

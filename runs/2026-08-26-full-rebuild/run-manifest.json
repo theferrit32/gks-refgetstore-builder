@@ -1,0 +1,173 @@
+{
+  "schema": "gks-refgetstore-run/1",
+  "run_id": "2026-08-26-full-rebuild",
+  "kind": "build",
+  "title": "Clean end-to-end rebuild: fresh cache, store, and lock",
+  "status": "succeeded",
+  "timestamps": {
+    "initialized_utc": "2026-08-26T19:56:11.468345+00:00",
+    "finalized_utc": "2026-08-29T02:19:06.441250+00:00"
+  },
+  "baseline_run_id": null,
+  "evidence": {
+    "quality": "captured",
+    "missing": [
+      "exit_code and finished_utc for the killed 'fetch' and 'build' commands were reconstructed from log mtimes after the fact; run_record's finally block does not run when the process is SIGKILLed."
+    ]
+  },
+  "git": {
+    "commit": "168054745f6485eea0418a99950ea89071273468",
+    "dirty": true,
+    "status_text": "D build.lock.json",
+    "diff_sha256": "f2c44e9da7543f69c3dc47504f03b28700fca6739e7ffb16ce71dc0d21b400cb"
+  },
+  "tool_versions": {
+    "python": "3.14.5",
+    "git": "git version 2.50.1 (Apple Git-155)",
+    "uv": "uv 0.11.19 (Homebrew 2026-06-03 aarch64-apple-darwin)",
+    "gtars": "0.9.2"
+  },
+  "commands": [
+    {
+      "label": "tests",
+      "argv": [
+        "uv",
+        "run",
+        "pytest",
+        "tests/",
+        "-q"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-08-26T19:56:11.579146+00:00",
+      "finished_utc": "2026-08-26T19:56:12.040725+00:00",
+      "exit_code": 0,
+      "log": "logs/tests.log",
+      "log_bytes": 99,
+      "log_sha256": "91f463ef342470c2c1530331e46aac5e9634e7bf9ca22a66ad257cf15cfd1870"
+    },
+    {
+      "label": "fetch",
+      "argv": [
+        "uv",
+        "run",
+        "gks-refgetstore",
+        "fetch",
+        "--min-free-gb",
+        "25"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-08-26T19:56:23.922896+00:00",
+      "finished_utc": "2026-08-26T19:56:23.923466+00:00",
+      "exit_code": -9,
+      "log": "logs/fetch.log",
+      "log_bytes": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "note": "Killed (SIGKILL) while running serially at ~273 KiB/s. Superseded by 'fetch-parallel', which downloaded the same manifest concurrently. Log is empty because the process was killed before flushing; exit code reconstructed, not captured."
+    },
+    {
+      "label": "fetch-parallel",
+      "argv": [
+        "uv",
+        "run",
+        "gks-refgetstore",
+        "fetch",
+        "--jobs",
+        "6",
+        "--min-free-gb",
+        "25"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-08-27T14:37:59.321228+00:00",
+      "finished_utc": "2026-08-27T16:43:54.797965+00:00",
+      "exit_code": 0,
+      "log": "logs/fetch-parallel.log",
+      "log_bytes": 67411,
+      "log_sha256": "3178f364681da64211060cb9789151daac0fe0db3cbe9d66ab25cab42d374862"
+    },
+    {
+      "label": "cache-verify",
+      "argv": [
+        "uv",
+        "run",
+        "gks-refgetstore",
+        "fetch",
+        "--dry-run"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-08-27T18:13:15.073836+00:00",
+      "finished_utc": "2026-08-27T18:15:05.993433+00:00",
+      "exit_code": 0,
+      "log": "logs/cache-verify.log",
+      "log_bytes": 46227,
+      "log_sha256": "b01d60dd5e41eeb078bd9c9b59473743115b2b8d8fa013b2fb00c1f758a0d369"
+    },
+    {
+      "label": "build",
+      "argv": [
+        "uv",
+        "run",
+        "gks-refgetstore",
+        "build"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-08-27T18:27:08.023198+00:00",
+      "finished_utc": "2026-08-27T19:26:31.916244+00:00",
+      "exit_code": -9,
+      "log": "logs/build.log",
+      "log_bytes": 180034,
+      "log_sha256": "725bde68284a2965eb5f8104fb9e1b1d977fd92803eb9e3e86d50485e2d5a893",
+      "note": "Killed (SIGKILL) mid-ingest at ensembl-89 to pick up the batched-ingest and streaming-log fixes. Superseded by 'build-resume', which reused this run's completed collections. Exit code reconstructed, not captured."
+    },
+    {
+      "label": "build-resume",
+      "argv": [
+        "uv",
+        "run",
+        "gks-refgetstore",
+        "build"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-08-28T15:17:00.985784+00:00",
+      "finished_utc": "2026-08-28T17:29:27.305291+00:00",
+      "exit_code": 0,
+      "log": "logs/build-resume.log",
+      "log_bytes": 243425,
+      "log_sha256": "03da130fdaa2d94e400fde68bebe75c9b40b71e2091af974c365df029cdc7dd5"
+    }
+  ],
+  "artifacts": [],
+  "result_summary": {
+    "store": {
+      "n_sequences": 1779497,
+      "n_collections": 240,
+      "alias_namespaces": 68,
+      "seqset_warnings": 0
+    },
+    "lock": {
+      "sources": 335,
+      "mutable": 44,
+      "null_collection_digest": 23,
+      "null_collection_digest_reason": "all assembly_report files; not collections"
+    },
+    "lrg": {
+      "aliases": 5905,
+      "store_only_digests": 442,
+      "collection_digest": "QMNp7XfJIk5CcfpDNbu8An4FWVlKPNho",
+      "dual_genomic_alias_verified": true
+    },
+    "verification": {
+      "verify_store": "PASS (67 passed, 0 failed)",
+      "verify_cache_vs_lock": "matched=335 changed=0 new=0 missing=0 corrupt=0; set-diff 0/0",
+      "pytest": "73 passed"
+    },
+    "seqrepo_parity_2024_12_20": {
+      "digests_both": 980664,
+      "seqrepo_only": 163429,
+      "store_only": 798833,
+      "shared_alias_digest_mismatches": 317,
+      "mismatches_explained": "115 star-normalization (known-divergent list) + 202 Ensembl release drift: the seqrepo digest is still in the store under a pinned release namespace (200 ensembl-113, 1 ensembl-114, 1 ensembl-109), because the rolling 'ensembl' namespace now points at release 116. 0 unexplained."
+    }
+  },
+  "validations": [],
+  "publication": null
+}

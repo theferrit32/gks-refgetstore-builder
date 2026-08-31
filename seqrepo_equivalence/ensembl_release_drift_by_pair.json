@@ -1,0 +1,447 @@
+[
+ {
+  "from": 75,
+  "to": 76,
+  "shared": 285521,
+  "changed": 18124,
+  "cat": {
+   "length-differs": 14475,
+   "internal (1 pos)": 2703,
+   "internal (2 pos)": 399,
+   "internal (3 pos)": 173,
+   "internal (4 pos)": 127,
+   "internal (5 pos)": 51,
+   "internal (6 pos)": 43,
+   "internal (7 pos)": 33,
+   "internal (8 pos)": 14,
+   "internal (14 pos)": 12,
+   "internal (9 pos)": 7,
+   "internal (15 pos)": 6,
+   "internal (10 pos)": 6,
+   "internal (13 pos)": 4,
+   "internal (11 pos)": 3,
+   "internal (18 pos)": 3,
+   "internal (16 pos)": 3,
+   "internal (21 pos)": 3,
+   "internal (24 pos)": 3,
+   "internal (17 pos)": 3,
+   "internal (20 pos)": 3,
+   "internal (26 pos)": 3,
+   "pos0 R->X": 2,
+   "internal (34 pos)": 2,
+   "internal (35 pos)": 2,
+   "internal (23 pos)": 2,
+   "internal (45 pos)": 2,
+   "internal (1471 pos)": 1,
+   "pos0 R->M": 1,
+   "internal (531 pos)": 1,
+   "internal (54 pos)": 1,
+   "internal (292 pos)": 1,
+   "internal (86 pos)": 1,
+   "internal (225 pos)": 1,
+   "internal (102 pos)": 1,
+   "internal (351 pos)": 1,
+   "internal (50 pos)": 1,
+   "internal (341 pos)": 1,
+   "internal (32 pos)": 1,
+   "internal (204 pos)": 1,
+   "internal (51 pos)": 1,
+   "internal (101 pos)": 1,
+   "internal (33 pos)": 1,
+   "pos0 T->X": 1,
+   "internal (229 pos)": 1,
+   "pos0 K->X": 1,
+   "internal (284 pos)": 1,
+   "internal (37 pos)": 1,
+   "internal (1741 pos)": 1,
+   "internal (69 pos)": 1,
+   "internal (1294 pos)": 1,
+   "internal (67 pos)": 1,
+   "internal (220 pos)": 1,
+   "internal (66 pos)": 1,
+   "internal (1897 pos)": 1,
+   "internal (25 pos)": 1,
+   "internal (95 pos)": 1,
+   "internal (12 pos)": 1,
+   "internal (1583 pos)": 1,
+   "internal (793 pos)": 1,
+   "internal (703 pos)": 1,
+   "internal (1399 pos)": 1,
+   "internal (56 pos)": 1,
+   "internal (386 pos)": 1
+  }
+ },
+ {
+  "from": 76,
+  "to": 77,
+  "shared": 305186,
+  "changed": 648,
+  "cat": {
+   "length-differs": 632,
+   "pos0 X->M": 6,
+   "internal (10 pos)": 1,
+   "pos0 M->X": 1,
+   "internal (1 pos)": 1,
+   "internal (6 pos)": 1,
+   "internal (13 pos)": 1,
+   "internal (23 pos)": 1,
+   "internal (21 pos)": 1,
+   "internal (2 pos)": 1,
+   "internal (31 pos)": 1,
+   "internal (28 pos)": 1
+  }
+ },
+ {
+  "from": 77,
+  "to": 78,
+  "shared": 307058,
+  "changed": 3047,
+  "cat": {
+   "length-differs": 3047
+  }
+ },
+ {
+  "from": 78,
+  "to": 79,
+  "shared": 303336,
+  "changed": 4656,
+  "cat": {
+   "length-differs": 4582,
+   "internal (1 pos)": 14,
+   "internal (2 pos)": 7,
+   "internal (175324 pos)": 3,
+   "internal (16 pos)": 2,
+   "internal (5 pos)": 2,
+   "internal (7 pos)": 2,
+   "internal (10 pos)": 2,
+   "internal (2179608 pos)": 1,
+   "internal (1223390 pos)": 1,
+   "internal (574248 pos)": 1,
+   "internal (1496135 pos)": 1,
+   "internal (2473 pos)": 1,
+   "internal (12 pos)": 1,
+   "internal (26 pos)": 1,
+   "internal (990822 pos)": 1,
+   "internal (1489890 pos)": 1,
+   "internal (8 pos)": 1,
+   "internal (24 pos)": 1,
+   "internal (475966 pos)": 1,
+   "internal (155967 pos)": 1,
+   "internal (4 pos)": 1,
+   "internal (57 pos)": 1,
+   "internal (175157 pos)": 1,
+   "internal (1441682 pos)": 1,
+   "internal (2824849 pos)": 1,
+   "internal (1997974 pos)": 1,
+   "internal (1799384 pos)": 1,
+   "internal (12393 pos)": 1,
+   "internal (64 pos)": 1,
+   "pos0 R->X": 1,
+   "internal (414 pos)": 1,
+   "internal (203744 pos)": 1,
+   "internal (9 pos)": 1,
+   "internal (3332425 pos)": 1,
+   "internal (1585580 pos)": 1,
+   "internal (30 pos)": 1,
+   "internal (3917162 pos)": 1,
+   "internal (63 pos)": 1,
+   "internal (1536722 pos)": 1,
+   "internal (51 pos)": 1,
+   "internal (991175 pos)": 1,
+   "internal (1733622 pos)": 1,
+   "internal (15 pos)": 1,
+   "internal (6 pos)": 1,
+   "internal (2164173 pos)": 1,
+   "internal (73 pos)": 1,
+   "internal (425 pos)": 1,
+   "internal (12394 pos)": 1,
+   "pos0 X->A": 1
+  }
+ },
+ {
+  "from": 79,
+  "to": 80,
+  "shared": 311348,
+  "changed": 0,
+  "cat": {}
+ },
+ {
+  "from": 80,
+  "to": 81,
+  "shared": 310844,
+  "changed": 3748,
+  "cat": {
+   "length-differs": 3741,
+   "internal (3 pos)": 2,
+   "internal (4084 pos)": 1,
+   "internal (15 pos)": 1,
+   "internal (630 pos)": 1,
+   "pos0 D->X": 1,
+   "pos0 V->X": 1
+  }
+ },
+ {
+  "from": 81,
+  "to": 82,
+  "shared": 314995,
+  "changed": 3163,
+  "cat": {
+   "length-differs": 3163
+  }
+ },
+ {
+  "from": 82,
+  "to": 83,
+  "shared": 493,
+  "changed": 0,
+  "cat": {}
+ },
+ {
+  "from": 83,
+  "to": 84,
+  "shared": 316819,
+  "changed": 3185,
+  "cat": {
+   "length-differs": 3185
+  }
+ },
+ {
+  "from": 84,
+  "to": 85,
+  "shared": 313500,
+  "changed": 3167,
+  "cat": {
+   "length-differs": 3167
+  }
+ },
+ {
+  "from": 85,
+  "to": 86,
+  "shared": 318276,
+  "changed": 0,
+  "cat": {}
+ },
+ {
+  "from": 86,
+  "to": 87,
+  "shared": 318276,
+  "changed": 0,
+  "cat": {}
+ },
+ {
+  "from": 87,
+  "to": 88,
+  "shared": 316214,
+  "changed": 0,
+  "cat": {}
+ },
+ {
+  "from": 88,
+  "to": 89,
+  "shared": 321932,
+  "changed": 0,
+  "cat": {}
+ },
+ {
+  "from": 89,
+  "to": 90,
+  "shared": 321428,
+  "changed": 0,
+  "cat": {}
+ },
+ {
+  "from": 90,
+  "to": 91,
+  "shared": 323538,
+  "changed": 0,
+  "cat": {}
+ },
+ {
+  "from": 91,
+  "to": 92,
+  "shared": 320831,
+  "changed": 0,
+  "cat": {}
+ },
+ {
+  "from": 92,
+  "to": 93,
+  "shared": 331804,
+  "changed": 0,
+  "cat": {}
+ },
+ {
+  "from": 93,
+  "to": 94,
+  "shared": 330454,
+  "changed": 0,
+  "cat": {}
+ },
+ {
+  "from": 94,
+  "to": 95,
+  "shared": 336053,
+  "changed": 0,
+  "cat": {}
+ },
+ {
+  "from": 95,
+  "to": 96,
+  "shared": 323965,
+  "changed": 0,
+  "cat": {}
+ },
+ {
+  "from": 96,
+  "to": 97,
+  "shared": 334590,
+  "changed": 0,
+  "cat": {}
+ },
+ {
+  "from": 97,
+  "to": 98,
+  "shared": 353364,
+  "changed": 0,
+  "cat": {}
+ },
+ {
+  "from": 98,
+  "to": 99,
+  "shared": 358328,
+  "changed": 0,
+  "cat": {}
+ },
+ {
+  "from": 99,
+  "to": 100,
+  "shared": 357455,
+  "changed": 0,
+  "cat": {}
+ },
+ {
+  "from": 100,
+  "to": 101,
+  "shared": 357706,
+  "changed": 1,
+  "cat": {
+   "length-differs": 1
+  }
+ },
+ {
+  "from": 101,
+  "to": 102,
+  "shared": 359986,
+  "changed": 0,
+  "cat": {}
+ },
+ {
+  "from": 102,
+  "to": 103,
+  "shared": 364814,
+  "changed": 0,
+  "cat": {}
+ },
+ {
+  "from": 103,
+  "to": 104,
+  "shared": 368340,
+  "changed": 0,
+  "cat": {}
+ },
+ {
+  "from": 104,
+  "to": 105,
+  "shared": 368797,
+  "changed": 0,
+  "cat": {}
+ },
+ {
+  "from": 105,
+  "to": 106,
+  "shared": 382937,
+  "changed": 0,
+  "cat": {}
+ },
+ {
+  "from": 106,
+  "to": 107,
+  "shared": 380896,
+  "changed": 0,
+  "cat": {}
+ },
+ {
+  "from": 107,
+  "to": 108,
+  "shared": 392247,
+  "changed": 0,
+  "cat": {}
+ },
+ {
+  "from": 108,
+  "to": 109,
+  "shared": 394541,
+  "changed": 0,
+  "cat": {}
+ },
+ {
+  "from": 109,
+  "to": 110,
+  "shared": 392469,
+  "changed": 1,
+  "cat": {
+   "internal (2778688 pos)": 1
+  }
+ },
+ {
+  "from": 110,
+  "to": 111,
+  "shared": 398339,
+  "changed": 0,
+  "cat": {}
+ },
+ {
+  "from": 111,
+  "to": 112,
+  "shared": 398362,
+  "changed": 0,
+  "cat": {}
+ },
+ {
+  "from": 112,
+  "to": 113,
+  "shared": 385761,
+  "changed": 4,
+  "cat": {
+   "length-differs": 4
+  }
+ },
+ {
+  "from": 113,
+  "to": 114,
+  "shared": 535092,
+  "changed": 2329,
+  "cat": {
+   "pos0 X->M": 2074,
+   "pos0 L->M": 249,
+   "length-differs": 6
+  }
+ },
+ {
+  "from": 114,
+  "to": 115,
+  "shared": 534603,
+  "changed": 2078,
+  "cat": {
+   "pos0 M->X": 2073,
+   "length-differs": 5
+  }
+ },
+ {
+  "from": 115,
+  "to": 116,
+  "shared": 635009,
+  "changed": 0,
+  "cat": {}
+ }
+]

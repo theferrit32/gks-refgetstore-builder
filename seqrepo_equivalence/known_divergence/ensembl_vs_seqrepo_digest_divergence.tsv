@@ -1,7 +1,25 @@
-# Ensembl aliases with known digest divergence between seqrepo and refgetstore
+# Ensembl aliases whose seqrepo digest differs from the refgetstore digest.
 #
-# 115 entries: bioutils seq_seqhash strips * before hashing (star_normalization)
-#   1 entry:  genuine sequence difference across Ensembl releases (sequence_divergence)
+# Pinned to seqrepo 2024-12-20 and store namespace `ensembl-113`. All 116 rows
+# were re-verified against ensembl-113 on 2026-08-31: 116/116 match.
+#
+# Do NOT validate these against the rolling `ensembl` namespace. It tracks the
+# newest release, and Ensembl republishes sequences without bumping the version
+# suffix, so rows drift out from under it by design -- ENSP00000477393.1 was
+# retired after release 115, and ENSP00000493090.1 had its trailing `*` stripped
+# upstream at release 114. Both are still correct for ensembl-113.
+#
+# 115 entries  star_normalization
+#     bioutils seq_seqhash strips `*` before hashing; gtars does not. Verified
+#     by re-hashing: stripping `*` from the stored sequence and taking
+#     sha512t24u reproduces the seqrepo digest for all 115.
+#
+#   1 entry    sequence_divergence  -- ENST00000668831.1
+#     NOT a hashing artifact. A transcript that Ensembl silently truncated
+#     1214 -> 1120 bases at the 112 -> 113 boundary under an unchanged
+#     accession.version. seqrepo's digest matches releases 97-112; the store's
+#     matches 113-116. Retained here as the first-observed instance of a
+#     phenomenon since measured in full -- see ../ENSEMBL_RELEASE_DRIFT.md.
 #
 # Format: accession	seqrepo_seq_id	refget_sha512t24u	cause
 #

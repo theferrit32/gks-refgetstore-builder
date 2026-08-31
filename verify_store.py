@@ -428,13 +428,15 @@ def section_ensembl(store: RefgetStore, r: Report) -> None:
     )
 
 
-KNOWN_DIVERGENT_PATH = HERE / "seqrepo_equivalence" / "ensembl_known_divergent.txt"
+KNOWN_DIVERGENT_PATH = (HERE / "seqrepo_equivalence" / "known_divergence"
+                        / "ensembl_vs_seqrepo_digest_divergence.tsv")
 
 
 def section_known_divergent(store: RefgetStore, r: Report) -> None:
     """Regression test for Ensembl accessions with known seqrepo digest divergence.
 
-    Loads the list of accessions from ``ensembl_known_divergent.txt`` and
+    Loads the list of accessions from
+    ``known_divergence/ensembl_vs_seqrepo_digest_divergence.tsv`` and
     verifies that each one still resolves in the store with the expected
     sha512t24u digest. A change here means the store was rebuilt with
     different Ensembl data and the divergent list needs refreshing.
@@ -461,26 +463,36 @@ def section_known_divergent(store: RefgetStore, r: Report) -> None:
         f"got {len(entries)}",
     )
 
-    # Spot-check first 10 entries: verify each resolves with expected digest
-    checked = 0
+    # Check every entry, not a sample. The fixture is pinned to ensembl-113, so
+    # a sample can pass while later rows have rotted -- and rot here is silent,
+    # because a stale row simply stops describing anything real. All 116 rows
+    # cost ~116 alias lookups.
     available = set(store.list_sequence_alias_namespaces())
     validation_ns = "ensembl-113" if "ensembl-113" in available else "ensembl"
-    for accession, expected_digest in entries[:10]:
+    checked = 0
+    failures: list[str] = []
+    for accession, expected_digest in entries:
         rec = store.get_sequence_by_alias(validation_ns, accession)
         if rec is None:
-            r.check(f"{accession} resolves", False, "not found in store")
+            failures.append(f"{accession}: not found in {validation_ns}")
             continue
-        r.check(
-            f"{accession} digest unchanged",
-            rec.metadata.sha512t24u == expected_digest,
-            f"expected {expected_digest}, got {rec.metadata.sha512t24u}",
-        )
         checked += 1
+        if rec.metadata.sha512t24u != expected_digest:
+            failures.append(
+                f"{accession}: expected {expected_digest}, "
+                f"got {rec.metadata.sha512t24u}"
+            )
 
     r.check(
-        f"spot-checked {checked} known-divergent entries",
-        checked >= 10,
-        f"checked {checked}",
+        f"all {len(entries)} known-divergent entries match {validation_ns}",
+        not failures,
+        "; ".join(failures[:5]) + (f" (+{len(failures) - 5} more)"
+                                   if len(failures) > 5 else ""),
+    )
+    r.check(
+        f"resolved {checked}/{len(entries)} known-divergent accessions",
+        checked == len(entries),
+        f"resolved {checked}",
     )
 
 

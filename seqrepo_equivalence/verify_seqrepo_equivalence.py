@@ -38,8 +38,8 @@ HERE = Path(__file__).resolve().parent
 REPO_ROOT = HERE.parent  # this script lives in seqrepo_equivalence/
 DEFAULT_SEQREPO = Path("/Users/kferrite/dev/data/seqrepo/2024-12-20")
 DEFAULT_STORE = REPO_ROOT / "store"
-DEFAULT_KNOWN_DIVERGENT = HERE / "ensembl_known_divergent.txt"
-DEFAULT_RUN_DIR = REPO_ROOT / "runs" / "2026-07-02-seqrepo-parity"
+DEFAULT_KNOWN_DIVERGENT = HERE / "known_divergence" / "ensembl_vs_seqrepo_digest_divergence.tsv"
+DEFAULT_RUN_DIR = REPO_ROOT / "runs" / "2026-08-26-full-rebuild" / "parity"
 DEFAULT_REPORT = DEFAULT_RUN_DIR / "equivalence-report.json"
 DEFAULT_GAP_LIST = DEFAULT_RUN_DIR / "build_gaps.tsv"
 
