@@ -190,6 +190,11 @@ def render_report(
     now = _dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     union = both + sr_only + rg_only
     coverage = 100.0 * both / max(1, len(sr_digests))
+    # Digest-only seqrepo entries have no accession in any biological namespace,
+    # so nothing on any FTP server corresponds to them. Counting them against
+    # coverage measures seqrepo's opacity, not our completeness.
+    nameable = len(sr_digests) - sr_only_digest_only
+    coverage_named = 100.0 * both / max(1, nameable)
 
     def table(counter: Counter, header: str) -> str:
         rows = sorted(counter.items(), key=lambda kv: -kv[1])
@@ -222,11 +227,22 @@ table is `parity_by_digest.tsv` (one row per sequence digest).
 | **in both** | **{both:,}** |
 | seqrepo-only (the gap) | {sr_only:,} |
 | our-store-only (extensions) | {rg_only:,} |
-| **seqrepo digest coverage** | **{coverage:.3f}%** |
+| seqrepo digest coverage, all digests | {coverage:.3f}% |
+| **coverage of seqrepo sequences that carry an accession** | **{coverage_named:.3f}%** |
 
 "Coverage" = fraction of seqrepo's sequences that are present (by digest) in our
 store. A digest counts as covered regardless of which alias spelling either side
 uses, because the digest IS the sequence.
+
+**Quote the second number, not the first.** {sr_only_digest_only:,} of the
+{sr_only:,} missing digests ({100.0 * sr_only_digest_only / max(1, sr_only):.0f}%)
+are *digest-only*: seqrepo records no biological accession for them anywhere, so
+there is no FTP source to load them from and no build could close that gap. The
+raw {coverage:.3f}% therefore reads as far worse than the position is. The
+actionable shortfall is {sr_only_sourceable:,} sequences
+({100.0 * sr_only_sourceable / max(1, len(sr_digests)):.1f}% of seqrepo), and it
+is dominated by NCBI's predicted-model tail, which is renumbered every annotation
+release. Full decomposition in *The residual gap* below.
 
 ## What sequence groups we can load
 

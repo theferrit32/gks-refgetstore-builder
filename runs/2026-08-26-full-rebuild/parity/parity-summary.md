@@ -1,6 +1,6 @@
 # Sequence parity: our RefgetStore vs seqrepo 2024-12-20
 
-_Generated 2026-08-31 10:43:06 by `parity_membership.py`. Numbers are computed, not hand-typed._
+_Generated 2026-08-31 11:45:35 by `parity_membership.py`. Numbers are computed, not hand-typed._
 
 Companion to the run record README (source strategy) and
 `seqrepo_equivalence/verify_seqrepo_equivalence.py` (categorized backwards-compat
@@ -17,11 +17,22 @@ table is `parity_by_digest.tsv` (one row per sequence digest).
 | **in both** | **980,664** |
 | seqrepo-only (the gap) | 163,429 |
 | our-store-only (extensions) | 798,833 |
-| **seqrepo digest coverage** | **85.715%** |
+| seqrepo digest coverage, all digests | 85.715% |
+| **coverage of seqrepo sequences that carry an accession** | **96.522%** |
 
 "Coverage" = fraction of seqrepo's sequences that are present (by digest) in our
 store. A digest counts as covered regardless of which alias spelling either side
 uses, because the digest IS the sequence.
+
+**Quote the second number, not the first.** 128,092 of the
+163,429 missing digests (78%)
+are *digest-only*: seqrepo records no biological accession for them anywhere, so
+there is no FTP source to load them from and no build could close that gap. The
+raw 85.715% therefore reads as far worse than the position is. The
+actionable shortfall is 35,286 sequences
+(3.1% of seqrepo), and it
+is dominated by NCBI's predicted-model tail, which is renumbered every annotation
+release. Full decomposition in *The residual gap* below.
 
 ## What sequence groups we can load
 
@@ -53,26 +64,26 @@ store this build. Alias counts are what actually landed (per store namespace):
 | `ensembl-98` | 359,438 |
 | `ensembl-97` | 357,419 |
 | `ensembl-96` | 338,804 |
-| `ensembl-94` | 336,053 |
 | `ensembl-95` | 336,053 |
-| `ensembl-92` | 331,804 |
+| `ensembl-94` | 336,053 |
 | `ensembl-93` | 331,804 |
-| `ensembl-91` | 323,538 |
+| `ensembl-92` | 331,804 |
 | `ensembl-90` | 323,538 |
-| `ensembl-89` | 321,932 |
+| `ensembl-91` | 323,538 |
 | `ensembl-88` | 321,932 |
+| `ensembl-89` | 321,932 |
 | `ensembl-75` | 320,230 |
 | `ensembl-84` | 319,297 |
-| `ensembl-85` | 318,276 |
-| `ensembl-87` | 318,276 |
 | `ensembl-86` | 318,276 |
+| `ensembl-87` | 318,276 |
+| `ensembl-85` | 318,276 |
 | `ensembl-83` | 316,819 |
 | `ensembl-82` | 314,995 |
 | `ensembl-81` | 314,995 |
 | `ensembl-79` | 311,348 |
 | `ensembl-80` | 311,348 |
-| `ensembl-77` | 307,058 |
 | `ensembl-78` | 307,058 |
+| `ensembl-77` | 307,058 |
 | `ensembl-76` | 306,097 |
 | `lrg` | 5,905 |
 | `GRCh38.p14` | 2,115 |
@@ -231,13 +242,13 @@ GRCh38.p14, the Ensembl superset).
 
 | prefix | count |
 |---|---|
-| `ENST` | 588,927 |
+| `ENST` | 588,918 |
 | `ENSP` | 145,731 |
-| `XM_` | 31,722 |
-| `XR_` | 11,720 |
+| `XM_` | 31,731 |
+| `XR_` | 11,718 |
 | `XP_` | 8,815 |
-| `NM_` | 8,602 |
-| `NR_` | 1,473 |
+| `NM_` | 8,605 |
+| `NR_` | 1,472 |
 | `NP_` | 1,411 |
 | `LRG` | 430 |
 | `Y` | 1 |
@@ -247,8 +258,8 @@ GRCh38.p14, the Ensembl superset).
 
 | prefix | count |
 |---|---|
-| `ENST` | 282,707 |
-| `XM_` | 250,353 |
+| `ENST` | 282,701 |
+| `XM_` | 250,351 |
 | `NM_` | 109,137 |
 | `XR_` | 108,186 |
 | `ENSP` | 101,612 |
@@ -269,6 +280,7 @@ GRCh38.p14, the Ensembl superset).
 | `HG4` | 15 |
 | `HG5` | 11 |
 | `HG8` | 10 |
+| `LRG` | 8 |
 | `3` | 5 |
 | `Y` | 5 |
 | `10` | 4 |
