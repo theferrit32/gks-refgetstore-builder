@@ -22,7 +22,7 @@ import time
 import tomllib
 import urllib.error
 import urllib.request
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable, Iterator
@@ -46,6 +46,38 @@ SEQSET_FORMATS = ("fasta", "gbff", "lrg_zip")
 # (~0.45 GiB per additional in-flight Ensembl ``dna.toplevel``), and the
 # throughput gain flattens out long before the memory cost does.
 INGEST_JOBS_DEFAULT = min(8, os.cpu_count() or 4)
+
+# Suffixes appended to a source artifact to name its derived FASTA. Shared with
+# build_lock.records_from_log, which recovers the source cache path by stripping
+# one of these; a resolver that invents its own suffix breaks that mapping
+# silently, so add it here rather than hardcoding it at either site.
+DERIVED_SUFFIXES = (".filtered.fa.gz", ".fasta")
+
+# Compression level for derived filtered FASTAs. Level 1 costs ~28s per Ensembl
+# dna.toplevel and yields 3.15 GB -> 1.02 GB; level 6 costs ~375s to reach
+# 0.88 GB, and the gzip module's own default (9) is slower still. These files are
+# regenerable cache artifacts, so the fast setting is the right trade.
+FILTERED_FASTA_COMPRESSLEVEL = 1
+
+
+@dataclass(frozen=True)
+class RecordExclusion:
+    """Declarative rule for dropping records from named file classes.
+
+    Exclusion is by record *name*, never by inspecting sequence content. Ensembl
+    releases 76-109 mark their N-padded alt/patch scaffolds with a ``CHR_``
+    prefix, which is both sound and complete for that set, so a name rule is
+    exact where an N-fraction heuristic would be a guess.
+    """
+
+    file_classes: tuple[str, ...]
+    record_prefixes: tuple[str, ...]
+
+    def applies_to(self, file_class: str | None) -> bool:
+        return file_class is not None and file_class in self.file_classes
+
+    def matches(self, record_name: str) -> bool:
+        return record_name.startswith(self.record_prefixes)
 
 
 @dataclass
@@ -88,7 +120,9 @@ class SeqsetConfig:
     release: int | None = None
     rolling_namespace: str | None = None
     format: str = "fasta"
+    exclude: dict | None = None
     resolved_sources: list["ResolvedSource"] | None = field(default=None, init=False)
+    exclusion: "RecordExclusion | None" = field(default=None, init=False)
 
     def __post_init__(self) -> None:
         modes = sum(value is not None for value in
@@ -167,6 +201,45 @@ class SeqsetConfig:
                 f"{', '.join(repr(f) for f in SEQSET_FORMATS)}, "
                 f"got {self.format!r}"
             )
+        self.exclusion = self._parse_exclude()
+
+    def _parse_exclude(self) -> "RecordExclusion | None":
+        """Validate the ``exclude`` table and freeze it into a RecordExclusion."""
+        if self.exclude is None:
+            return None
+        if not isinstance(self.exclude, dict):
+            raise ValueError(f"seqset {self.name!r}: exclude must be a table")
+        unknown = set(self.exclude) - {"file_classes", "record_prefixes"}
+        if unknown:
+            raise ValueError(
+                f"seqset {self.name!r}: unknown exclude key(s) "
+                f"{', '.join(sorted(repr(k) for k in unknown))}"
+            )
+        classes = tuple(self.exclude.get("file_classes") or ())
+        prefixes = tuple(self.exclude.get("record_prefixes") or ())
+        if not classes:
+            raise ValueError(f"seqset {self.name!r}: exclude.file_classes is required")
+        if not prefixes:
+            raise ValueError(f"seqset {self.name!r}: exclude.record_prefixes is required")
+        known = set(self.file_classes or ([self.file_class] if self.file_class else []))
+        missing = [c for c in classes if c not in known]
+        if missing:
+            raise ValueError(
+                f"seqset {self.name!r}: exclude.file_classes "
+                f"{', '.join(repr(c) for c in missing)} not among this seqset's "
+                f"file classes {sorted(known)}"
+            )
+        return RecordExclusion(file_classes=classes, record_prefixes=prefixes)
+
+    def file_class_for_index(self, index: int) -> str | None:
+        """File class of the ``index``-th resolved source (0-based).
+
+        ``iter_shard_urls`` drops per-index metadata, so callers that need the
+        file class alongside the URL enumerate and ask here.
+        """
+        if self.file_classes is not None:
+            return self.file_classes[index] if index < len(self.file_classes) else None
+        return self.file_class
 
     def iter_shard_urls(self) -> Iterator[tuple[str, str]]:
         """Yield (shard_label, url) pairs. Shard label is "" for unsharded."""
@@ -508,6 +581,7 @@ class SeqsetStats:
     sequences_ingested: int = 0
     sequence_aliases_added: int = 0
     sequence_aliases_skipped: int = 0
+    records_excluded: int = 0
     warnings: int = 0
 
 
@@ -774,6 +848,136 @@ DERIVED_FASTA_RESOLVERS: dict[str, Callable[[Path, bool], Path]] = {
     "gbff": resolve_gbff_fasta,
     "lrg_zip": resolve_lrg_fasta,
 }
+
+
+def filtered_fasta_path(src: Path) -> Path:
+    """Cache path of ``src``'s filtered rendering, a sibling of the artifact."""
+    return src.parent / (src.name + ".filtered.fa.gz")
+
+
+def excluded_log_path(src: Path) -> Path:
+    """Cache path of the audit log listing records dropped from ``src``."""
+    return src.parent / (src.name + ".excluded.tsv")
+
+
+def filter_fasta_records(
+    src: Path, out_path: Path, exclusion: RecordExclusion, audit_log: Path | None = None
+) -> tuple[int, int]:
+    """Copy ``src`` to ``out_path``, dropping records whose name matches a prefix.
+
+    Streams gzip->gzip, copying kept records' lines verbatim so their digests are
+    unaffected. Returns ``(kept, dropped)``.
+
+    Every dropped record's name and line count is written to ``audit_log`` so an
+    exclusion is inspectable after the fact rather than inferred from a shrunken
+    store. Raises if the rule matches nothing: a declared exclusion that silently
+    no-ops would quietly retain everything it was meant to remove.
+    """
+    opener = gzip.open if src.suffix == ".gz" else open
+    tmp = out_path.with_suffix(out_path.suffix + ".part")
+    tmp.parent.mkdir(parents=True, exist_ok=True)
+    kept = dropped = 0
+    dropped_rows: list[tuple[str, int]] = []
+    emit = True
+    name = ""
+    lines = 0
+    with opener(src, "rb") as fh, gzip.open(  # type: ignore[operator]
+        tmp, "wb", compresslevel=FILTERED_FASTA_COMPRESSLEVEL
+    ) as out:
+        for line in fh:
+            if line.startswith(b">"):
+                if not emit and name:
+                    dropped_rows.append((name, lines))
+                name = line[1:].split()[0].decode("utf-8", "replace") if len(line) > 1 else ""
+                emit = not exclusion.matches(name)
+                kept += emit
+                dropped += not emit
+                lines = 0
+            lines += 1
+            if emit:
+                out.write(line)
+    if not emit and name:
+        dropped_rows.append((name, lines))
+    if not dropped:
+        raise ValueError(
+            f"exclusion matched no records in {src.name} "
+            f"(prefixes {', '.join(repr(p) for p in exclusion.record_prefixes)})"
+        )
+    if audit_log is not None:
+        audit_tmp = audit_log.with_suffix(audit_log.suffix + ".part")
+        with audit_tmp.open("w", encoding="utf-8") as fh:
+            fh.write("record_name\tlines\n")
+            for record_name, n in dropped_rows:
+                fh.write(f"{record_name}\t{n}\n")
+        audit_tmp.replace(audit_log)
+    tmp.replace(out_path)
+    return kept, dropped
+
+
+def resolve_filtered_fasta(src: Path, exclusion: RecordExclusion, force: bool) -> Path:
+    """Return a cached filtered rendering of ``src``, producing it if needed.
+
+    Same cache contract as ``resolve_gbff_fasta``/``resolve_lrg_fasta``: a sibling
+    of the downloaded artifact, reused when present and non-empty unless ``force``.
+    """
+    out_path = filtered_fasta_path(src)
+    if out_path.exists() and out_path.stat().st_size > 0 and not force:
+        logger.info("using cached filtered fasta %s", out_path)
+        return out_path
+    logger.info("filtering %s", src)
+    kept, dropped = filter_fasta_records(
+        src, out_path, exclusion, audit_log=excluded_log_path(src)
+    )
+    logger.info("  kept %d record(s), dropped %d -> %s", kept, dropped, out_path)
+    return out_path
+
+
+def _excluded_count(src: Path) -> int:
+    """Rows in ``src``'s exclusion audit log, or 0 if it is absent."""
+    audit = excluded_log_path(src)
+    if not audit.exists():
+        return 0
+    with audit.open("r", encoding="utf-8") as fh:
+        return max(0, sum(1 for _ in fh) - 1)  # minus the header
+
+
+def prepare_filtered_sources(
+    seqsets: list[SeqsetConfig], download_dir: Path, jobs: int, force: bool = False
+) -> dict[str, Path]:
+    """Materialize every declared filtered FASTA up front, concurrently.
+
+    Downloads are already a preflight (``ensure_download`` runs over all sources
+    before any seqset is processed); filtration is the same shape. Doing it here
+    rather than inline lets the whole set run in parallel: zlib releases the GIL,
+    and decompression dominates at roughly four minutes per Ensembl release, so
+    threading turns hours into minutes.
+
+    Returns a ``{source cache path: filtered path}`` map. ``process_seqset``
+    resolves the same paths independently, so this is a warm-up, not a handoff.
+    """
+    work: list[tuple[Path, RecordExclusion]] = []
+    for entry in seqsets:
+        if entry.exclusion is None:
+            continue
+        for index, (_label, url) in enumerate(entry.iter_shard_urls()):
+            if not entry.exclusion.applies_to(entry.file_class_for_index(index)):
+                continue
+            target = mirror_cache_path(download_dir, url)
+            if target.exists() and target.stat().st_size > 0:
+                work.append((target, entry.exclusion))
+    if not work:
+        return {}
+    logger.info("filtering %d source file(s) with %d job(s)", len(work), jobs)
+    out: dict[str, Path] = {}
+    with ThreadPoolExecutor(max_workers=max(1, jobs)) as pool:
+        futures = {
+            pool.submit(resolve_filtered_fasta, src, exclusion, force): src
+            for src, exclusion in work
+        }
+        for future in as_completed(futures):
+            src = futures[future]
+            out[str(src)] = future.result()
+    return out
 
 
 def lrg_alias_names(name: str) -> tuple[str, ...]:
@@ -1398,7 +1602,7 @@ def process_seqset(
 
     # Phase 1: resolve every shard before importing any of them.
     resolved: list[tuple[Path, Path]] = []  # (source cache path, FASTA to ingest)
-    for shard_label, url in entry.iter_shard_urls():
+    for index, (shard_label, url) in enumerate(entry.iter_shard_urls()):
         target = mirror_cache_path(download_dir, url)
         logger.info(
             "shard %s%s",
@@ -1422,6 +1626,25 @@ def process_seqset(
                 )
                 stats.warnings += 1
                 continue
+
+        file_class = entry.file_class_for_index(index)
+        if entry.exclusion is not None and entry.exclusion.applies_to(file_class):
+            unfiltered = fasta_path
+            try:
+                fasta_path = resolve_filtered_fasta(
+                    unfiltered, entry.exclusion, refresh_derived
+                )
+            except Exception as exc:  # noqa: BLE001
+                # Naming the file class and URL matters: a seqset can declare
+                # exclusions for several classes, and "it failed somewhere in
+                # this release" is not actionable.
+                logger.warning(
+                    "record exclusion failed for %s (file_class=%s, url=%s): %s",
+                    fasta_path, file_class, url, exc,
+                )
+                stats.warnings += 1
+                continue
+            stats.records_excluded += _excluded_count(unfiltered)
 
         resolved.append((target, fasta_path))
 
@@ -1662,6 +1885,7 @@ def print_summary(
             f"seqs={s.sequences_ingested:7d} "
             f"seq_aliases_added={s.sequence_aliases_added:7d} "
             f"skipped={s.sequence_aliases_skipped:6d} "
+            f"excluded={s.records_excluded:4d} "
             f"warnings={s.warnings:3d}"
         )
     print()
@@ -1800,6 +2024,15 @@ def run_build(args) -> int:
                 source.url, target, args.force_download, source.upstream_md5,
                 source,
             )
+
+    # Second preflight: every declared record exclusion, in parallel. Downloads
+    # above and filtration here are both "make the inputs ready before touching
+    # the store"; keeping filtration out of the per-seqset loop is what lets the
+    # whole set run concurrently.
+    prepare_filtered_sources(
+        sel_seqsets, args.cache_dir,
+        getattr(args, "filter_jobs", INGEST_JOBS_DEFAULT), args.force_download,
+    )
 
     check: build_lock.LockCheck | None = None
     membership_check: build_lock.LockCheck | None = None

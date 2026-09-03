@@ -49,6 +49,13 @@ def _add_build(sub: argparse._SubParsersAction) -> None:
                         f"(default {build_store.INGEST_JOBS_DEFAULT}; 1=serial). "
                         "Lower it if peak memory is a concern; the largest "
                         "Ensembl inputs cost ~0.45 GiB per concurrent file")
+    p.add_argument("--filter-jobs", type=int,
+                   default=build_store.INGEST_JOBS_DEFAULT,
+                   help="source files filtered concurrently in the preflight "
+                        f"(default {build_store.INGEST_JOBS_DEFAULT}; 1=serial). "
+                        "Separate from --ingest-jobs: filtering is zlib-bound "
+                        "and cheap in memory, so capping ingest concurrency to "
+                        "limit peak RSS should not serialize it")
     p.add_argument("--min-free-gb", type=float, default=25.0,
                    help="stop before ingesting if free disk is below this "
                         "(default 25)")

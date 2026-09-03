@@ -936,3 +936,192 @@ def test_download_renames_atomically_and_cleans_up_on_failure(
         fetch_sources.download("https://x/z", other, 10, 2)
     assert not other.exists(), "a failed download must not create the target"
     assert not other.with_suffix(other.suffix + ".part").exists()
+
+
+# --------------------------------------------------------------------------
+# Record exclusion: Ensembl's pre-110 N-padded alt/patch scaffolds
+# --------------------------------------------------------------------------
+
+
+def _toplevel_seqset(name: str = "rel", **kwargs) -> SeqsetConfig:
+    return SeqsetConfig(
+        name, "ensembl-100",
+        urls=["https://x/dna.fa.gz", "https://x/cdna.fa.gz"],
+        file_classes=["dna.toplevel", "cdna"], **kwargs,
+    )
+
+
+def _write_fasta(path: Path, records: list[tuple[str, str]]) -> None:
+    import gzip
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with gzip.open(path, "wt") as fh:
+        for name, seq in records:
+            fh.write(f">{name} description here\n{seq}\n")
+
+
+PADDED = [("1", "ACGT"), ("CHR_HSCHR1_2_CTG3", "NNNN"),
+          ("KI270766.1", "GGTT"), ("CHR_HG708_PATCH", "NNNN")]
+
+
+def test_exclude_table_is_validated_against_the_seqsets_own_file_classes() -> None:
+    with pytest.raises(ValueError, match="unknown exclude key"):
+        _toplevel_seqset(exclude={"file_classes": ["dna.toplevel"],
+                                  "record_prefixes": ["CHR_"], "threshold": 0.9})
+    with pytest.raises(ValueError, match="file_classes is required"):
+        _toplevel_seqset(exclude={"record_prefixes": ["CHR_"]})
+    with pytest.raises(ValueError, match="record_prefixes is required"):
+        _toplevel_seqset(exclude={"file_classes": ["dna.toplevel"]})
+    with pytest.raises(ValueError, match="not among"):
+        _toplevel_seqset(exclude={"file_classes": ["pep"],
+                                  "record_prefixes": ["CHR_"]})
+    entry = _toplevel_seqset(exclude={"file_classes": ["dna.toplevel"],
+                                      "record_prefixes": ["CHR_"]})
+    assert entry.exclusion.file_classes == ("dna.toplevel",)
+    assert entry.exclusion.record_prefixes == ("CHR_",)
+
+
+def test_file_class_for_index_pairs_each_url_with_its_class() -> None:
+    entry = _toplevel_seqset()
+    assert entry.file_class_for_index(0) == "dna.toplevel"
+    assert entry.file_class_for_index(1) == "cdna"
+    single = SeqsetConfig("s", "x", url_template="https://x/a", file_class="rna")
+    assert single.file_class_for_index(0) == "rna"
+
+
+def test_filter_drops_prefixed_records_and_records_them_in_an_audit_log(
+    tmp_path: Path,
+) -> None:
+    import gzip
+    src = tmp_path / "in.fa.gz"
+    _write_fasta(src, PADDED)
+    out = tmp_path / "out.fa.gz"
+    audit = build_store.excluded_log_path(src)
+    exclusion = build_store.RecordExclusion(("dna.toplevel",), ("CHR_",))
+
+    kept, dropped = build_store.filter_fasta_records(src, out, exclusion, audit)
+
+    assert (kept, dropped) == (2, 2)
+    text = gzip.open(out, "rt").read()
+    assert ">1 " in text and ">KI270766.1 " in text
+    assert "CHR_" not in text
+    rows = audit.read_text().splitlines()
+    assert rows[0] == "record_name\tlines"
+    assert {r.split("\t")[0] for r in rows[1:]} == {
+        "CHR_HSCHR1_2_CTG3", "CHR_HG708_PATCH"
+    }
+
+
+def test_filter_raises_when_a_declared_exclusion_matches_nothing(
+    tmp_path: Path,
+) -> None:
+    """A silent no-op would retain everything the rule was meant to remove."""
+    src = tmp_path / "in.fa.gz"
+    _write_fasta(src, [("1", "ACGT"), ("2", "ACGT")])
+    with pytest.raises(ValueError, match="matched no records"):
+        build_store.filter_fasta_records(
+            src, tmp_path / "out.fa.gz",
+            build_store.RecordExclusion(("dna.toplevel",), ("CHR_",)),
+        )
+
+
+def test_filtered_fasta_is_cached_until_force(tmp_path: Path) -> None:
+    src = tmp_path / "in.fa.gz"
+    _write_fasta(src, PADDED)
+    exclusion = build_store.RecordExclusion(("dna.toplevel",), ("CHR_",))
+
+    first = build_store.resolve_filtered_fasta(src, exclusion, False)
+    stamp = first.stat().st_mtime_ns
+    assert build_store.resolve_filtered_fasta(src, exclusion, False) == first
+    assert first.stat().st_mtime_ns == stamp, "cached output was rewritten"
+
+    build_store.resolve_filtered_fasta(src, exclusion, True)
+    assert first.stat().st_mtime_ns != stamp, "force did not regenerate"
+
+
+def test_exclusion_only_touches_the_declared_file_classes(tmp_path: Path) -> None:
+    """A CHR_ record in an undeclared class must survive untouched."""
+    cache = tmp_path / "cache"
+    entry = _toplevel_seqset(exclude={"file_classes": ["dna.toplevel"],
+                                      "record_prefixes": ["CHR_"]})
+    for url, records in (("https://x/dna.fa.gz", PADDED),
+                         ("https://x/cdna.fa.gz", [("CHR_LOOKALIKE", "ACGT")])):
+        _write_fasta(build_store.mirror_cache_path(cache, url), records)
+
+    build_store.prepare_filtered_sources([entry], cache, jobs=2)
+
+    dna = build_store.mirror_cache_path(cache, "https://x/dna.fa.gz")
+    cdna = build_store.mirror_cache_path(cache, "https://x/cdna.fa.gz")
+    assert build_store.filtered_fasta_path(dna).exists()
+    assert not build_store.filtered_fasta_path(cdna).exists()
+
+
+def test_preflight_is_deterministic_across_job_counts(tmp_path: Path) -> None:
+    import gzip
+    entry = _toplevel_seqset(exclude={"file_classes": ["dna.toplevel"],
+                                      "record_prefixes": ["CHR_"]})
+    digests = []
+    for jobs in (1, 4):
+        cache = tmp_path / f"cache{jobs}"
+        for url, records in (("https://x/dna.fa.gz", PADDED),
+                             ("https://x/cdna.fa.gz", [("ENST1", "ACGT")])):
+            _write_fasta(build_store.mirror_cache_path(cache, url), records)
+        build_store.prepare_filtered_sources([entry], cache, jobs=jobs)
+        out = build_store.filtered_fasta_path(
+            build_store.mirror_cache_path(cache, "https://x/dna.fa.gz"))
+        digests.append(hashlib.sha256(gzip.open(out, "rb").read()).hexdigest())
+    assert digests[0] == digests[1]
+
+
+def test_process_seqset_reuses_the_preflight_output(tmp_path: Path) -> None:
+    """Filtration is a preflight; the ingest path must not redo it."""
+    cache = tmp_path / "cache"
+    entry = _toplevel_seqset(exclude={"file_classes": ["dna.toplevel"],
+                                      "record_prefixes": ["CHR_"]})
+    for url, records in (("https://x/dna.fa.gz", PADDED),
+                         ("https://x/cdna.fa.gz", [("ENST1", "ACGT")])):
+        _write_fasta(build_store.mirror_cache_path(cache, url), records)
+    build_store.prepare_filtered_sources([entry], cache, jobs=1)
+
+    store = build_store.RefgetStore.in_memory()
+    stats = build_store.process_seqset(store, entry, cache)
+
+    assert stats.warnings == 0
+    assert stats.records_excluded == 2
+    assert store.get_sequence_metadata_by_alias("ensembl-100", "1") is not None
+    assert store.get_sequence_metadata_by_alias("ensembl-100", "KI270766.1") is not None
+    assert store.get_sequence_metadata_by_alias(
+        "ensembl-100", "CHR_HSCHR1_2_CTG3") is None
+
+
+def test_seqset_without_exclude_writes_no_derived_file(tmp_path: Path) -> None:
+    cache = tmp_path / "cache"
+    entry = _toplevel_seqset()
+    for url in ("https://x/dna.fa.gz", "https://x/cdna.fa.gz"):
+        _write_fasta(build_store.mirror_cache_path(cache, url), [("1", "ACGT")])
+
+    assert build_store.prepare_filtered_sources([entry], cache, jobs=1) == {}
+    store = build_store.RefgetStore.in_memory()
+    stats = build_store.process_seqset(store, entry, cache)
+    assert stats.records_excluded == 0
+    assert not build_store.filtered_fasta_path(
+        build_store.mirror_cache_path(cache, "https://x/dna.fa.gz")).exists()
+
+
+def test_derived_suffixes_recover_the_source_path_for_lock_backfill() -> None:
+    """records_from_log strips these to map a derived file back to its source."""
+    for suffix in build_store.DERIVED_SUFFIXES:
+        path = "/cache/host/thing.fa.gz" + suffix
+        assert path.endswith(suffix)
+        assert path[: -len(suffix)] == "/cache/host/thing.fa.gz"
+
+
+def test_checked_in_config_declares_exclusions_only_for_padded_releases() -> None:
+    """Releases 76-109 pad alt/patch scaffolds; 75 is GRCh37 and 110+ are fixed."""
+    _assemblies, seqsets = load_config(Path("sources.toml"))
+    excluded = {e.release for e in seqsets
+                if e.name.startswith("ensembl_release_") and e.exclusion}
+    assert excluded == set(range(76, 110))
+    for entry in seqsets:
+        if entry.exclusion is not None:
+            assert entry.exclusion.file_classes == ("dna.toplevel",)
+            assert entry.exclusion.record_prefixes == ("CHR_",)

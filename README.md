@@ -90,6 +90,7 @@ is fetched on demand. Writes/refreshes the build lock at the end (see
     --skip-assemblies / --skip-seqsets
     --force-download       re-fetch even if cached
     --ingest-jobs N        FASTAs imported concurrently per seqset (default: min(8, cores))
+    --filter-jobs N        source files filtered concurrently in the preflight (default: min(8, cores))
     --min-free-gb N        refuse to start if free disk is below this (default 25)
     --lock PATH            build-lock to check against + write (default ./build.lock.json)
     --lock-check-mode {strict,subset,ignore}   pre-flight check vs the lock (default strict)
@@ -260,6 +261,7 @@ Each `[[seqset]]` block (flat FASTA where the header name is the accession):
 | `rolling_namespace` | with `release` | Namespace replaced in full after a release succeeds; the immutable namespace must be `<rolling_namespace>-<release>`. |
 | `shard_range` | no | `[min, max]` inclusive substituted into `{shard}` in `url_template`. |
 | `format` | no, default `fasta` | `fasta`; `gbff` to convert a GenBank flat file to FASTA before ingest; or `lrg_zip` to concatenate the `LRG_N.fasta` members of an EBI LRG bundle, in natural-sorted member order, into one FASTA. Non-FASTA formats are cached as `<artifact>.fasta` beside the download and regenerate offline. |
+| `exclude` | no | Table `{file_classes = [...], record_prefixes = [...]}` dropping records from the named file classes before ingest. Matching is on the record name only, never on sequence content. The filtered FASTA is cached as `<artifact>.filtered.fa.gz` beside the download, with `<artifact>.excluded.tsv` listing every dropped record. A rule matching nothing is an error. |
 
 Exactly one of `url_template`, `urls`, or `url_pattern` is required.
 `shard_range` is valid only with `url_template`; `checksum_manifest_url` is

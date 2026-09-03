@@ -51,6 +51,15 @@
 #   file_classes           Per-URL representation labels for attribution.
 #   release                Ordered provider release number.
 #   rolling_namespace      Namespace replaced completely after that release.
+#   exclude                Table dropping records from named file classes before
+#                          ingest: {file_classes = [...], record_prefixes = [...]}.
+#                          Matching is by record name only, never by inspecting
+#                          sequence content. The filtered FASTA is cached beside
+#                          the artifact as <name>.filtered.fa.gz, with a
+#                          <name>.excluded.tsv listing every dropped record. A
+#                          rule that matches nothing is an error, so a stale
+#                          declaration fails loudly instead of silently
+#                          retaining what it was meant to remove.
 
 # ---------------------------------------------------------------------------
 # NCBI human reference assembly releases
@@ -511,6 +520,18 @@ file_classes = ["protein", "protein", "protein", "protein", "protein", "protein"
 # generic ensembl namespace only after all four files have been ingested.
 # Ensembl CHECKSUMS files publish BSD-sum checksums and 1 KiB block counts.
 # CDS, masked DNA, and chromosome/primary-assembly subsets are excluded.
+#
+# Releases 76-109 carry an `exclude` rule for their dna.toplevel file. Those
+# releases emit each alt locus and patch scaffold at the full length of its
+# parent chromosome, padding everything outside the placed interval with N and
+# prefixing the name with CHR_. Release 110 switched to true-length records.
+# The padding is ~95% of those files' content and, because N forces the store's
+# 3-bit alphabet, ~21 GiB of the store, while encoding nothing the store does
+# not already hold at true length: all 445 padded records have a true-length
+# counterpart, and re-hashing the real span of each reproduces its digest
+# exactly. The CHR_ prefix is Ensembl's own marker for this representation and
+# is both sound and complete across 76-109, so the rule needs no content
+# inspection. See seqrepo_equivalence/ENSEMBL_N_PADDED_SCAFFOLDS.md.
 
 [[seqset]]
 name = "ensembl_release_75"
@@ -543,6 +564,7 @@ urls = [
   "https://ftp.ensembl.org/pub/release-76/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
 ]
 file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+exclude = { file_classes = ["dna.toplevel"], record_prefixes = ["CHR_"] }
 checksum_manifest_urls = [
   "https://ftp.ensembl.org/pub/release-76/fasta/homo_sapiens/dna/CHECKSUMS",
   "https://ftp.ensembl.org/pub/release-76/fasta/homo_sapiens/cdna/CHECKSUMS",
@@ -562,6 +584,7 @@ urls = [
   "https://ftp.ensembl.org/pub/release-77/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
 ]
 file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+exclude = { file_classes = ["dna.toplevel"], record_prefixes = ["CHR_"] }
 checksum_manifest_urls = [
   "https://ftp.ensembl.org/pub/release-77/fasta/homo_sapiens/dna/CHECKSUMS",
   "https://ftp.ensembl.org/pub/release-77/fasta/homo_sapiens/cdna/CHECKSUMS",
@@ -581,6 +604,7 @@ urls = [
   "https://ftp.ensembl.org/pub/release-78/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
 ]
 file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+exclude = { file_classes = ["dna.toplevel"], record_prefixes = ["CHR_"] }
 checksum_manifest_urls = [
   "https://ftp.ensembl.org/pub/release-78/fasta/homo_sapiens/dna/CHECKSUMS",
   "https://ftp.ensembl.org/pub/release-78/fasta/homo_sapiens/cdna/CHECKSUMS",
@@ -600,6 +624,7 @@ urls = [
   "https://ftp.ensembl.org/pub/release-79/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
 ]
 file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+exclude = { file_classes = ["dna.toplevel"], record_prefixes = ["CHR_"] }
 checksum_manifest_urls = [
   "https://ftp.ensembl.org/pub/release-79/fasta/homo_sapiens/dna/CHECKSUMS",
   "https://ftp.ensembl.org/pub/release-79/fasta/homo_sapiens/cdna/CHECKSUMS",
@@ -619,6 +644,7 @@ urls = [
   "https://ftp.ensembl.org/pub/release-80/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
 ]
 file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+exclude = { file_classes = ["dna.toplevel"], record_prefixes = ["CHR_"] }
 checksum_manifest_urls = [
   "https://ftp.ensembl.org/pub/release-80/fasta/homo_sapiens/dna/CHECKSUMS",
   "https://ftp.ensembl.org/pub/release-80/fasta/homo_sapiens/cdna/CHECKSUMS",
@@ -638,6 +664,7 @@ urls = [
   "https://ftp.ensembl.org/pub/release-81/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
 ]
 file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+exclude = { file_classes = ["dna.toplevel"], record_prefixes = ["CHR_"] }
 checksum_manifest_urls = [
   "https://ftp.ensembl.org/pub/release-81/fasta/homo_sapiens/dna/CHECKSUMS",
   "https://ftp.ensembl.org/pub/release-81/fasta/homo_sapiens/cdna/CHECKSUMS",
@@ -657,6 +684,7 @@ urls = [
   "https://ftp.ensembl.org/pub/release-82/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
 ]
 file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+exclude = { file_classes = ["dna.toplevel"], record_prefixes = ["CHR_"] }
 checksum_manifest_urls = [
   "https://ftp.ensembl.org/pub/release-82/fasta/homo_sapiens/dna/CHECKSUMS",
   "https://ftp.ensembl.org/pub/release-82/fasta/homo_sapiens/cdna/CHECKSUMS",
@@ -676,6 +704,7 @@ urls = [
   "https://ftp.ensembl.org/pub/release-83/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
 ]
 file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+exclude = { file_classes = ["dna.toplevel"], record_prefixes = ["CHR_"] }
 checksum_manifest_urls = [
   "https://ftp.ensembl.org/pub/release-83/fasta/homo_sapiens/dna/CHECKSUMS",
   "https://ftp.ensembl.org/pub/release-83/fasta/homo_sapiens/cdna/CHECKSUMS",
@@ -695,6 +724,7 @@ urls = [
   "https://ftp.ensembl.org/pub/release-84/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
 ]
 file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+exclude = { file_classes = ["dna.toplevel"], record_prefixes = ["CHR_"] }
 checksum_manifest_urls = [
   "https://ftp.ensembl.org/pub/release-84/fasta/homo_sapiens/dna/CHECKSUMS",
   "https://ftp.ensembl.org/pub/release-84/fasta/homo_sapiens/cdna/CHECKSUMS",
@@ -714,6 +744,7 @@ urls = [
   "https://ftp.ensembl.org/pub/release-85/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
 ]
 file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+exclude = { file_classes = ["dna.toplevel"], record_prefixes = ["CHR_"] }
 checksum_manifest_urls = [
   "https://ftp.ensembl.org/pub/release-85/fasta/homo_sapiens/dna/CHECKSUMS",
   "https://ftp.ensembl.org/pub/release-85/fasta/homo_sapiens/cdna/CHECKSUMS",
@@ -733,6 +764,7 @@ urls = [
   "https://ftp.ensembl.org/pub/release-86/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
 ]
 file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+exclude = { file_classes = ["dna.toplevel"], record_prefixes = ["CHR_"] }
 checksum_manifest_urls = [
   "https://ftp.ensembl.org/pub/release-86/fasta/homo_sapiens/dna/CHECKSUMS",
   "https://ftp.ensembl.org/pub/release-86/fasta/homo_sapiens/cdna/CHECKSUMS",
@@ -752,6 +784,7 @@ urls = [
   "https://ftp.ensembl.org/pub/release-87/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
 ]
 file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+exclude = { file_classes = ["dna.toplevel"], record_prefixes = ["CHR_"] }
 checksum_manifest_urls = [
   "https://ftp.ensembl.org/pub/release-87/fasta/homo_sapiens/dna/CHECKSUMS",
   "https://ftp.ensembl.org/pub/release-87/fasta/homo_sapiens/cdna/CHECKSUMS",
@@ -771,6 +804,7 @@ urls = [
   "https://ftp.ensembl.org/pub/release-88/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
 ]
 file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+exclude = { file_classes = ["dna.toplevel"], record_prefixes = ["CHR_"] }
 checksum_manifest_urls = [
   "https://ftp.ensembl.org/pub/release-88/fasta/homo_sapiens/dna/CHECKSUMS",
   "https://ftp.ensembl.org/pub/release-88/fasta/homo_sapiens/cdna/CHECKSUMS",
@@ -790,6 +824,7 @@ urls = [
   "https://ftp.ensembl.org/pub/release-89/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
 ]
 file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+exclude = { file_classes = ["dna.toplevel"], record_prefixes = ["CHR_"] }
 checksum_manifest_urls = [
   "https://ftp.ensembl.org/pub/release-89/fasta/homo_sapiens/dna/CHECKSUMS",
   "https://ftp.ensembl.org/pub/release-89/fasta/homo_sapiens/cdna/CHECKSUMS",
@@ -809,6 +844,7 @@ urls = [
   "https://ftp.ensembl.org/pub/release-90/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
 ]
 file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+exclude = { file_classes = ["dna.toplevel"], record_prefixes = ["CHR_"] }
 checksum_manifest_urls = [
   "https://ftp.ensembl.org/pub/release-90/fasta/homo_sapiens/dna/CHECKSUMS",
   "https://ftp.ensembl.org/pub/release-90/fasta/homo_sapiens/cdna/CHECKSUMS",
@@ -828,6 +864,7 @@ urls = [
   "https://ftp.ensembl.org/pub/release-91/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
 ]
 file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+exclude = { file_classes = ["dna.toplevel"], record_prefixes = ["CHR_"] }
 checksum_manifest_urls = [
   "https://ftp.ensembl.org/pub/release-91/fasta/homo_sapiens/dna/CHECKSUMS",
   "https://ftp.ensembl.org/pub/release-91/fasta/homo_sapiens/cdna/CHECKSUMS",
@@ -847,6 +884,7 @@ urls = [
   "https://ftp.ensembl.org/pub/release-92/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
 ]
 file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+exclude = { file_classes = ["dna.toplevel"], record_prefixes = ["CHR_"] }
 checksum_manifest_urls = [
   "https://ftp.ensembl.org/pub/release-92/fasta/homo_sapiens/dna/CHECKSUMS",
   "https://ftp.ensembl.org/pub/release-92/fasta/homo_sapiens/cdna/CHECKSUMS",
@@ -866,6 +904,7 @@ urls = [
   "https://ftp.ensembl.org/pub/release-93/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
 ]
 file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+exclude = { file_classes = ["dna.toplevel"], record_prefixes = ["CHR_"] }
 checksum_manifest_urls = [
   "https://ftp.ensembl.org/pub/release-93/fasta/homo_sapiens/dna/CHECKSUMS",
   "https://ftp.ensembl.org/pub/release-93/fasta/homo_sapiens/cdna/CHECKSUMS",
@@ -885,6 +924,7 @@ urls = [
   "https://ftp.ensembl.org/pub/release-94/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
 ]
 file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+exclude = { file_classes = ["dna.toplevel"], record_prefixes = ["CHR_"] }
 checksum_manifest_urls = [
   "https://ftp.ensembl.org/pub/release-94/fasta/homo_sapiens/dna/CHECKSUMS",
   "https://ftp.ensembl.org/pub/release-94/fasta/homo_sapiens/cdna/CHECKSUMS",
@@ -904,6 +944,7 @@ urls = [
   "https://ftp.ensembl.org/pub/release-95/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
 ]
 file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+exclude = { file_classes = ["dna.toplevel"], record_prefixes = ["CHR_"] }
 checksum_manifest_urls = [
   "https://ftp.ensembl.org/pub/release-95/fasta/homo_sapiens/dna/CHECKSUMS",
   "https://ftp.ensembl.org/pub/release-95/fasta/homo_sapiens/cdna/CHECKSUMS",
@@ -923,6 +964,7 @@ urls = [
   "https://ftp.ensembl.org/pub/release-96/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
 ]
 file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+exclude = { file_classes = ["dna.toplevel"], record_prefixes = ["CHR_"] }
 checksum_manifest_urls = [
   "https://ftp.ensembl.org/pub/release-96/fasta/homo_sapiens/dna/CHECKSUMS",
   "https://ftp.ensembl.org/pub/release-96/fasta/homo_sapiens/cdna/CHECKSUMS",
@@ -942,6 +984,7 @@ urls = [
   "https://ftp.ensembl.org/pub/release-97/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
 ]
 file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+exclude = { file_classes = ["dna.toplevel"], record_prefixes = ["CHR_"] }
 checksum_manifest_urls = [
   "https://ftp.ensembl.org/pub/release-97/fasta/homo_sapiens/dna/CHECKSUMS",
   "https://ftp.ensembl.org/pub/release-97/fasta/homo_sapiens/cdna/CHECKSUMS",
@@ -961,6 +1004,7 @@ urls = [
   "https://ftp.ensembl.org/pub/release-98/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
 ]
 file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+exclude = { file_classes = ["dna.toplevel"], record_prefixes = ["CHR_"] }
 checksum_manifest_urls = [
   "https://ftp.ensembl.org/pub/release-98/fasta/homo_sapiens/dna/CHECKSUMS",
   "https://ftp.ensembl.org/pub/release-98/fasta/homo_sapiens/cdna/CHECKSUMS",
@@ -980,6 +1024,7 @@ urls = [
   "https://ftp.ensembl.org/pub/release-99/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
 ]
 file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+exclude = { file_classes = ["dna.toplevel"], record_prefixes = ["CHR_"] }
 checksum_manifest_urls = [
   "https://ftp.ensembl.org/pub/release-99/fasta/homo_sapiens/dna/CHECKSUMS",
   "https://ftp.ensembl.org/pub/release-99/fasta/homo_sapiens/cdna/CHECKSUMS",
@@ -999,6 +1044,7 @@ urls = [
   "https://ftp.ensembl.org/pub/release-100/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
 ]
 file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+exclude = { file_classes = ["dna.toplevel"], record_prefixes = ["CHR_"] }
 checksum_manifest_urls = [
   "https://ftp.ensembl.org/pub/release-100/fasta/homo_sapiens/dna/CHECKSUMS",
   "https://ftp.ensembl.org/pub/release-100/fasta/homo_sapiens/cdna/CHECKSUMS",
@@ -1018,6 +1064,7 @@ urls = [
   "https://ftp.ensembl.org/pub/release-101/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
 ]
 file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+exclude = { file_classes = ["dna.toplevel"], record_prefixes = ["CHR_"] }
 checksum_manifest_urls = [
   "https://ftp.ensembl.org/pub/release-101/fasta/homo_sapiens/dna/CHECKSUMS",
   "https://ftp.ensembl.org/pub/release-101/fasta/homo_sapiens/cdna/CHECKSUMS",
@@ -1037,6 +1084,7 @@ urls = [
   "https://ftp.ensembl.org/pub/release-102/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
 ]
 file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+exclude = { file_classes = ["dna.toplevel"], record_prefixes = ["CHR_"] }
 checksum_manifest_urls = [
   "https://ftp.ensembl.org/pub/release-102/fasta/homo_sapiens/dna/CHECKSUMS",
   "https://ftp.ensembl.org/pub/release-102/fasta/homo_sapiens/cdna/CHECKSUMS",
@@ -1056,6 +1104,7 @@ urls = [
   "https://ftp.ensembl.org/pub/release-103/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
 ]
 file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+exclude = { file_classes = ["dna.toplevel"], record_prefixes = ["CHR_"] }
 checksum_manifest_urls = [
   "https://ftp.ensembl.org/pub/release-103/fasta/homo_sapiens/dna/CHECKSUMS",
   "https://ftp.ensembl.org/pub/release-103/fasta/homo_sapiens/cdna/CHECKSUMS",
@@ -1075,6 +1124,7 @@ urls = [
   "https://ftp.ensembl.org/pub/release-104/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
 ]
 file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+exclude = { file_classes = ["dna.toplevel"], record_prefixes = ["CHR_"] }
 checksum_manifest_urls = [
   "https://ftp.ensembl.org/pub/release-104/fasta/homo_sapiens/dna/CHECKSUMS",
   "https://ftp.ensembl.org/pub/release-104/fasta/homo_sapiens/cdna/CHECKSUMS",
@@ -1094,6 +1144,7 @@ urls = [
   "https://ftp.ensembl.org/pub/release-105/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
 ]
 file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+exclude = { file_classes = ["dna.toplevel"], record_prefixes = ["CHR_"] }
 checksum_manifest_urls = [
   "https://ftp.ensembl.org/pub/release-105/fasta/homo_sapiens/dna/CHECKSUMS",
   "https://ftp.ensembl.org/pub/release-105/fasta/homo_sapiens/cdna/CHECKSUMS",
@@ -1113,6 +1164,7 @@ urls = [
   "https://ftp.ensembl.org/pub/release-106/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
 ]
 file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+exclude = { file_classes = ["dna.toplevel"], record_prefixes = ["CHR_"] }
 checksum_manifest_urls = [
   "https://ftp.ensembl.org/pub/release-106/fasta/homo_sapiens/dna/CHECKSUMS",
   "https://ftp.ensembl.org/pub/release-106/fasta/homo_sapiens/cdna/CHECKSUMS",
@@ -1132,6 +1184,7 @@ urls = [
   "https://ftp.ensembl.org/pub/release-107/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
 ]
 file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+exclude = { file_classes = ["dna.toplevel"], record_prefixes = ["CHR_"] }
 checksum_manifest_urls = [
   "https://ftp.ensembl.org/pub/release-107/fasta/homo_sapiens/dna/CHECKSUMS",
   "https://ftp.ensembl.org/pub/release-107/fasta/homo_sapiens/cdna/CHECKSUMS",
@@ -1151,6 +1204,7 @@ urls = [
   "https://ftp.ensembl.org/pub/release-108/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
 ]
 file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+exclude = { file_classes = ["dna.toplevel"], record_prefixes = ["CHR_"] }
 checksum_manifest_urls = [
   "https://ftp.ensembl.org/pub/release-108/fasta/homo_sapiens/dna/CHECKSUMS",
   "https://ftp.ensembl.org/pub/release-108/fasta/homo_sapiens/cdna/CHECKSUMS",
@@ -1170,6 +1224,7 @@ urls = [
   "https://ftp.ensembl.org/pub/release-109/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
 ]
 file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+exclude = { file_classes = ["dna.toplevel"], record_prefixes = ["CHR_"] }
 checksum_manifest_urls = [
   "https://ftp.ensembl.org/pub/release-109/fasta/homo_sapiens/dna/CHECKSUMS",
   "https://ftp.ensembl.org/pub/release-109/fasta/homo_sapiens/cdna/CHECKSUMS",

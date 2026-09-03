@@ -34,6 +34,7 @@ from pathlib import Path
 
 # build_store imports this module lazily (inside run_build) to avoid a circular
 # import, so importing from it at module load is safe here.
+import build_store
 from build_store import (ResolvedSource, load_config, mirror_cache_path,
                          provider_checksum_matches, resolve_sources)
 
@@ -114,8 +115,16 @@ def records_from_log(log_path: Path) -> dict[str, dict]:
                 continue
             rec = {"collection_digest": digest.strip(), "n_sequences": n_seqs}
             out[path] = rec
-            if path.endswith(".fasta"):
-                out[path[: -len(".fasta")]] = rec
+            # Derived FASTAs are named by appending a suffix to the source
+            # artifact, so stripping it recovers the cache path the lock is
+            # keyed on. The suffix list lives in build_store beside the
+            # resolvers that produce these names; a resolver that invents its
+            # own suffix without registering it there would break this mapping
+            # silently, leaving collection_digest null for those sources.
+            for suffix in build_store.DERIVED_SUFFIXES:
+                if path.endswith(suffix):
+                    out[path[: -len(suffix)]] = rec
+                    break
     return out
 
 
