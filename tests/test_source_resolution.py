@@ -149,13 +149,16 @@ def test_lock_records_ncbi_md5_as_generic_provider_checksum(tmp_path: Path) -> N
     assert record["provider_checksum_algorithm"] == "md5"
 
 
-def test_locked_sources_uses_v2_concrete_urls_without_resolution(tmp_path: Path) -> None:
+def test_locked_sources_uses_concrete_urls_without_resolution(tmp_path: Path) -> None:
     seqset = pattern("rna", "rna.fna.gz")
     locked = ResolvedSource("seqset", "rna", BASE + "human.3.rna.fna.gz", "a" * 32)
-    lock = {"schema": build_lock.SCHEMA, "sources": [locked.__dict__]}
-    assert apply_locked_sources([seqset], lock) == [locked]
-    assert list(seqset.iter_shard_urls()) == [("1", locked.url)]
-    with pytest.raises(ValueError, match="v2"):
+    for schema in (build_lock.SCHEMA, build_lock.V2_SCHEMA):
+        seqset.resolved_sources = None
+        lock = {"schema": schema, "sources": [locked.__dict__]}
+        assert apply_locked_sources([seqset], lock) == [locked]
+        assert list(seqset.iter_shard_urls()) == [("1", locked.url)]
+    # v1 predates concrete per-source URLs, so it cannot drive an offline build.
+    with pytest.raises(ValueError, match="concrete sources"):
         apply_locked_sources([seqset], {"schema": build_lock.V1_SCHEMA, "sources": []})
 
 

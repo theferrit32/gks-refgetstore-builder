@@ -231,6 +231,30 @@ class SeqsetConfig:
             )
         return RecordExclusion(file_classes=classes, record_prefixes=prefixes)
 
+    def ingest_spec(self, file_class: str | None) -> dict | None:
+        """Declared transformation applied to a source of ``file_class``.
+
+        Recorded in the build lock so a config change that alters *what gets
+        ingested* from *unchanged upstream bytes* is detectable. The lock's
+        ``sha256`` pins the bytes read; this pins how they are interpreted.
+
+        ``None`` means "ingested as published" -- no derived-format conversion
+        and no record exclusion. Most sources are in that case, so returning
+        ``None`` rather than an empty dict keeps the lock free of noise.
+
+        The exclusion is included only when it applies to *this* file class:
+        a seqset declares exclusions per class, and editing the rule for
+        ``dna.toplevel`` must not mark its ``cdna`` sibling as changed.
+        """
+        spec: dict = {}
+        if self.format != "fasta":
+            spec["format"] = self.format
+        if self.exclusion is not None and self.exclusion.applies_to(file_class):
+            spec["exclude"] = {
+                "record_prefixes": list(self.exclusion.record_prefixes)
+            }
+        return spec or None
+
     def file_class_for_index(self, index: int) -> str | None:
         """File class of the ``index``-th resolved source (0-based).
 
@@ -529,10 +553,22 @@ def resolve_sources(
     return resolved
 
 
+# Lock schemas carrying concrete per-source URLs and checksums, which is what
+# --locked-sources needs. v1 predates them. Spelled here rather than imported
+# from build_lock, which imports this module.
+LOCKED_SOURCE_SCHEMAS = (
+    "gks-refgetstore-build-lock/2",
+    "gks-refgetstore-build-lock/3",
+)
+
+
 def apply_locked_sources(seqsets: list[SeqsetConfig], lock: dict) -> list[ResolvedSource]:
-    """Use concrete v2 lock entries without performing live discovery."""
-    if lock.get("schema") != "gks-refgetstore-build-lock/2":
-        raise ValueError("--locked-sources requires a v2 build lock")
+    """Use concrete lock entries without performing live discovery."""
+    if lock.get("schema") not in LOCKED_SOURCE_SCHEMAS:
+        raise ValueError(
+            "--locked-sources requires a build lock with concrete sources "
+            f"(one of {', '.join(LOCKED_SOURCE_SCHEMAS)})"
+        )
     sources = [ResolvedSource(
         s["kind"], s["owner"], s["url"], s.get("upstream_md5"),
         s.get("provider_checksum"), s.get("provider_checksum_algorithm"),
@@ -2176,6 +2212,7 @@ def run_build(args) -> int:
             config_path=args.config, download_dir=args.cache_dir,
             resolved_sources=all_sources,
             collection_by_cachepath=provenance, store=store,
+            seqsets=seqsets,
         )
         build_lock.write_lock(args.lock, lock)
         logger.info("wrote build-lock with %d sources", len(lock["sources"]))
@@ -2185,6 +2222,7 @@ def run_build(args) -> int:
         merged = build_lock.merge_into_lock(
             existing_lock, config_path=args.config, download_dir=args.cache_dir,
             touched_sources=run_sources, collection_by_cachepath=provenance, store=store,
+            seqsets=seqsets,
         )
         build_lock.write_lock(args.lock, merged)
         logger.info("build-lock now has %d sources", len(merged["sources"]))

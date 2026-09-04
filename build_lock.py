@@ -38,9 +38,16 @@ import build_store
 from build_store import (ResolvedSource, load_config, mirror_cache_path,
                          provider_checksum_matches, resolve_sources)
 
-SCHEMA = "gks-refgetstore-build-lock/2"
+SCHEMA = "gks-refgetstore-build-lock/3"
+V2_SCHEMA = "gks-refgetstore-build-lock/2"
 V1_SCHEMA = "gks-refgetstore-build-lock/1"
 CHUNK = 1 << 20
+
+# Schemas whose records predate ``ingest_spec``. A missing spec in one of these
+# is *unknown*, not *known to be absent* -- the distinction drives sync's
+# migration behaviour, and it cannot be recovered from the record itself
+# because "no transformation" is also serialized as null.
+SCHEMAS_WITHOUT_INGEST_SPEC = (V1_SCHEMA, V2_SCHEMA)
 
 
 def sha256_file(path: Path) -> str:
@@ -135,9 +142,37 @@ def _rel(download_dir: Path, cache_path: Path) -> str:
         return str(cache_path)
 
 
+def canonical_spec_sha256(spec: dict | None) -> str | None:
+    """Stable digest of an ingest spec. ``None`` for "no transformation"."""
+    if spec is None:
+        return None
+    canonical = json.dumps(spec, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
+def ingest_spec_for(
+    source: ResolvedSource, seqset_by_name: dict[str, object]
+) -> dict | None:
+    """Ingest spec for one resolved source, or ``None`` if it has no transform.
+
+    Assembly sources are always ``None``: they are ingested as published.
+    """
+    if source.kind != "seqset":
+        return None
+    entry = seqset_by_name.get(source.owner)
+    if entry is None:
+        return None
+    return entry.ingest_spec(source.file_class)
+
+
+def _seqset_by_name(seqsets) -> dict[str, object]:
+    return {entry.name: entry for entry in (seqsets or [])}
+
+
 def source_record(
     source: ResolvedSource, download_dir: Path,
     collection_by_cachepath: dict[str, dict], hash_files: bool = True,
+    seqset_by_name: dict[str, object] | None = None,
 ) -> dict:
     """Build the lock record for one manifest-referenced remote source.
 
@@ -202,6 +237,9 @@ def source_record(
     coll = collection_by_cachepath.get(str(cache_path))
     rec["collection_digest"] = coll["collection_digest"] if coll else None
     rec["n_sequences"] = coll["n_sequences"] if coll else None
+    spec = ingest_spec_for(source, seqset_by_name or {})
+    rec["ingest_spec"] = spec
+    rec["ingest_spec_sha256"] = canonical_spec_sha256(spec)
     return rec
 
 
@@ -234,10 +272,12 @@ def build_lock_dict(
     collection_by_cachepath: dict[str, dict],
     store,
     hash_files: bool = True,
+    seqsets=None,
 ) -> dict:
     """Full-build lock: one entry per source in the whole manifest (replace)."""
+    by_name = _seqset_by_name(seqsets)
     sources = [
-        source_record(source, download_dir, collection_by_cachepath, hash_files)
+        source_record(source, download_dir, collection_by_cachepath, hash_files, by_name)
         for source in resolved_sources
     ]
     return {"schema": SCHEMA, "build": _build_meta(config_path, store), "sources": sources}
@@ -252,17 +292,28 @@ def merge_into_lock(
     collection_by_cachepath: dict[str, dict],
     store,
     hash_files: bool = True,
+    seqsets=None,
+    dropped_scopes: set[tuple[str, str]] | None = None,
 ) -> dict:
-    """Replace touched owner scopes while preserving every untouched scope."""
+    """Replace touched owner scopes while preserving every untouched scope.
+
+    ``dropped_scopes`` are removed outright rather than rewritten -- used by
+    ``sync`` when a source disappears from the manifest, so the lock stops
+    claiming a collection the store no longer holds.
+    """
     by_rel: dict[str, dict] = {}
+    by_name = _seqset_by_name(seqsets)
     touched_scopes = {(source.kind, source.owner) for source in touched_sources}
+    touched_scopes |= dropped_scopes or set()
     if existing_lock:
         for s in existing_lock.get("sources", []):
             if (s.get("kind"), s.get("owner")) in touched_scopes:
                 continue
             by_rel[s["cache_path"]] = s
     for source in touched_sources:
-        rec = source_record(source, download_dir, collection_by_cachepath, hash_files)
+        rec = source_record(
+            source, download_dir, collection_by_cachepath, hash_files, by_name
+        )
         by_rel[rec["cache_path"]] = rec
     sources = sorted(by_rel.values(), key=lambda r: (r.get("kind", ""), r["cache_path"]))
     return {"schema": SCHEMA, "build": _build_meta(config_path, store), "sources": sources}
@@ -334,6 +385,105 @@ def evaluate_sources_vs_lock(sources: list[ResolvedSource], lock: dict) -> LockC
     return result
 
 
+@dataclass
+class SyncPlan:
+    """What ``sync`` would do to make a store match the current manifest.
+
+    Classification is pure: it reads the manifest, the lock, and the cache, and
+    touches no store. Every source lands in exactly one bucket.
+    """
+
+    unchanged: list[str] = field(default_factory=list)
+    added: list[str] = field(default_factory=list)
+    removed: list[dict] = field(default_factory=list)
+    reingest: list[tuple[str, str]] = field(default_factory=list)
+    missing: list[str] = field(default_factory=list)
+    legacy_schema: bool = False
+    # Lock records for the reingest set, kept alongside the (rel, reason) pairs
+    # because removal needs their collection_digest.
+    reingest_records: list[dict] = field(default_factory=list)
+
+    @property
+    def touched(self) -> bool:
+        return bool(self.added or self.removed or self.reingest)
+
+    @property
+    def collection_digests_to_remove(self) -> list[str]:
+        """Distinct collections to drop, for ``removed`` plus ``reingest``.
+
+        Distinct because content-identical sources share one collection: the 34
+        Ensembl releases carrying padded scaffolds resolve to 8 digests. Nulls
+        are dropped -- a source the lock never mapped has nothing to remove.
+        """
+        digests = {r.get("collection_digest") for r in self.removed}
+        digests |= {r.get("collection_digest") for r in self.reingest_records}
+        return sorted(d for d in digests if d)
+
+
+def plan_sync(
+    sources: list[ResolvedSource],
+    lock: dict,
+    download_dir: Path,
+    seqsets=None,
+    hash_files: bool = True,
+) -> SyncPlan:
+    """Classify every manifest source against the lock and the cache.
+
+    | class       | condition                                        |
+    |-------------|--------------------------------------------------|
+    | ``unchanged``| in lock, sha256 matches, ingest spec matches     |
+    | ``added``    | not in lock                                      |
+    | ``removed``  | in lock, absent from the manifest                |
+    | ``reingest`` | sha256 **or** ingest spec moved                  |
+    | ``missing``  | referenced by the manifest, absent from cache    |
+
+    A lock written before ``ingest_spec`` existed cannot say whether a
+    transformation was applied, so an absent spec is treated as *unknown* and
+    resolved conservatively: a source that now declares a transformation is
+    re-ingested, one that declares none is left alone. That migrates an older
+    lock without special-casing and without re-ingesting the whole manifest.
+    """
+    by_name = _seqset_by_name(seqsets)
+    spec_pinned = lock.get("schema") not in SCHEMAS_WITHOUT_INGEST_SPEC
+    lock_by_rel = {s["cache_path"]: s for s in lock.get("sources", [])}
+    plan = SyncPlan(legacy_schema=not spec_pinned)
+    seen: set[str] = set()
+
+    for source in sources:
+        cache_path = mirror_cache_path(download_dir, source.url)
+        rel = _rel(download_dir, cache_path)
+        seen.add(rel)
+        locked = lock_by_rel.get(rel)
+        if locked is None:
+            plan.added.append(rel)
+            continue
+        if not cache_path.exists() or cache_path.stat().st_size == 0:
+            plan.missing.append(rel)
+            continue
+
+        desired = canonical_spec_sha256(ingest_spec_for(source, by_name))
+        if hash_files and locked.get("sha256"):
+            if sha256_file(cache_path) != locked["sha256"]:
+                plan.reingest.append((rel, "upstream bytes changed"))
+                plan.reingest_records.append(locked)
+                continue
+        if spec_pinned:
+            if locked.get("ingest_spec_sha256") != desired:
+                plan.reingest.append((rel, "ingest spec changed"))
+                plan.reingest_records.append(locked)
+                continue
+        elif desired is not None:
+            plan.reingest.append((rel, "ingest spec not pinned by this lock"))
+            plan.reingest_records.append(locked)
+            continue
+        plan.unchanged.append(rel)
+
+    plan.removed = [
+        rec for rel, rec in sorted(lock_by_rel.items()) if rel not in seen
+    ]
+    return plan
+
+
 def write_lock(path: Path, lock: dict) -> None:
     path.write_text(json.dumps(lock, indent=2) + "\n", encoding="utf-8")
 
@@ -341,7 +491,7 @@ def write_lock(path: Path, lock: dict) -> None:
 def load_lock(path: Path) -> dict:
     lock = json.loads(Path(path).read_text(encoding="utf-8"))
     schema = lock.get("schema")
-    if schema not in (SCHEMA, V1_SCHEMA):
+    if schema not in (SCHEMA, *SCHEMAS_WITHOUT_INGEST_SPEC):
         raise ValueError(f"unsupported build lock schema: {schema!r}")
     return lock
 
@@ -514,6 +664,7 @@ def run_lock(args) -> int:
         config_path=args.config, download_dir=args.cache_dir,
         resolved_sources=resolve_sources(assemblies, seqsets),
         collection_by_cachepath=collection_by_cachepath, store=store,
+        seqsets=seqsets,
     )
     fasta_sources = [s for s in lock["sources"] if s["kind"] != "assembly_report"]
     mapped = [s for s in fasta_sources if s["collection_digest"]]

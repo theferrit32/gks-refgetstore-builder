@@ -23,6 +23,7 @@ from pathlib import Path
 import build_lock
 import build_store
 import fetch_sources
+import store_sync
 
 REPO_ROOT = Path(__file__).resolve().parent
 DEFAULT_CONFIG = REPO_ROOT / "sources.toml"
@@ -73,6 +74,36 @@ def _add_build(sub: argparse._SubParsersAction) -> None:
     p.add_argument("--locked-sources", action="store_true",
                    help="use concrete URLs and SHA-256 values from --lock; no discovery")
     p.set_defaults(func=build_store.run_build)
+
+
+def _add_sync(sub: argparse._SubParsersAction) -> None:
+    p = sub.add_parser(
+        "sync",
+        help="apply sources.toml changes to an existing store incrementally",
+        description="Classify every manifest source against the build lock, "
+                    "then remove and re-ingest only what changed. Sources whose "
+                    "upstream bytes and ingest spec both match the lock are "
+                    "validated and left untouched.",
+    )
+    p.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
+    p.add_argument("--store-dir", type=Path, default=DEFAULT_STORE)
+    p.add_argument("--cache-dir", type=Path, default=DEFAULT_CACHE)
+    p.add_argument("--lock", type=Path, default=DEFAULT_LOCK)
+    p.add_argument("--apply", action="store_true",
+                   help="mutate the store. Without it, sync classifies and "
+                        "exits. Removal persists immediately and cannot be "
+                        "rolled back, so this is never the default")
+    p.add_argument("--no-hash", action="store_true",
+                   help="skip re-hashing cached sources; classify on the "
+                        "ingest spec alone. Faster, but will not notice "
+                        "upstream bytes that changed in place")
+    p.add_argument("--no-lock", action="store_true",
+                   help="apply to the store but don't rewrite the lock")
+    p.add_argument("--ingest-jobs", type=int,
+                   default=build_store.INGEST_JOBS_DEFAULT)
+    p.add_argument("--filter-jobs", type=int,
+                   default=build_store.INGEST_JOBS_DEFAULT)
+    p.set_defaults(func=store_sync.run_sync)
 
 
 def _add_verify(sub: argparse._SubParsersAction) -> None:
@@ -136,6 +167,7 @@ def build_parser() -> argparse.ArgumentParser:
     _add_verify(sub)
     _add_fetch(sub)
     _add_lock(sub)
+    _add_sync(sub)
     return ap
 
 
