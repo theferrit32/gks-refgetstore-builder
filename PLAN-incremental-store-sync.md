@@ -151,8 +151,21 @@ matched by the exclusion, and are restored by re-ingest.
 | point | `n_sequences` | delta |
 |---|---:|---|
 | before | 1,779,497 | |
-| after removing all 8 | 1,779,027 | −470 |
+| after removing the 8 Ensembl collections | 1,779,027 | −470 |
 | after re-ingest | **1,779,052** | **−445 net** |
+
+The realized run also removes and re-ingests the one `lrg_zip` source, which the
+lock cannot prove was converted (see *Change 1*). LRG's 434 sequences live in
+that collection alone, so they orphan on its removal and return on re-ingest,
+moving the intermediate figure without changing the final one:
+
+| point | `n_sequences` |
+|---|---:|
+| before | 1,779,497 |
+| after all 9 removals | **1,778,593** |
+| after re-ingest | **1,779,052** |
+
+Both were confirmed against the real store.
 
 −445 is exactly the count of distinct `CHR_` names, reached independently of the
 padding analysis. `sync` should predict both numbers and abort on disagreement.
@@ -373,8 +386,14 @@ Not worth 15 minutes.
 
 ### Acceptance
 
-- `n_sequences` = **1,779,052** (−445); `n_collections` returns to 240 after
-  dipping to 232.
+- `n_sequences` = **1,779,052** (−445).
+- `n_collections` = **235**, not 240. The 8 pre-110 `dna.toplevel` collections
+  are replaced by **3**, because the padding was most of what distinguished the
+  release groups; strip it and only genuine sequence drift keeps them apart.
+  Every filtered file keeps exactly 194 records, but those 194 are not identical
+  across all 34 releases, so they do not collapse to one either. Content
+  addressing makes this correct, not lossy -- no sequence is lost, and the
+  removed and created collections need not correspond 1:1.
 - Store ≈ **27.9 GiB**, from 48.9.
 - Every `.seq` path in `ensembl_padded_scaffolds.tsv` is gone.
 - No alias resolves to a padded digest; the namespace **set** is unchanged — all
