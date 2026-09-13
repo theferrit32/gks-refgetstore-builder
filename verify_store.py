@@ -138,21 +138,12 @@ def section_inventory(store: RefgetStore, r: Report) -> None:
     print("\n[A] Store inventory")
     stats = store.stats()
     print(f"    stats: {stats}")
-    # 4 assembly collections + 16 RNA shards + 16 protein shards = 36. Lower
-    # bound of 4 keeps the assembly-only configuration passing too.
-    r.check(
-        "n_collections >= 4",
-        int(stats["n_collections"]) >= 4,
-        f"got {stats['n_collections']}",
-    )
-    n_seq = int(stats["n_sequences"])
-    # A full assembly build has at least 900 unique sequences; extensive
-    # deduplication across releases keeps this below the naive sum.
-    r.check(
-        "n_sequences >= 900",
-        n_seq >= 900,
-        f"got {n_seq}",
-    )
+    # The former `n_collections >= 4` and `n_sequences >= 900` floors are gone.
+    # They were guessing at "is this store plausibly populated"; the build lock
+    # now records the exact counts and the roots over both digest sets, so
+    # `gks-refgetstore verify --store` answers that question precisely rather
+    # than loosely. This script keeps only the checks a lock cannot make --
+    # semantic ones, against seqrepo ground truth and the assembly reports.
     seq_ns = set(store.list_sequence_alias_namespaces())
     expected_seq_namespaces = expected_sequence_namespaces()
     r.check(

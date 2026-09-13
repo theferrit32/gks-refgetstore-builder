@@ -553,38 +553,9 @@ def resolve_sources(
     return resolved
 
 
-# Lock schemas carrying concrete per-source URLs and checksums, which is what
-# --locked-sources needs. v1 predates them. Spelled here rather than imported
-# from build_lock, which imports this module.
-LOCKED_SOURCE_SCHEMAS = (
-    "gks-refgetstore-build-lock/2",
-    "gks-refgetstore-build-lock/3",
-)
-
-
-def apply_locked_sources(seqsets: list[SeqsetConfig], lock: dict) -> list[ResolvedSource]:
-    """Use concrete lock entries without performing live discovery."""
-    if lock.get("schema") not in LOCKED_SOURCE_SCHEMAS:
-        raise ValueError(
-            "--locked-sources requires a build lock with concrete sources "
-            f"(one of {', '.join(LOCKED_SOURCE_SCHEMAS)})"
-        )
-    sources = [ResolvedSource(
-        s["kind"], s["owner"], s["url"], s.get("upstream_md5"),
-        s.get("provider_checksum"), s.get("provider_checksum_algorithm"),
-        s.get("provider_checksum_blocks"), s.get("checksum_url"),
-        s.get("file_class"),
-    ) for s in lock.get("sources", [])]
-    by_owner: dict[str, list[ResolvedSource]] = {}
-    for source in sources:
-        if source.kind == "seqset":
-            by_owner.setdefault(source.owner, []).append(source)
-    for seqset in seqsets:
-        locked = by_owner.get(seqset.name, [])
-        if not locked:
-            raise ValueError(f"lock has no concrete sources for seqset {seqset.name!r}")
-        seqset.resolved_sources = locked
-    return sources
+# ``apply_locked_sources`` lives in build_lock: it reads the lock through that
+# module's accessors, and keeping it there leaves exactly one place that knows
+# which lock schema carries concrete sources.
 
 
 @dataclass
@@ -988,19 +959,32 @@ def prepare_filtered_sources(
     and decompression dominates at roughly four minutes per Ensembl release, so
     threading turns hours into minutes.
 
-    Returns a ``{source cache path: filtered path}`` map. ``process_seqset``
+    Returns a ``{filtered input path: filtered path}`` map. ``process_seqset``
     resolves the same paths independently, so this is a warm-up, not a handoff.
+
+    The filter input is the **derived** FASTA, not the downloaded artifact, for
+    formats that have one. ``process_seqset`` converts before it filters, and a
+    seqset combining ``format="lrg_zip"`` with ``exclude`` would otherwise hand
+    ``filter_fasta_records`` a ZIP here: it would parse no records, drop
+    nothing, and raise "exclusion matched no records" -- blaming the rule for a
+    path bug. Production never combines the two today, which is exactly why it
+    would have gone unnoticed.
     """
     work: list[tuple[Path, RecordExclusion]] = []
     for entry in seqsets:
         if entry.exclusion is None:
             continue
+        resolver = DERIVED_FASTA_RESOLVERS.get(entry.format)
         for index, (_label, url) in enumerate(entry.iter_shard_urls()):
             if not entry.exclusion.applies_to(entry.file_class_for_index(index)):
                 continue
             target = mirror_cache_path(download_dir, url)
-            if target.exists() and target.stat().st_size > 0:
-                work.append((target, entry.exclusion))
+            if not (target.exists() and target.stat().st_size > 0):
+                continue
+            work.append((
+                resolver(target, force) if resolver is not None else target,
+                entry.exclusion,
+            ))
     if not work:
         return {}
     logger.info("filtering %d source file(s) with %d job(s)", len(work), jobs)
@@ -1054,6 +1038,20 @@ def md5_file(path: Path) -> str:
     return digest.hexdigest()
 
 
+def sha256_file(path: Path) -> str:
+    """SHA-256 of a file's bytes -- the lock's identity anchor for a source.
+
+    Lives here rather than in ``build_lock`` because ``ensure_download`` needs
+    it to decide whether cached bytes are the ones a lock pinned, and
+    ``build_lock`` imports this module.
+    """
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        while chunk := stream.read(1 << 20):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
 def provider_checksum_matches(path: Path, source: ResolvedSource) -> bool:
     """Validate any provider checksum attached to a resolved source."""
     if source.provider_checksum_algorithm == "md5":
@@ -1069,7 +1067,19 @@ def provider_checksum_matches(path: Path, source: ResolvedSource) -> bool:
 
 def ensure_download(url: str, target: Path, force: bool,
                     expected_md5: str | None = None,
-                    source: ResolvedSource | None = None) -> Path:
+                    source: ResolvedSource | None = None,
+                    locked_sha256: str | None = None) -> Path:
+    """Make ``target`` hold ``url``'s bytes, preferring what a lock pinned.
+
+    ``locked_sha256`` is the lock's SHA-256 for this file, when a lock covers
+    it. A provider-checksum mismatch on an otherwise valid cached file means the
+    provider republished in place, and for a lock-based tool the lock wins: the
+    cached bytes are the only surviving copy of what the lock describes, so they
+    are kept and the drift is reported. Re-downloading would silently destroy
+    the baseline the lock exists to preserve -- upstream has already changed the
+    MD5 of all 30 remaining ``mRNA_Prot`` shards, so this is live, not
+    hypothetical. ``--force-download`` remains the override.
+    """
     target.parent.mkdir(parents=True, exist_ok=True)
     if target.exists() and not force:
         if source is not None:
@@ -1078,6 +1088,14 @@ def ensure_download(url: str, target: Path, force: bool,
             checksum_ok = expected_md5 is None or md5_file(target) == expected_md5
         if checksum_ok:
             logger.info("using cached %s", target)
+            return target
+        if locked_sha256 is not None and sha256_file(target) == locked_sha256:
+            logger.warning(
+                "provider republished %s in place; keeping the lock-pinned "
+                "cached bytes (sha256=%s…). Re-lock with --force-lock to accept "
+                "the new upstream, or --force-download to overwrite.",
+                target, locked_sha256[:12],
+            )
             return target
         logger.warning("cached provider checksum mismatch; re-downloading %s", target)
     logger.info("downloading %s -> %s", url, target)
@@ -1098,35 +1116,6 @@ def require_prepared_source(path: Path) -> Path:
     if not path.exists() or path.stat().st_size == 0:
         raise FileNotFoundError(f"prepared source is missing or empty: {path}")
     return path
-
-
-def resolve_fasta_source(
-    entry: AssemblyConfig, download_dir: Path, force: bool
-) -> Path | None:
-    if not entry.load_fasta:
-        return None
-    if entry.fasta_path:
-        local = (REPO_ROOT / entry.fasta_path).resolve()
-        if local.exists():
-            logger.info("using local fasta override %s", local)
-            return local
-        logger.warning("fasta_path %s not found; falling back to download", local)
-    assert entry.fasta_url is not None
-    return ensure_download(
-        entry.fasta_url,
-        mirror_cache_path(download_dir, entry.fasta_url),
-        force,
-    )
-
-
-def resolve_report_source(
-    entry: AssemblyConfig, download_dir: Path, force: bool
-) -> Path:
-    return ensure_download(
-        entry.report_url,
-        mirror_cache_path(download_dir, entry.report_url),
-        force,
-    )
 
 
 def parse_assembly_report(path: Path) -> AssemblyReport:
@@ -1165,6 +1154,27 @@ def parse_assembly_report(path: Path) -> AssemblyReport:
         genbank_assembly_accession=genbank_accn,
         rows=rows,
     )
+
+
+def resolve_present_alias(store, namespace: str, alias: str, *, collection=False):
+    """Metadata for an alias the caller already saw listed in ``namespace``.
+
+    gtars returns ``None`` rather than raising when an alias points at a digest
+    the store no longer holds. That happens whenever a collection is removed
+    without reconciling the namespaces referencing it -- a partially applied
+    ``sync``, for instance -- and dereferencing the ``None`` raises an
+    ``AttributeError`` naming neither the alias nor the cause.
+    """
+    getter = (store.get_collection_metadata_by_alias if collection
+              else store.get_sequence_metadata_by_alias)
+    metadata = getter(namespace, alias)
+    if metadata is None:
+        raise ValueError(
+            f"dangling alias {namespace}:{alias} is listed in the namespace but "
+            "resolves to no stored entry. The namespace still references a "
+            "removed collection; reconcile it before ingesting into it"
+        )
+    return metadata
 
 
 def build_name_to_digest_map(
@@ -1249,7 +1259,7 @@ class ReportAliasAccumulator:
             stats.sequence_aliases_skipped += 1
             return False
         if alias in self._sequence_aliases(namespace):
-            metadata = self.store.get_sequence_metadata_by_alias(namespace, alias)
+            metadata = resolve_present_alias(self.store, namespace, alias)
             if metadata.sha512t24u != digest:
                 raise ValueError(
                     f"immutable alias collision {namespace}:{alias}: "
@@ -1271,7 +1281,9 @@ class ReportAliasAccumulator:
                 )
             return False
         if alias in self._collection_aliases(namespace):
-            metadata = self.store.get_collection_metadata_by_alias(namespace, alias)
+            metadata = resolve_present_alias(
+                self.store, namespace, alias, collection=True
+            )
             if metadata.digest != digest:
                 raise ValueError(
                     f"immutable collection alias collision {namespace}:{alias}"
@@ -1789,7 +1801,7 @@ def load_immutable_aliases(
         if alias not in existing:
             additions[alias] = digest
             continue
-        metadata = store.get_sequence_metadata_by_alias(namespace, alias)
+        metadata = resolve_present_alias(store, namespace, alias)
         if metadata.sha512t24u != digest:
             raise ValueError(
                 f"immutable alias collision {namespace}:{alias}: "
@@ -2021,7 +2033,7 @@ def run_build(args) -> int:
     if args.locked_sources:
         if existing_lock is None:
             raise SystemExit("--locked-sources requires an existing --lock")
-        all_sources = apply_locked_sources(seqsets, existing_lock)
+        all_sources = build_lock.apply_locked_sources(seqsets, existing_lock)
     else:
         all_sources = resolve_sources(assemblies, seqsets)
 
@@ -2045,20 +2057,24 @@ def run_build(args) -> int:
                    or (source.kind == "seqset" and source.owner in seqset_owners)]
 
     # Materialize and validate every input before opening or mutating the store.
-    locked_by_url = ({entry["url"]: entry for entry in existing_lock.get("sources", [])}
+    locked_by_url = ({record["url"]: record
+                      for record in build_lock.lock_files(existing_lock)}
                      if existing_lock else {})
     for source in run_sources:
         target = mirror_cache_path(args.cache_dir, source.url)
+        locked = locked_by_url.get(source.url)
         if args.locked_sources:
-            locked = locked_by_url.get(source.url)
             if not locked or not target.exists() or target.stat().st_size == 0:
                 raise SystemExit(f"locked source missing from cache: {source.url}")
-            if build_lock.sha256_file(target) != locked.get("sha256"):
+            if sha256_file(target) != locked.get("sha256"):
                 raise SystemExit(f"locked source SHA-256 mismatch: {source.url}")
         else:
+            # The lock's sha256 lets ensure_download tell "the provider
+            # republished" apart from "the cache is damaged", and keep the
+            # pinned bytes in the first case instead of overwriting them.
             ensure_download(
                 source.url, target, args.force_download, source.upstream_md5,
-                source,
+                source, locked_sha256=locked.get("sha256") if locked else None,
             )
 
     # Second preflight: every declared record exclusion, in parallel. Downloads
@@ -2082,8 +2098,6 @@ def run_build(args) -> int:
         fatal = (membership_check.drift or check.changed or check.new or check.missing)
         if fatal and not args.force_lock:
             details = []
-            if membership_check.legacy_schema:
-                details.append("existing lock is v1")
             if membership_check.set_differs:
                 details.append("resolved URL membership changed")
             if membership_check.upstream_changed:
@@ -2214,8 +2228,13 @@ def run_build(args) -> int:
             collection_by_cachepath=provenance, store=store,
             seqsets=seqsets,
         )
+        build_lock.validate_lock(lock)
         build_lock.write_lock(args.lock, lock)
-        logger.info("wrote build-lock with %d sources", len(lock["sources"]))
+        logger.info(
+            "wrote build-lock: %d input file(s), %d collection(s), "
+            "%d sequence(s)", len(build_lock.lock_files(lock)),
+            lock["outputs"]["n_collections"], lock["outputs"]["n_sequences"],
+        )
     else:
         logger.info("partial build; merging %d touched source(s) into %s",
                     len(run_sources), args.lock)
@@ -2224,6 +2243,8 @@ def run_build(args) -> int:
             touched_sources=run_sources, collection_by_cachepath=provenance, store=store,
             seqsets=seqsets,
         )
+        build_lock.validate_lock(merged)
         build_lock.write_lock(args.lock, merged)
-        logger.info("build-lock now has %d sources", len(merged["sources"]))
+        logger.info("build-lock now has %d input file(s)",
+                    len(build_lock.lock_files(merged)))
     return 0

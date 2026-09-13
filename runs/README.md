@@ -7,6 +7,12 @@ Durable records currently retained:
 - [`2026-07-23-ensembl-r116-genomic-experiment/`](2026-07-23-ensembl-r116-genomic-experiment/) — isolated, non-publishable genomic experiment.
 - [`2026-08-26-full-rebuild/`](2026-08-26-full-rebuild/) — clean end-to-end rebuild
   (fresh cache, store, and lock) plus the seqrepo parity analysis run against it.
+- [`2026-09-12-lock-schema-v4/`](2026-09-12-lock-schema-v4/) — the committed build
+  lock converted from schema `/2` to `/4`. Converted, not rebuilt: a rebuild
+  would have destroyed the preserved upstream drift.
+- [`2026-09-12-deep-verify/`](2026-09-12-deep-verify/) — full round-trip scan of
+  the store, producing the `verify --deep` encoder baseline. Found 133 sequences
+  whose stored payload does not re-digest to its own digest.
 
 Removed: `2026-07-02-seqrepo-parity/`. Its build and parity analysis were fully
 superseded by `2026-08-26-full-rebuild/`, which covers a larger source set and

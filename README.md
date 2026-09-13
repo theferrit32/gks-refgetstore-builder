@@ -47,14 +47,19 @@ header names. The only runtime dependency is `gtars`.
 ## Layout
 
     sources.toml                   # declarative, authoritative source manifest
-    cli.py                         # gks-refgetstore CLI (build/verify/fetch/lock)
+    sources.dev.toml               # every config shape, ~3 GB: the fast edit-test loop
+    cli.py                         # gks-refgetstore CLI (build/verify/status/repair/sync/fetch/lock)
     build_store.py                 # build engine + shared helpers (config, cache paths, ingest)
-    build_lock.py                  # build-lock + cache-verification core (used by build & verify)
-    fetch_sources.py               # cache pre-fetch (fetch subcommand)
+    build_lock.py                  # the build lock: schema, accessors, validation, sync planning
+    store_census.py                # read-only store primitives (counts, roots, membership, re-digest)
+    verify.py                      # verify + status: cache, store, manifest, remote
+    repair.py                      # restore the locked state after verify finds damage
+    store_sync.py                  # incremental add/remove against a built store
+    fetch_sources.py               # cache pre-fetch (fetch subcommand) + the shared downloader
     inventory_sources.py           # exact remote sizes + pre-download space-budget gate
     provenance.py                  # file <-> refget-digest queries from the lock + store
     build.lock.json                # provenance lock for the most recent build (see below)
-    verify_store.py                # post-build gtars self-checks (standalone)
+    verify_store.py                # post-build gtars self-checks (standalone, semantics-driven)
     seqrepo_equivalence/           # optional backwards-compat check vs a seqrepo snapshot
     RUNBOOK.md                     # reproducible run-record lifecycle and policies
     runs/                          # compact historical manifests, summaries, logs, evidence
@@ -64,15 +69,45 @@ header names. The only runtime dependency is `gtars`.
 
 ## CLI
 
-Everything runs through one CLI, `gks-refgetstore`, with four subcommands.
-Two equivalent invocation styles:
+Everything runs through one CLI, `gks-refgetstore`. Two equivalent invocation
+styles:
 
     gks-refgetstore <cmd> ...     # installed console script (after `uv sync`)
     uv run cli.py <cmd> ...       # run the source directly, no install
 
+| subcommand | does | exits non-zero on |
+| --- | --- | --- |
+| `build` | ingest the manifest into a RefgetStore, write the lock | source drift, ingest failure |
+| `verify` | check the cache and the store against the lock | any error-severity finding |
+| `status` | describe manifest/lock/cache/store agreement | **never** |
+| `repair` | restore the locked state after `verify` finds damage | unrepairable or failed repair |
+| `sync` | apply `sources.toml` changes incrementally | missing sources |
+| `fetch` | pre-populate the download cache (no ingest) | download failure |
+| `lock` | regenerate a lock for a build that already ran | — |
+
 Global: `-v/--verbose` for debug logging. Every subcommand shares
 `--config` (default `./sources.toml`) and `--cache-dir` (default `./downloads`).
 `gks-refgetstore <cmd> --help` prints the full flag list.
+
+### The development manifest
+
+`sources.dev.toml` covers every config *shape* in `sources.toml` with 19 files
+and ~3.19 GB, against 335 files and 106 GB. Everything it names is already
+cached and still matches its provider checksum, so it downloads nothing.
+
+Measured: build ~6 minutes, `verify --all` 23 seconds, `sync --apply` ~2
+minutes, `status` instant.
+
+    gks-refgetstore build  --config sources.dev.toml --store-dir store.dev --lock build.dev.lock.json
+    gks-refgetstore verify --config sources.dev.toml --store-dir store.dev --lock build.dev.lock.json --all
+    gks-refgetstore status --config sources.dev.toml --store-dir store.dev --lock build.dev.lock.json
+
+It shares `downloads/` with the production manifest rather than using its own
+cache directory. That is forced, not incidental: `fasta_path` resolves relative
+to the repo root, derived artifacts are written beside their source, and
+re-deriving release 76's filtered toplevel costs 273 seconds. The header of
+`sources.dev.toml` lists which entry covers which shape, and which one shape is
+deliberately left out.
 
 ### `build` — ingest the manifest into a RefgetStore
 
@@ -134,25 +169,120 @@ aborts.
 Idempotent (skips files already cached), atomic, disk-guarded
 (`--min-free-gb`). Useful to warm the cache before a long build, or offline.
 
-### `verify` — check the cache
+### `verify` — check the cache and the store
 
-Three checks, from cheapest to strictest:
+Four independent targets. With no scope flag the default is `--cache --store`,
+which is **offline and lock-driven**; only `--remote` and `--manifest` touch the
+network.
 
-    gks-refgetstore verify                          # (A) integrity: present + gzip -t
-    gks-refgetstore verify --check-remote           #     + local size vs server Content-Length
-    gks-refgetstore verify --lock build.lock.json   # (B) per-file drift vs the lock
-    gks-refgetstore verify --lock build.lock.json --strict-set  # (C) + identical file set
+    gks-refgetstore verify                  # cache + store, offline
+    gks-refgetstore verify --store --deep   # + re-digest every stored sequence
+    gks-refgetstore verify --manifest       # has upstream moved since the lock?
+    gks-refgetstore verify --all            # all four
 
-- **(A) integrity** needs no lock: every manifest file is present and, for
-  `.gz`, passes `gzip -t` (catches truncation/corruption).
-- **(B) per-file drift** compares, for each file the build would ingest that
-  *also* appears in the lock, its cached `sha256` against the pinned value —
-  keyed per file, so it works even when the manifest has more/fewer files than
-  the lock. Files with no lock baseline fall back to a gzip check.
-- **(C) set match** additionally fails if the build's file set differs from the
-  lock's.
+| target | question | network |
+| --- | --- | --- |
+| `--cache` | are the pinned source bytes still on disk and intact? | no |
+| `--store` | does the store still hold what the lock recorded? | no |
+| `--manifest` | has upstream moved since the lock was written? | yes |
+| `--remote` | are the remote objects still the size we saw? | yes |
 
-Exit code is non-zero on any failure, so `verify` is CI-friendly.
+The split is the point. On the currently committed lock:
+
+    verify --cache --store   PASS   the store matches the lock, which is what it claims
+    verify --manifest        FAIL   2 files withdrawn, 1 added, 30 checksums moved
+    status                   describes all of it, exit 0
+
+A legitimately stale lock is not a broken store. The old single `verify` could
+not tell them apart, because it resolved the manifest over the network to decide
+what to check — which also made offline verification impossible and made the
+result depend on what upstream happened to be serving that day.
+
+Every finding carries a stable `code` (`cache.sha256_mismatch`,
+`store.seq_file_missing`, `manifest.file_removed`, …). That is the contract
+`repair` dispatches on, so the codes are interface, not log text.
+
+`--remote` findings are always warnings: several endpoints omit
+`Content-Length`, and mutable endpoints legitimately change size. `--manifest`
+answers the same question better at the same network cost.
+
+#### The store ladder
+
+| level | proves | does not prove | cost |
+| --- | --- | --- | --- |
+| **L0** roots + counts | the store holds **exactly** the digest sets the lock recorded — one add or remove flips a root | that any payload exists or is readable | ~7s |
+| **L1** membership | every locked collection resolves, every sequence is backed by a `.seq` file, nothing is stranded | that any byte is correct | ~85s |
+| **L2** `--deep` | the store can actually serve each sequence, and returns what its digest promises | nothing about the lock — it needs no lock | ~15 min |
+
+The levels are independent: unlinking a `.seq` fires L1 while L0 stays clean,
+and corrupting one fires L2 while L0 and L1 stay clean.
+
+`--limit` is accepted for `--cache` and `--remote` and **rejected for
+`--store`** — a root is a digest over the complete set, so a partial one is not
+a weaker check, it is a different number that means nothing.
+
+#### Known encoder defects (`--deep`)
+
+`--deep` on the production store reports 133 sequences whose stored payload does
+not re-digest to the digest it is filed under. They are **not** bit rot, and
+re-ingesting reproduces them exactly:
+
+- **106 proteins** — gtars' `protein` alphabet has no `U` (selenocysteine), so
+  every selenoprotein loses that residue on encode. `ENSP00000473614` (GPX4,
+  180 aa) has `U` at position 109; the store returns `A`.
+- **27 short proteins** — residues that happen to all be legal IUPAC nucleotide
+  codes get misdetected as nucleotide and encoded lossily
+  (`ENSP00000499040.1`, 12 aa).
+
+They are pinned as a **baseline**
+(`seqrepo_equivalence/known_divergence/gtars_encoding_roundtrip.tsv`) rather
+than suppressed, which gives three outcomes instead of two:
+
+| in baseline | re-digests correctly | outcome |
+| --- | --- | --- |
+| yes | no | `warn` — known defect, rendered with its diagnosed cause |
+| **no** | **no** | **`error`** — a new defect; this is the regression that matters |
+| **yes** | **yes** | `info` — gtars was fixed; update the baseline and re-ingest |
+
+That third row is why this is a baseline and not a `--ignore` flag: it turns the
+upstream fix into something the tool reports rather than something we have to
+remember to check. See
+[`seqrepo_equivalence/known_divergence/README.md`](seqrepo_equivalence/known_divergence/README.md).
+
+### `status` — describe, don't judge
+
+    gks-refgetstore status             # four legs, one of them online
+    gks-refgetstore status --offline   # skip the upstream leg
+
+Four legs: manifest↔lock, manifest↔cache, lock↔cache, lock↔store. Each reuses
+the implementation `verify` and `sync` already use — there is no second copy of
+"resolve and diff".
+
+**`status` always exits 0.** It is meant to be run casually and read; `verify`
+is the one that judges and gates CI. A command that fails on a stale lock is a
+command people stop running.
+
+### `repair` — restore the locked state
+
+    gks-refgetstore repair             # verify, then plan; changes nothing
+    gks-refgetstore repair --apply     # actually repair
+
+Re-fetches damaged cache files, **accepting only bytes that match the lock's
+SHA-256**, and re-ingests collections the store has lost. It restores what the
+lock records and never re-baselines — new upstream bytes are a `sync` or
+`--force-lock` decision.
+
+Two deliberate refusals:
+
+- **`store.seq_digest_mismatch` is unrepairable.** Re-ingesting reproduces the
+  encoder defect byte for byte. The fix is upstream in gtars.
+- **A root mismatch with no attributable cause is refused.** If the store's
+  digest set differs from the lock's but no collection is missing and no payload
+  is absent, the store has diverged in a way repair cannot name. That is `sync`.
+
+Cache repair always runs first and aborts the run if it fails: store removal
+persists immediately and gtars offers no rollback, so a source file discovered
+missing *after* the removal leaves the store worse than it started.
 
 ### `lock` — (re)generate a build lock without rebuilding
 
@@ -167,13 +297,68 @@ for a build that already ran.
     uv run python verify_store.py            # gtars-only checks on ./store
     uv run python verify_store.py PATH        # explicit store dir
 
-## Build lock & cache verification
+## Build lock & verification
 
-A full build writes **`build.lock.json`** — a provenance record of exactly what
-that build consumed: every source's URL, provider checksum and algorithm (when
-supplied), checksum source, cached path, byte length, `sha256`, file class, and
-the collection digest it produced, plus build metadata (timestamp, git commit,
-gtars version, `sources.toml` hash, store counts). It is small and committed.
+A full build writes **`build.lock.json`** (schema
+`gks-refgetstore-build-lock/4`). It is small, committed, and has exactly two
+jobs, which is what the shape is organized around:
+
+```json
+{
+  "schema": "gks-refgetstore-build-lock/4",
+  "build":   {"timestamp_utc": …, "git": {…}, "gtars_version": "0.9.2"},
+  "inputs":  {"sources_toml_sha256": …,
+              "files": [{"kind","owner","url","cache_path","mutable",
+                         "sha256","bytes","present","provider_checksum",
+                         "provider_checksum_algorithm",
+                         "provider_checksum_blocks","checksum_url",
+                         "file_class","ingest_spec","ingest_spec_sha256"}]},
+  "outputs": {"n_sequences": 1779497, "n_collections": 240,
+              "sequences_root": "sha256:…", "collections_root": "sha256:…",
+              "collections": [{"digest": …, "n_sequences": …,
+                               "from": ["cache/path", …]}]}
+}
+```
+
+- **`inputs`** is upstream reproducibility: every concrete file the build read,
+  and `ingest_spec` pinning how those bytes were interpreted. The `sha256` pins
+  the bytes; the spec pins what was done with them.
+- **`outputs`** is local completeness: a **census enumerated from the store**,
+  not synthesized from build provenance. Provenance only supplies the `from`
+  annotation, so a collection with no known contributor is recorded honestly as
+  `"from": []` rather than omitted.
+
+**`outputs.collections[].from` is a list.** One file yields exactly one
+collection, but one collection can have many contributing files —
+content-addressing merges byte-identical sources, and filtering collapsed eight
+Ensembl collections into three. In the committed lock 43 collections have two or
+more contributors and one has twelve. `validate_lock` enforces the direction
+that *does* hold by rejecting a cache path attributed to two collections.
+
+**Roots** are canonical, and documented so a reimplementation cannot drift:
+
+```python
+def digest_root(digests):
+    h = hashlib.sha256()
+    for d in sorted(set(digests)):     # bare digests, no SQ. prefix
+        h.update(d.encode("ascii")); h.update(b"\n")
+    return "sha256:" + h.hexdigest()
+```
+
+Order- and duplicate-independent by construction, so a root answers exactly one
+question — does the store hold the same *set* the lock recorded — and any single
+change flips it. Computing both costs about four seconds on the production
+store, which is why it happens on every lock write.
+
+Readers go through the accessors (`lock_files`, `lock_collections`,
+`collection_by_file`, `files_by_collection`), never raw subscripting, and
+through `load_lock`, which validates. Schemas /1–/3 are **rejected outright**,
+not shimmed: a /2 lock's `sources` list reads as an empty `inputs.files` under
+the v4 accessors, so a tolerant reader would report zero drift and an empty
+store census as a pass. The committed lock was converted once rather than
+rebuilt — see
+[`runs/2026-09-12-lock-schema-v4/`](runs/2026-09-12-lock-schema-v4/) for why a
+rebuild would have destroyed test material.
 
 The committed `build.lock.json` is the lock for the **most recent published
 build** — a single, latest snapshot, not a history. A periodic process builds
@@ -191,13 +376,24 @@ build; `verify` handles the interim gap gracefully.)
    change is fatal unless `--force-lock` explicitly accepts a new baseline.
    NCBI MD5 and Ensembl BSD checksums verify provider delivery; the lock's
    SHA-256 identifies the exact bytes consumed by the build.
-2. **Provenance** — because each ingested file becomes exactly one collection and
-   the store records collection membership, the lock's `url → collection_digest`
-   is enough to answer file↔digest questions on demand:
+2. **Provenance** — the lock records each collection's contributing files and
+   the store records each collection's membership, so composing the two answers
+   file↔digest questions on demand without storing a table:
 
        uv run python provenance.py --file human.6.rna   # digests from that file
        uv run python provenance.py --digest <sha512t24u> # source file(s) for a digest
-       uv run python provenance.py --list                # all sources + collections
+       uv run python provenance.py --list                # all collections + contributors
+
+   `--digest` is an O(all collections) scan, ~56s on the production store.
+   That is deliberately not backed by a cached reverse index: 1.8M entries to
+   build, persist, and keep honest, to save under a minute on an interactive
+   query.
+
+3. **Local completeness** — `verify --cache --store` checks that the download
+   cache *and the built store* still contain everything the lock says they do.
+   Before schema /4 this was entirely unimplemented for the store: the lock
+   recorded collection digests and counts, and nothing ever checked them, so a
+   deleted `.seq` file was invisible.
 
 **Recommended workflows:**
 
@@ -210,8 +406,13 @@ build; `verify` handles the interim gap gracefully.)
     # Rebuild offline from exactly the locked, already-cached bytes
     gks-refgetstore build --locked-sources
 
-The first build after introducing dynamic sources encounters the readable v1
-lock and requires `--force-lock` to establish the v2 URL/MD5 baseline.
+**The lock wins over the provider.** When a cached file's *provider* checksum no
+longer matches but its bytes still match the lock's `sha256`, the cache is kept
+and the drift is reported rather than silently re-downloaded. For a lock-based
+tool that is the only defensible default: upstream has since changed the MD5 of
+all 30 remaining `mRNA_Prot` shards, so re-downloading would destroy the only
+surviving copy of what the lock describes. `--force-download` remains the
+override.
 
 **`--lock-check-mode`** controls whether a live build compares against a lock:
 
@@ -222,8 +423,8 @@ lock and requires `--force-lock` to establish the v2 URL/MD5 baseline.
 | `ignore` | — | no check |
 
 `--force-lock` is the explicit re-baseline operation. `--locked-sources` is
-stricter and offline: it performs no manifest request, requires a v2 lock, and
-rejects missing or SHA-256-mismatched cached files.
+stricter and offline: it performs no manifest request, and rejects missing or
+SHA-256-mismatched cached files.
 
 **Reproducible rebuild from a validated cache:**
 

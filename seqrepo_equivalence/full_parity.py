@@ -7,10 +7,15 @@ import argparse
 import csv
 import json
 import re
+import sys
 from collections import Counter
 from pathlib import Path
 
 from gtars.refget import RefgetStore
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+import build_lock  # noqa: E402
+from store_census import collection_members  # noqa: E402
 
 from verify_seqrepo_equivalence import (
     DEFAULT_SEQREPO, EXPECTED_OMIT, NAMESPACE_MAP, build_refget_digest_set,
@@ -77,16 +82,18 @@ def source_contributions(
     store: RefgetStore, lock_path: Path, seqrepo_digests: set[str], out_path: Path,
     summary_path: Path,
 ) -> tuple[int, Counter]:
-    lock = json.loads(lock_path.read_text())
+    # Through load_lock, not json.loads: this reader attributes every store-only
+    # digest to the *earliest* source that introduced it, and a silently
+    # mis-shaped lock would produce a complete-looking table attributing
+    # nothing.
+    lock = build_lock.load_lock(lock_path)
+    collection_of = build_lock.collection_by_file(lock)
     first: dict[str, dict] = {}
-    for source in sorted(lock["sources"], key=source_chronology):
-        collection = source.get("collection_digest")
+    for source in sorted(build_lock.lock_files(lock), key=source_chronology):
+        collection = collection_of.get(source["cache_path"])
         if not collection:
             continue
-        store.load_collection(collection)
-        level2 = store.get_collection_level2(collection)
-        for raw_digest in level2["sequences"]:
-            digest = raw_digest.removeprefix("SQ.")
+        for digest in collection_members(store, collection):
             if digest not in seqrepo_digests and digest not in first:
                 first[digest] = source
     grouped: Counter = Counter()

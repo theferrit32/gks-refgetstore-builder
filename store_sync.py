@@ -52,6 +52,7 @@ class SyncReport:
     sequences_final: int = 0
     namespaces_reconciled: dict[str, tuple[int, int]] = field(default_factory=dict)
     seqsets_processed: list[str] = field(default_factory=list)
+    collections_added: dict[str, int] = field(default_factory=dict)
 
 
 def store_sequence_count(store) -> int:
@@ -147,6 +148,7 @@ def apply_plan(
     plan,
     seqsets: list[SeqsetConfig],
     download_dir: Path,
+    lock: dict,
     *,
     ingest_jobs: int = INGEST_JOBS_DEFAULT,
     filter_jobs: int = INGEST_JOBS_DEFAULT,
@@ -156,16 +158,45 @@ def apply_plan(
 
     Returns the report and the build provenance (cache path -> collection),
     which the caller merges into the lock.
+
+    The re-ingest scope is widened twice, for two independent reasons:
+
+    1. **Collection coverage.** Removal is per collection, so dropping one
+       because a single contributor changed also drops every *other*
+       contributor's sequences. ``build_lock.reingest_scope`` follows the
+       lock's ``from`` lists to recover them.
+    2. **Alias coverage.** A rolling release namespace is fed by several
+       seqsets, and reconciling it needs the complete desired alias map, so
+       every contributor to a touched namespace is reprocessed.
     """
+    import build_lock
+
     report = SyncReport()
     by_name = {entry.name: entry for entry in seqsets}
-    touched_owners = ({rec["owner"] for rec in plan.removed}
-                      | _owners_of(plan, seqsets, download_dir))
+    touched_paths = (
+        {record["cache_path"] for record in plan.removed}
+        | set(plan.added)
+        | {rel for rel, _ in plan.reingest}
+    )
+    # Expanding by collection is correct by construction; expanding by
+    # namespace was correct by coincidence. In the committed lock every
+    # collection with contributors in more than one seqset is an Ensembl
+    # release group, which the namespace expansion below already covers -- but
+    # content-addressing does not respect namespace boundaries, so that holds
+    # only until the manifest grows a shared collection that crosses them.
+    covered = build_lock.reingest_scope(lock, sorted(touched_paths))
+    touched_owners = {
+        owner for _kind, owner in build_lock.owners_for_paths(lock, covered)
+    }
+    touched_owners |= _owners_of(plan, seqsets, download_dir)
     affected = [by_name[n] for n in sorted(touched_owners) if n in by_name]
     namespaces = {entry.namespace for entry in affected}
     scope = seqsets_for_namespaces(seqsets, namespaces)
-    logger.info("affected seqsets: %d; expanded to %d for namespace coverage",
-                len(affected), len(scope))
+    logger.info(
+        "touched files: %d; expanded to %d by collection membership; "
+        "affected seqsets: %d; expanded to %d for namespace coverage",
+        len(touched_paths), len(covered), len(affected), len(scope),
+    )
 
     report.sequences_before = store_sequence_count(store)
 
@@ -203,6 +234,14 @@ def apply_plan(
     # Phase 4: persist sequences and indexes, THEN rewrite alias namespaces.
     store.write()
     report.sequences_final = store_sequence_count(store)
+    # Content-addressing means the re-ingested collections need not map 1:1 to
+    # the removed ones. Filtering the Ensembl toplevels collapses 8 collections
+    # into 3, because the padding was most of what distinguished the release
+    # groups. Report what was actually created rather than assuming symmetry.
+    report.collections_added = {
+        rec["collection_digest"]: rec["n_sequences"]
+        for rec in provenance.values() if rec.get("collection_digest")
+    }
     for namespace, desired in sorted(alias_maps.items()):
         report.namespaces_reconciled[namespace] = reconcile_namespace(
             store_dir, namespace, desired
@@ -215,9 +254,6 @@ def print_plan(plan, limit: int = 40) -> None:
     print(f"unchanged={len(plan.unchanged)}  added={len(plan.added)}  "
           f"removed={len(plan.removed)}  reingest={len(plan.reingest)}  "
           f"missing={len(plan.missing)}")
-    if plan.legacy_schema:
-        print("  note: lock predates ingest_spec; sources declaring a "
-              "transformation are re-ingested to establish a baseline")
     for label, items in (("added", plan.added),
                          ("missing", plan.missing),
                          ("removed", [r["cache_path"] for r in plan.removed])):
@@ -270,7 +306,7 @@ def run_sync(args) -> int:
     print(f"\napplying to {args.store_dir} ...", flush=True)
     store = RefgetStore.open_local(str(args.store_dir))
     report, provenance = apply_plan(
-        store, args.store_dir, plan, seqsets, args.cache_dir,
+        store, args.store_dir, plan, seqsets, args.cache_dir, lock,
         ingest_jobs=args.ingest_jobs, filter_jobs=args.filter_jobs,
     )
     print(f"\nn_sequences: {report.sequences_before} -> "
@@ -278,7 +314,11 @@ def run_sync(args) -> int:
           f"{report.sequences_final}")
     print(f"net change: {report.sequences_final - report.sequences_before:+d}")
     print(f"collections removed: {report.collections_removed}; "
+          f"created: {len(report.collections_added)}; "
           f"seqsets reprocessed: {len(report.seqsets_processed)}")
+    for digest, n in sorted(report.collections_added.items(),
+                            key=lambda kv: -kv[1]):
+        print(f"  + {digest}  n_sequences={n}")
     for namespace, (added, removed) in sorted(report.namespaces_reconciled.items()):
         if added or removed:
             print(f"  {namespace}: +{added} -{removed}")
@@ -293,11 +333,14 @@ def run_sync(args) -> int:
         store=store, seqsets=seqsets,
         dropped_scopes={(r["kind"], r["owner"]) for r in plan.removed},
     )
+    build_lock.validate_lock(merged)
     if args.no_lock:
         print("\nskipping lock write (--no-lock)")
     else:
         build_lock.write_lock(args.lock, merged)
-        print(f"\nwrote {args.lock} ({len(merged['sources'])} sources)")
+        print(f"\nwrote {args.lock} "
+              f"({len(build_lock.lock_files(merged))} input file(s), "
+              f"{merged['outputs']['n_collections']} collection(s))")
     return 0
 
 

@@ -16,7 +16,24 @@ import pytest
 import build_lock
 import store_sync
 from build_store import ResolvedSource, SeqsetConfig
+from conftest import file_record, v4_lock
 from store_sync import MutationOrderError
+
+
+def _no_network(*args, **kwargs):
+    raise AssertionError("test attempted a provider fetch")
+
+
+def _present(root: Path, url: str) -> Path:
+    """Materialize a cache file at the mirrored path a build would use."""
+    import build_store
+
+    path = build_store.mirror_cache_path(root, url)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if not path.exists():
+        path.write_bytes(b"x")
+    return path
+
 
 EN = "https://ftp.ensembl.org/pub/release-100/fasta/homo_sapiens/"
 TOPLEVEL = EN + "dna/Homo_sapiens.GRCh38.dna.toplevel.fa.gz"
@@ -56,22 +73,33 @@ REL_CDNA = ("ftp.ensembl.org/pub/release-100/fasta/homo_sapiens/cdna/"
             "Homo_sapiens.GRCh38.cdna.all.fa.gz")
 
 
-def lock_with(schema: str, *records: dict) -> dict:
-    return {"schema": schema, "build": {}, "sources": list(records)}
-
-
 def record(rel: str, *, sha: str | None = None, spec: dict | None = None,
            digest: str = "COLL1", owner: str = "ensembl_release_100") -> dict:
-    rec = {
-        "kind": "seqset", "owner": owner, "url": "https://x/" + rel,
-        "cache_path": rel, "collection_digest": digest, "n_sequences": 10,
-    }
-    if sha is not None:
-        rec["sha256"] = sha
-    if spec is not None or True:
-        rec["ingest_spec"] = spec
-        rec["ingest_spec_sha256"] = build_lock.canonical_spec_sha256(spec)
+    """A v4 input record, tagged with the collection it fed.
+
+    The tag is consumed by :func:`lock_with`, which inverts it into the
+    ``outputs.collections[].from`` lists the real schema stores.
+    """
+    rec = file_record(rel, owner=owner, url="https://x/" + rel, sha256=sha,
+                      ingest_spec=spec)
+    rec["_collection"] = digest
     return rec
+
+
+def lock_with(*records: dict) -> dict:
+    files: list[dict] = []
+    from_map: dict[str, list[str]] = {}
+    for tagged in records:
+        rec = dict(tagged)
+        digest = rec.pop("_collection", None)
+        files.append(rec)
+        if digest:
+            from_map.setdefault(digest, []).append(rec["cache_path"])
+    collections = [
+        {"digest": digest, "n_sequences": 10, "from": sorted(paths)}
+        for digest, paths in sorted(from_map.items())
+    ]
+    return v4_lock(files, collections)
 
 
 # --------------------------------------------------------------------------
@@ -113,7 +141,7 @@ def test_source_matching_bytes_and_spec_is_unchanged(tmp_path: Path) -> None:
     sha = build_lock.sha256_file(tmp_path / REL_TOP)
     plan = build_lock.plan_sync(
         [source(TOPLEVEL, "dna.toplevel")],
-        lock_with(build_lock.SCHEMA, record(REL_TOP, sha=sha)),
+        lock_with(record(REL_TOP, sha=sha)),
         tmp_path, seqsets=[seqset()],
     )
     assert plan.unchanged == [REL_TOP]
@@ -124,7 +152,7 @@ def test_changed_upstream_bytes_are_reingested(tmp_path: Path) -> None:
     cache(tmp_path, REL_TOP)
     plan = build_lock.plan_sync(
         [source(TOPLEVEL, "dna.toplevel")],
-        lock_with(build_lock.SCHEMA, record(REL_TOP, sha="0" * 64)),
+        lock_with(record(REL_TOP, sha="0" * 64)),
         tmp_path, seqsets=[seqset()],
     )
     assert plan.reingest == [(REL_TOP, "upstream bytes changed")]
@@ -136,7 +164,7 @@ def test_changed_ingest_spec_is_reingested_though_bytes_match(tmp_path: Path) ->
     sha = build_lock.sha256_file(tmp_path / REL_TOP)
     plan = build_lock.plan_sync(
         [source(TOPLEVEL, "dna.toplevel")],
-        lock_with(build_lock.SCHEMA, record(REL_TOP, sha=sha)),
+        lock_with(record(REL_TOP, sha=sha)),
         tmp_path, seqsets=[seqset(exclude=EXCLUDE)],
     )
     assert plan.reingest == [(REL_TOP, "ingest spec changed")]
@@ -147,7 +175,7 @@ def test_source_absent_from_manifest_is_removed(tmp_path: Path) -> None:
     sha = build_lock.sha256_file(tmp_path / REL_TOP)
     plan = build_lock.plan_sync(
         [source(TOPLEVEL, "dna.toplevel")],
-        lock_with(build_lock.SCHEMA, record(REL_TOP, sha=sha),
+        lock_with(record(REL_TOP, sha=sha),
                   record(REL_CDNA, sha=sha, digest="COLL2")),
         tmp_path, seqsets=[seqset()],
     )
@@ -159,7 +187,7 @@ def test_source_absent_from_lock_is_added(tmp_path: Path) -> None:
     cache(tmp_path, REL_TOP)
     plan = build_lock.plan_sync(
         [source(TOPLEVEL, "dna.toplevel")],
-        lock_with(build_lock.SCHEMA), tmp_path, seqsets=[seqset()],
+        lock_with(), tmp_path, seqsets=[seqset()],
     )
     assert plan.added == [REL_TOP]
 
@@ -167,7 +195,7 @@ def test_source_absent_from_lock_is_added(tmp_path: Path) -> None:
 def test_source_missing_from_cache_is_reported_not_reingested(tmp_path: Path) -> None:
     plan = build_lock.plan_sync(
         [source(TOPLEVEL, "dna.toplevel")],
-        lock_with(build_lock.SCHEMA, record(REL_TOP, sha="0" * 64)),
+        lock_with(record(REL_TOP, sha="0" * 64)),
         tmp_path, seqsets=[seqset()],
     )
     assert plan.missing == [REL_TOP]
@@ -179,7 +207,7 @@ def test_duplicate_collection_digests_collapse_for_removal(tmp_path: Path) -> No
     cache(tmp_path, REL_TOP, REL_CDNA)
     plan = build_lock.plan_sync(
         [source(TOPLEVEL, "dna.toplevel"), source(CDNA, "cdna")],
-        lock_with(build_lock.SCHEMA,
+        lock_with(
                   record(REL_TOP, sha="0" * 64, digest="SHARED"),
                   record(REL_CDNA, sha="0" * 64, digest="SHARED")),
         tmp_path, seqsets=[seqset()],
@@ -189,63 +217,109 @@ def test_duplicate_collection_digests_collapse_for_removal(tmp_path: Path) -> No
 
 
 # --------------------------------------------------------------------------
-# migrating a lock written before ingest_spec existed
+# re-ingest scope
 # --------------------------------------------------------------------------
+#
+# Removal is per collection, so a collection dropped because one contributor
+# changed also drops every *other* contributor's sequences. Expanding by alias
+# namespace -- what sync did before the lock recorded `from` -- covers the
+# Ensembl release groups by accident and misses cross-namespace sharing.
 
-def test_legacy_lock_leaves_untransformed_sources_alone(tmp_path: Path) -> None:
-    cache(tmp_path, REL_TOP)
-    sha = build_lock.sha256_file(tmp_path / REL_TOP)
-    legacy = lock_with(build_lock.V2_SCHEMA, record(REL_TOP, sha=sha))
-    for rec in legacy["sources"]:
-        rec.pop("ingest_spec"), rec.pop("ingest_spec_sha256")
-    plan = build_lock.plan_sync(
-        [source(TOPLEVEL, "dna.toplevel")], legacy, tmp_path,
-        seqsets=[seqset()],
-    )
-    assert plan.unchanged == [REL_TOP]
-    assert plan.legacy_schema
-
-
-def test_legacy_lock_reingests_sources_that_now_declare_a_transform(
-    tmp_path: Path,
+def test_reingest_scope_expands_to_every_contributor_of_a_shared_collection(
 ) -> None:
-    """The migration case: an absent spec is unknown, so a declared transform
-    cannot be assumed to have been applied."""
-    cache(tmp_path, REL_TOP)
-    sha = build_lock.sha256_file(tmp_path / REL_TOP)
-    legacy = lock_with(build_lock.V2_SCHEMA, record(REL_TOP, sha=sha))
-    for rec in legacy["sources"]:
-        rec.pop("ingest_spec"), rec.pop("ingest_spec_sha256")
-    plan = build_lock.plan_sync(
-        [source(TOPLEVEL, "dna.toplevel")], legacy, tmp_path,
-        seqsets=[seqset(exclude=EXCLUDE)],
+    lock = lock_with(
+        record(REL_TOP, digest="SHARED"),
+        record(REL_CDNA, digest="SHARED"),
     )
-    assert plan.reingest == [(REL_TOP, "ingest spec not pinned by this lock")]
+    assert build_lock.reingest_scope(lock, [REL_TOP]) == {REL_TOP, REL_CDNA}
 
 
-def test_live_config_against_the_committed_lock_targets_only_padded_releases() -> None:
-    """Guards the real migration: releases 76-109 plus the one lrg_zip source."""
+def test_reingest_scope_crosses_namespaces(tmp_path: Path) -> None:
+    """The case namespace expansion cannot reach.
+
+    One RefSeq protein file published under both the per-patch assembly path
+    and an annotation-release path, byte-identical, so they yield one
+    collection -- but owned by different seqsets under different alias
+    namespaces. Expanding by namespace re-ingests only the one that changed and
+    silently drops the other's sequences.
+
+    This shape does not occur in the committed lock: its 31 multi-owner
+    collections are all Ensembl release groups, which namespace expansion
+    happens to cover. That is the point of the test -- the old approximation was
+    right by coincidence, and splitting one seqset's URL list would break it.
+    """
+    patch_rel = ("ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/"
+                 "GCF_000001405.25_GRCh37.p13/GCF_..._protein.faa.gz")
+    release_rel = ("ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/"
+                   "105.20220307/GCF_..._protein.faa.gz")
+    lock = lock_with(
+        record(patch_rel, digest="SHARED", owner="refseq_history_grch37_protein"),
+        record(release_rel, digest="SHARED", owner="refseq_annotation_105"),
+    )
+    scope = build_lock.reingest_scope(lock, [patch_rel])
+    assert scope == {patch_rel, release_rel}
+    assert build_lock.owners_for_paths(lock, scope) == {
+        ("seqset", "refseq_history_grch37_protein"),
+        ("seqset", "refseq_annotation_105"),
+    }
+
+
+def test_reingest_scope_leaves_unrelated_collections_alone() -> None:
+    lock = lock_with(
+        record(REL_TOP, digest="COLL1"),
+        record(REL_CDNA, digest="COLL2"),
+    )
+    assert build_lock.reingest_scope(lock, [REL_TOP]) == {REL_TOP}
+
+
+def test_reingest_scope_of_an_unattributed_file_is_itself() -> None:
+    lock = lock_with(record(REL_TOP, digest=None))
+    assert build_lock.reingest_scope(lock, [REL_TOP]) == {REL_TOP}
+
+
+def test_committed_config_against_committed_lock_targets_only_padded_releases(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Guards the real migration: releases 76-109 plus the one lrg_zip source.
+
+    Sources come from the lock via ``apply_locked_sources`` rather than from
+    live discovery. Resolving them for real would fetch provider manifests, so
+    the test would depend on what NCBI and Ensembl are publishing today -- it
+    failed exactly that way when a ninth RefSeqGene shard appeared upstream.
+    """
     import re
 
     import build_store
 
     repo = Path(__file__).resolve().parent.parent
     lock_path = repo / "build.lock.json"
-    if not lock_path.exists():  # lock is a build artifact, not always present
+    if not lock_path.exists():  # a build artifact, not always present
         pytest.skip("build.lock.json not present")
-    assemblies, seqsets = build_store.load_config(repo / "sources.toml")
+    monkeypatch.setattr(build_store, "_fetch_text", _no_network)
+
+    _, seqsets = build_store.load_config(repo / "sources.toml")
     lock = build_lock.load_lock(lock_path)
+    sources = build_lock.apply_locked_sources(seqsets, lock)
+    # Mirror the cache layout under tmp_path so presence checks pass without
+    # depending on the real downloads/ tree. mirror_cache_path is a pure
+    # URL-to-path mapping, so the relative keys still match the lock's.
+    for source in sources:
+        _present(tmp_path, source.url)
+
     plan = build_lock.plan_sync(
-        build_store.resolve_sources(assemblies, seqsets), lock,
-        repo / "downloads", seqsets=seqsets, hash_files=False,
+        sources, lock, tmp_path, seqsets=seqsets, hash_files=False,
     )
-    assert not plan.added and not plan.removed
+    assert not plan.missing
     releases = {
         int(m.group(1))
         for rel, _ in plan.reingest
         if (m := re.search(r"release-(\d+)", rel))
     }
     assert releases == set(range(76, 110))
+    # Everything re-ingested is either a padded Ensembl release or the lrg_zip
+    # source, whose conversion the lock cannot vouch for.
+    non_ensembl = [rel for rel, _ in plan.reingest if "release-" not in rel]
+    assert len(non_ensembl) == 1 and non_ensembl[0].endswith(".zip")
 
 
 # --------------------------------------------------------------------------

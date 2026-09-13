@@ -3,6 +3,10 @@
 /downloads*/
 *.part
 
+# The dev manifest's lock is a local build artifact, regenerated in minutes.
+# sources.dev.toml itself is tracked -- it is the manifest, not the output.
+/build.dev.lock.json
+
 # Legacy root-level generated artifacts (regenerable; large or machine-only).
 # Compact summaries belong in runs/ and are intentionally visible to Git.
 /build_full.log
@@ -37,6 +41,9 @@ sources.toml.bak.*
 /runs/**/*.fa.gz
 
 # Local-only working notes / one-off analysis (kept on disk, not part of the repo)
+# Drafted upstream bug reports stay local until they are actually filed; the
+# findings they rest on live in runs/ and seqrepo_equivalence/, which are tracked.
+/ISSUE-gtars-encoder-alphabet.md
 /TODO.md
 /UPLOAD_PLAN.md
 /SEQREPO_PARITY.md

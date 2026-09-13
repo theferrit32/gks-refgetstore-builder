@@ -1,0 +1,230 @@
+# Development manifest: every config *shape* in sources.toml, at 1/33rd the cost.
+#
+# 19 source files / ~3.19 GB, versus 335 files / 106 GB. A full build takes about
+# six minutes and `verify --all` twenty-three seconds, against hours.
+# The point is not a smaller store -- it is that every distinct code path in
+# resolution, download, derivation, ingest, and locking is exercised, so a
+# change can be proved end-to-end before it is pointed at the real manifest.
+#
+#     gks-refgetstore build --config sources.dev.toml \
+#         --store-dir store.dev --lock build.dev.lock.json
+#     gks-refgetstore verify --config sources.dev.toml \
+#         --lock build.dev.lock.json --store-dir store.dev --all
+#
+# The cache is `downloads/` -- the same one the production manifest uses, not a
+# separate directory. Three things force that: `fasta_path` resolves relative to
+# the repo root, derived artifacts (`.filtered.fa.gz`, `.fasta`) are written as
+# siblings of their source, and re-deriving release 76's filtered toplevel costs
+# 273 seconds. Every file below is already cached and still matches its provider
+# checksum, so a dev build downloads nothing.
+#
+# Artifacts: `store.dev/` (already ignored by `/store*/`) and
+# `build.dev.lock.json` (ignored explicitly). This file is tracked.
+#
+# Shapes covered, and by what:
+#
+#   assembly, load_fasta=true ............ GRCh37 (the smallest, 872 MB)
+#   assembly, fasta_path override ........ GRCh37.p13
+#   assembly, report-only (load_fasta=false)  GRCh37.p11, GRCh37.p12
+#   deferred report resolution ........... p11/p12 reference NW_003871055.3,
+#                                          supplied by p13's FASTA
+#   url_template + shard_range ........... refseq_human_refseqgene_dev
+#   format="lrg_zip", derived FASTA ...... lrg_public
+#   md5_manifest_urls + file_classes ..... refseq_history_grch37_protein_dev
+#   exclude, with no prior lock baseline . refseq_history_grch37_protein_dev
+#   Ensembl bsd-sum CHECKSUMS ............ ensembl_release_76, _113
+#   release + rolling_namespace .......... ensembl_release_76, _113
+#   production CHR_ exclude .............. ensembl_release_76
+#   a mutable source ..................... ensembl_release_113, refseqgene
+#
+# Deliberately NOT covered: `url_pattern` + `checksum_manifest_url` (shape C).
+# Building it would re-resolve and re-download the 39 `mRNA_Prot` and
+# `RefSeqGene` files whose upstream MD5s have all drifted since the committed
+# lock was written, destroying the preserved drift that `verify --manifest` is
+# tested against. That shape stays covered by unit tests with a stubbed
+# `fetch_text`, plus read-only resolution against the production config.
+#
+# Two things a dev build reports that are correct, not regressions:
+#
+#   * **GRCh37.p11 and p12 each log 15 warnings.** Their reports reference
+#     scaffolds supplied by the p2/p5/p9/p10 genomic FASTAs, which this manifest
+#     omits, so those aliases are skipped. Inherent to a subset manifest;
+#     assembly warnings do not fail a build, unlike seqset warnings.
+#   * **One collection ends up with `"from": []`.** GRCh37.p13's FASTA is
+#     ingested through `fasta_path`, and `resolve_sources` emits no remote
+#     source for an overridden FASTA, so nothing pins it in `inputs.files` and
+#     the lock cannot honestly name it as a contributor. A `fasta_path` override
+#     is not covered by the lock. That is the tradeoff of the escape hatch, and
+#     this entry is where it is visible.
+
+# ---------------------------------------------------------------------------
+# NCBI human reference assembly releases
+# ---------------------------------------------------------------------------
+# Four GRCh37 releases, chosen for their shapes rather than their content.
+# GRCh37 is the smallest full genomic FASTA in the manifest. p11 and p12 are
+# report-only: their genomic FASTA URLs are unavailable upstream, but their
+# reports are published, and those reports reference accessions supplied by
+# p13's FASTA -- which is what exercises the deferred-report path.
+
+[[assembly]]
+namespace = "GRCh37"
+fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.13_GRCh37/GCF_000001405.13_GRCh37_genomic.fna.gz"
+report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.13_GRCh37/GCF_000001405.13_GRCh37_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.13_GRCh37/md5checksums.txt"
+load_fasta = true
+
+[[assembly]]
+namespace = "GRCh37.p11"
+report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.23_GRCh37.p11/GCF_000001405.23_GRCh37.p11_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.23_GRCh37.p11/md5checksums.txt"
+load_fasta = false
+
+[[assembly]]
+namespace = "GRCh37.p12"
+report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.24_GRCh37.p12/GCF_000001405.24_GRCh37.p12_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.24_GRCh37.p12/md5checksums.txt"
+load_fasta = false
+
+# The only `fasta_path` user anywhere. Production never sets it, so without this
+# entry the local-override branch of `resolve_sources`/`ingest_assembly` -- which
+# suppresses the `assembly_fasta` source entirely and ingests from a repo-root
+# relative path -- has no coverage at all. The path points into the shared cache,
+# so nothing extra is downloaded; `fasta_url` is still required by
+# `AssemblyConfig`, and is still the authoritative origin the override stands in
+# for.
+[[assembly]]
+namespace = "GRCh37.p13"
+fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.25_GRCh37.p13/GCF_000001405.25_GRCh37.p13_genomic.fna.gz"
+fasta_path = "downloads/ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.25_GRCh37.p13/GCF_000001405.25_GRCh37.p13_genomic.fna.gz"
+report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.25_GRCh37.p13/GCF_000001405.25_GRCh37.p13_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.25_GRCh37.p13/md5checksums.txt"
+load_fasta = true
+
+# ---------------------------------------------------------------------------
+# url_template + shard_range
+# ---------------------------------------------------------------------------
+# The only `shard_range` user anywhere -- production discovers RefSeqGene through
+# `url_pattern` instead. Two of the nine published shards are enough to prove the
+# template substitution and the per-shard collection mapping.
+#
+# Safe to point at a mutable endpoint precisely because the template names its
+# files directly: there is no checksum manifest to consult and none is declared,
+# so `resolve_sources` makes no network request for it and `ensure_download`
+# has no provider checksum to find stale. Widening the range to [1, 3] is the
+# standard integration-test mutation; shard 3 is already cached.
+
+[[seqset]]
+name = "refseq_human_refseqgene_dev"
+namespace = "refseq"
+url_template = "https://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/RefSeqGene/refseqgene.{shard}.genomic.fna.gz"
+shard_range = [1, 2]
+file_class = "genomic"
+
+# ---------------------------------------------------------------------------
+# EBI LRG: format="lrg_zip"
+# ---------------------------------------------------------------------------
+# Identical to the production entry, including the name, because the source set
+# is identical: one immutable 34 MB zip, frozen at release 810 (2021-03-31). It
+# is the only non-FASTA format in either manifest, the only user of a derived
+# FASTA (`lrg_zip_to_fasta`), the only alias expander
+# (`LRG_1g` also aliased `LRG_1`), and the only source with no checksum manifest
+# published anywhere -- so the lock's SHA-256 is its sole integrity anchor.
+
+[[seqset]]
+name = "lrg_public"
+namespace = "lrg"
+urls = ["https://ftp.ebi.ac.uk/pub/databases/lrgex/fasta/LRG_public_fasta_files.zip"]
+file_class = "lrg_bundle"
+format = "lrg_zip"
+
+# ---------------------------------------------------------------------------
+# md5_manifest_urls + file_classes + a cold-start exclusion
+# ---------------------------------------------------------------------------
+# Three archived GRCh37 protein snapshots, each paired with its directory
+# `md5checksums.txt`. All immutable, so the provider checksums still match and
+# nothing re-downloads.
+#
+# The exclusion here is the *cold-start* case, which production no longer has:
+# a rule applied to sources the lock has never recorded an `ingest_spec` for.
+# The first `build` establishes that baseline; deleting the rule afterwards
+# should reclassify all three as `reingest`, which is the cheapest available
+# end-to-end test of `ingest_spec` pinning.
+#
+# `XP_` is the right prefix and `YP_` is a trap. Across these three files there
+# are 88,782 `NP_`, 5,761 `XP_`, and 26 `YP_` records -- but the `YP_` records
+# are absent from the first file entirely (0 / 13 / 13), and
+# `filter_fasta_records` raises on a rule that drops nothing, by design. `XP_`
+# matches a real subset of every one of the three (3,585 / 1,497 / 679).
+
+[[seqset]]
+name = "refseq_history_grch37_protein_dev"
+namespace = "refseq"
+urls = [
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.13_GRCh37/GCF_000001405.13_GRCh37_protein.faa.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.14_GRCh37.p2/GCF_000001405.14_GRCh37.p2_protein.faa.gz",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.17_GRCh37.p5/GCF_000001405.17_GRCh37.p5_protein.faa.gz",
+]
+md5_manifest_urls = [
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.13_GRCh37/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.14_GRCh37.p2/md5checksums.txt",
+  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.17_GRCh37.p5/md5checksums.txt",
+]
+file_classes = ["protein", "protein", "protein"]
+exclude = { file_classes = ["protein"], record_prefixes = ["XP_"] }
+
+# ---------------------------------------------------------------------------
+# Ensembl releases
+# ---------------------------------------------------------------------------
+# Two releases, both complete four-file groups (`load_config` requires exactly
+# dna.toplevel + cdna + ncrna + pep for any ensembl release group). Two is the
+# minimum that makes the rolling `ensembl` namespace *advance*: 76 is published
+# first and then wholly replaced by 113, which is the property
+# `process_release_groups` exists to guarantee and which a single release cannot
+# demonstrate.
+#
+# Release 76 carries the production `CHR_` exclusion for its N-padded alt/patch
+# scaffolds. Its filtered toplevel is already cached; re-deriving it costs 273s,
+# which is most of why the dev cache has to be `downloads/` itself.
+#
+# Release 113 is the newer release, carries no exclusion, and is the one mutable
+# Ensembl endpoint in either manifest (`build_lock.is_mutable` keys on
+# `/release-113/`).
+
+[[seqset]]
+name = "ensembl_release_76"
+namespace = "ensembl-76"
+release = 76
+rolling_namespace = "ensembl"
+urls = [
+  "https://ftp.ensembl.org/pub/release-76/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.toplevel.fa.gz",
+  "https://ftp.ensembl.org/pub/release-76/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
+  "https://ftp.ensembl.org/pub/release-76/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
+  "https://ftp.ensembl.org/pub/release-76/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
+]
+file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+exclude = { file_classes = ["dna.toplevel"], record_prefixes = ["CHR_"] }
+checksum_manifest_urls = [
+  "https://ftp.ensembl.org/pub/release-76/fasta/homo_sapiens/dna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-76/fasta/homo_sapiens/cdna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-76/fasta/homo_sapiens/ncrna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-76/fasta/homo_sapiens/pep/CHECKSUMS",
+]
+
+[[seqset]]
+name = "ensembl_release_113"
+namespace = "ensembl-113"
+release = 113
+rolling_namespace = "ensembl"
+urls = [
+  "https://ftp.ensembl.org/pub/release-113/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.toplevel.fa.gz",
+  "https://ftp.ensembl.org/pub/release-113/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
+  "https://ftp.ensembl.org/pub/release-113/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz",
+  "https://ftp.ensembl.org/pub/release-113/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz",
+]
+file_classes = ["dna.toplevel", "cdna", "ncrna", "pep"]
+checksum_manifest_urls = [
+  "https://ftp.ensembl.org/pub/release-113/fasta/homo_sapiens/dna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-113/fasta/homo_sapiens/cdna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-113/fasta/homo_sapiens/ncrna/CHECKSUMS",
+  "https://ftp.ensembl.org/pub/release-113/fasta/homo_sapiens/pep/CHECKSUMS",
+]

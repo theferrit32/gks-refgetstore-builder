@@ -8,9 +8,12 @@ import pytest
 
 import build_lock
 import build_store
-from build_store import (ResolvedSource, SeqsetConfig, apply_locked_sources,
-                         load_config, parse_checksum_manifest,
+import store_census
+from build_lock import apply_locked_sources
+from build_store import (ResolvedSource, SeqsetConfig, load_config,
+                         parse_checksum_manifest,
                          parse_ensembl_checksum_manifest, resolve_sources)
+from conftest import file_record, v4_lock
 
 
 BASE = "https://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/"
@@ -123,11 +126,15 @@ def test_refseqgene_current_eight_file_result() -> None:
 def test_lock_classifies_membership_and_same_url_md5_change() -> None:
     live = [ResolvedSource("seqset", "rna", BASE + "human.1.rna.fna.gz", "b" * 32),
             ResolvedSource("seqset", "rna", BASE + "human.2.rna.fna.gz", "c" * 32)]
-    lock = {"schema": build_lock.SCHEMA, "sources": [
-        {"kind": "seqset", "owner": "rna", "url": live[0].url, "upstream_md5": "a" * 32},
-        {"kind": "seqset", "owner": "rna", "url": BASE + "human.9.rna.fna.gz",
-         "upstream_md5": "d" * 32},
-    ]}
+    lock = v4_lock([
+        file_record("human.1.rna.fna.gz", owner="rna", url=live[0].url,
+                    provider_checksum="a" * 32,
+                    provider_checksum_algorithm="md5"),
+        file_record("human.9.rna.fna.gz", owner="rna",
+                    url=BASE + "human.9.rna.fna.gz",
+                    provider_checksum="d" * 32,
+                    provider_checksum_algorithm="md5"),
+    ])
     result = build_lock.evaluate_sources_vs_lock(live, lock)
     assert result.new == [live[1].url]
     assert result.only_in_lock == [BASE + "human.9.rna.fna.gz"]
@@ -143,30 +150,37 @@ def test_lock_records_ncbi_md5_as_generic_provider_checksum(tmp_path: Path) -> N
     target = build_store.mirror_cache_path(tmp_path, source.url)
     target.parent.mkdir(parents=True)
     target.write_bytes(b"cached")
-    record = build_lock.source_record(source, tmp_path, {}, hash_files=False)
-    assert record["upstream_md5"] == "a" * 32
+    record = build_lock.file_record(source, tmp_path, hash_files=False)
     assert record["provider_checksum"] == "a" * 32
     assert record["provider_checksum_algorithm"] == "md5"
+    # v4 stores the MD5 once and reconstructs the NCBI-specific spelling.
+    assert "upstream_md5" not in record
+    assert build_lock.upstream_md5_of(record) == "a" * 32
 
 
-def test_locked_sources_uses_concrete_urls_without_resolution(tmp_path: Path) -> None:
+def test_locked_sources_uses_concrete_urls_without_resolution() -> None:
     seqset = pattern("rna", "rna.fna.gz")
-    locked = ResolvedSource("seqset", "rna", BASE + "human.3.rna.fna.gz", "a" * 32)
-    for schema in (build_lock.SCHEMA, build_lock.V2_SCHEMA):
-        seqset.resolved_sources = None
-        lock = {"schema": schema, "sources": [locked.__dict__]}
-        assert apply_locked_sources([seqset], lock) == [locked]
-        assert list(seqset.iter_shard_urls()) == [("1", locked.url)]
-    # v1 predates concrete per-source URLs, so it cannot drive an offline build.
-    with pytest.raises(ValueError, match="concrete sources"):
-        apply_locked_sources([seqset], {"schema": build_lock.V1_SCHEMA, "sources": []})
+    url = BASE + "human.3.rna.fna.gz"
+    lock = v4_lock([file_record("human.3.rna.fna.gz", owner="rna", url=url,
+                                provider_checksum="a" * 32,
+                                provider_checksum_algorithm="md5")])
+    assert apply_locked_sources([seqset], lock) == [
+        ResolvedSource("seqset", "rna", url, "a" * 32, "a" * 32, "md5")
+    ]
+    assert list(seqset.iter_shard_urls()) == [("1", url)]
+
+
+def test_locked_sources_rejects_a_lock_with_no_entry_for_a_seqset() -> None:
+    seqset = pattern("rna", "rna.fna.gz")
+    with pytest.raises(build_lock.LockError, match="no concrete sources"):
+        apply_locked_sources([seqset], v4_lock([]))
 
 
 def test_cache_sha256_classification(tmp_path: Path) -> None:
     cached = tmp_path / "x.gz"
     cached.write_bytes(b"new")
     rel = "x.gz"
-    lock = {"sources": [{"cache_path": rel, "sha256": hashlib.sha256(b"old").hexdigest()}]}
+    lock = v4_lock([file_record(rel, sha256=hashlib.sha256(b"old").hexdigest())])
     result = build_lock.evaluate_cache_vs_lock([(rel, cached), ("missing", tmp_path / "missing")], lock)
     assert result.changed[0][0] == rel
     assert result.missing == ["missing"]
@@ -205,7 +219,9 @@ def test_seqset_ingestion_reuses_prepared_cache_without_downloading(
     assert stats.shards_processed == 1
 
 
-def test_partial_lock_merge_replaces_complete_touched_scopes(tmp_path: Path) -> None:
+def test_partial_lock_merge_replaces_complete_touched_scopes(
+    tmp_path: Path, tiny_store,
+) -> None:
     config = tmp_path / "sources.toml"
     config.write_text("")
     cache = tmp_path / "cache"
@@ -219,37 +235,46 @@ def test_partial_lock_merge_replaces_complete_touched_scopes(tmp_path: Path) -> 
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(content)
 
-    def old_record(kind: str, owner: str, url: str) -> dict:
-        return {
-            "kind": kind, "owner": owner, "url": url,
-            "cache_path": str(build_store.mirror_cache_path(cache, url)
-                              .relative_to(cache)),
-            "sha256": "old", "upstream_md5": None,
-        }
+    def rel(url: str) -> str:
+        return str(build_store.mirror_cache_path(cache, url).relative_to(cache))
 
-    existing = {"schema": build_lock.SCHEMA, "sources": [
-        old_record("seqset", "rna", old_url),
-        old_record("seqset", "rna", changed_url),
-        old_record("seqset", "protein", keep_url),
-    ]}
+    alpha, beta = sorted(store_census.collection_census(tiny_store))
+    existing = v4_lock(
+        [
+            file_record(rel(old_url), owner="rna", url=old_url, sha256="old"),
+            file_record(rel(changed_url), owner="rna", url=changed_url,
+                        sha256="old"),
+            file_record(rel(keep_url), owner="protein", url=keep_url,
+                        sha256="old"),
+        ],
+        [
+            {"digest": alpha, "n_sequences": 2,
+             "from": [rel(old_url), rel(changed_url)]},
+            {"digest": beta, "n_sequences": 2, "from": [rel(keep_url)]},
+        ],
+    )
     touched = [
         ResolvedSource("seqset", "rna", changed_url),
         ResolvedSource("seqset", "rna", added_url),
     ]
 
-    class Store:
-        @staticmethod
-        def stats(): return {}
-
     merged = build_lock.merge_into_lock(
         existing, config_path=config, download_dir=cache,
-        touched_sources=touched, collection_by_cachepath={}, store=Store(),
+        touched_sources=touched, collection_by_cachepath={}, store=tiny_store,
     )
-    by_url = {source["url"]: source for source in merged["sources"]}
+    by_url = {record["url"]: record for record in build_lock.lock_files(merged)}
     assert set(by_url) == {changed_url, added_url, keep_url}
     assert by_url[changed_url]["sha256"] == hashlib.sha256(b"new changed").hexdigest()
     assert by_url[keep_url]["sha256"] == "old"
     assert not build_lock.evaluate_sources_vs_lock(touched, merged).drift
+
+    # `from` is carried forward only for files that survived the merge. The
+    # touched scope's attributions are dropped and re-derived from this run's
+    # provenance (empty here), while the untouched scope keeps its own.
+    carried = build_lock.files_by_collection(merged)
+    assert carried[alpha] == []
+    assert carried[beta] == [rel(keep_url)]
+    build_lock.validate_lock(merged)
 
 
 def test_locked_sources_with_force_download_remains_offline(
@@ -264,14 +289,10 @@ def test_locked_sources_with_force_download_remains_offline(
     target.parent.mkdir(parents=True)
     target.write_bytes(b">one\nA\n")
     lock_path = tmp_path / "lock.json"
-    build_lock.write_lock(lock_path, {
-        "schema": build_lock.SCHEMA,
-        "sources": [{
-            "kind": "seqset", "owner": "one", "url": url,
-            "cache_path": str(target.relative_to(cache)),
-            "sha256": build_lock.sha256_file(target), "upstream_md5": None,
-        }],
-    })
+    build_lock.write_lock(lock_path, v4_lock([file_record(
+        str(target.relative_to(cache)), owner="one", url=url,
+        sha256=build_lock.sha256_file(target),
+    )]))
 
     monkeypatch.setattr(
         build_store, "ensure_download",
@@ -316,9 +337,16 @@ def test_locked_sources_with_force_download_remains_offline(
     assert seen == [True]
 
 
-def test_v1_lock_stops_build_before_store_is_opened(
+def test_pre_v4_lock_stops_build_before_store_is_opened(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
+    """Old schemas are rejected outright, not shimmed.
+
+    A /2 lock's ``sources`` list reads as an empty ``inputs.files`` under the
+    v4 accessors, so a tolerant reader would report zero drift and an empty
+    store census -- a passing build over a lock it did not understand. Failing
+    at load is the only safe behaviour.
+    """
     config = tmp_path / "sources.toml"
     config.write_text('[[seqset]]\nname="one"\nnamespace="x"\n'
                       'url_template="https://example.test/one.fa"\n')
@@ -328,7 +356,7 @@ def test_v1_lock_stops_build_before_store_is_opened(
     target.write_bytes(b">x\nA\n")
     lock_path = tmp_path / "lock.json"
     build_lock.write_lock(lock_path, {
-        "schema": build_lock.V1_SCHEMA,
+        "schema": "gks-refgetstore-build-lock/2",
         "sources": [{"kind": "seqset", "owner": "one",
                      "url": "https://example.test/one.fa",
                      "cache_path": str(target.relative_to(cache)),
@@ -337,7 +365,7 @@ def test_v1_lock_stops_build_before_store_is_opened(
     class FailStore:
         @staticmethod
         def on_disk(*_):
-            pytest.fail("store opened before drift gate")
+            pytest.fail("store opened despite an unreadable lock")
 
     monkeypatch.setattr(build_store, "RefgetStore", FailStore)
     args = type("Args", (), {
@@ -347,7 +375,7 @@ def test_v1_lock_stops_build_before_store_is_opened(
         "lock_check_mode": "strict", "force_download": False,
         "force_lock": False, "no_lock": False,
     })()
-    with pytest.raises(SystemExit, match="v1"):
+    with pytest.raises(build_lock.LockError, match="unsupported build lock schema"):
         build_store.run_build(args)
 
 

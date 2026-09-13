@@ -1,5 +1,8 @@
 # The build lock pins inputs but not the ingested outcome
 
+**Status: CLOSED** — resolved by `ingest_spec` (schema /3) and by
+`outputs` + `verify --store` (schema /4). See [Resolution](#resolution).
+
 **Labels:** `provenance` · `build-lock` · `verification`
 
 ## Summary
@@ -87,3 +90,78 @@ right number.
 - `seqrepo_equivalence/ENSEMBL_N_PADDED_SCAFFOLDS.md` — the exclusion this
   surfaced from.
 - `ISSUE-ensembl-padded-scaffold-bloat.md` — the originating issue.
+
+---
+
+## Resolution
+
+Closed in two steps, because the issue turned out to contain two questions
+rather than one.
+
+**Schema /3 pinned the *intent*.** `inputs.files[].ingest_spec` records the
+declared transformation per file — derived format, and the record-exclusion
+rule when it applies to *that* file class — with `ingest_spec_sha256` as its
+canonical digest. `plan_sync` classifies a source as `reingest` when either the
+bytes or the spec moved, so editing an exclusion rule over unchanged upstream
+bytes is now detected.
+
+**Schema /4 pinned the *outcome*.** `outputs` is a census enumerated from the
+store: counts, a canonical root over the sequence digest set, a root over the
+collection digest set, and every collection with its contributing files.
+`verify --store` checks it. This is what the issue was actually asking for — the
+realized result, content-addressed, immune to compensating errors.
+
+### The four design questions, answered
+
+**Where the check runs.** Not in the preflight — the issue was right that a
+preflight cannot know a digest before ingest. It runs in `verify --store`, as
+its own command, against the lock a previous build wrote. `build` still gates on
+*inputs* before opening the store; `verify` judges outputs afterwards. Splitting
+them is what lets outcome verification be offline, repeatable, and runnable
+without a build.
+
+**How an intentional change is expressed.** Through the existing lock-write
+path, not a new mode. An intentional change moves `ingest_spec_sha256`, which
+makes `sync` re-ingest and rewrite `outputs` from the resulting store. The
+strict/informational split the issue anticipated proved unnecessary: a changed
+outcome with an unchanged spec is a regression, and a changed outcome with a
+changed spec is already explained by the spec.
+
+**Whether the lock should record the exclusion rule itself.** Yes, and it does —
+`ingest_spec` carries the literal `record_prefixes`. That was the point:
+`sources_toml_sha256` detects *that* the config changed, not *what*, so a
+one-character typo in a prefix and an unrelated comment edit were
+indistinguishable. Per-file specs make a deliberate change attributable to the
+file it affects, and keep a `dna.toplevel` edit from marking its `cdna` sibling
+as changed.
+
+**First builds and new sources.** They have no prior digest, and that is
+recorded rather than papered over: a full build writes `outputs` fresh from the
+store, and a collection whose contributor is unknown is `"from": []` rather than
+omitted. `verify --store` compares the store to *whatever the lock last
+recorded*, so a first build establishes the baseline and the second build
+onwards is checked against it.
+
+**Scope.** The gate covers every collection, not only transformed sources. The
+roots are over the complete digest sets, so a gtars upgrade that encodes or
+digests differently moves `sequences_root` regardless of which source it came
+from — which is exactly the case the issue named that a per-source check would
+have missed.
+
+### What it caught immediately
+
+`verify --store --deep` found 133 sequences whose stored payload does not
+re-digest to the digest it is filed under: 106 selenoproteins losing `U` because
+gtars' protein alphabet lacks it, and 27 short proteins misdetected as
+nucleotide. Not bit rot, not a filter regression, and not fixable by
+re-ingesting — a real data-correctness defect that had been invisible for the
+entire life of the store. It is pinned as a baseline and reported on every
+`--deep` run.
+
+### The premise the issue inherited, and which was wrong
+
+The issue quotes `rec["collection_digest"] = …` approvingly as the thing to
+compare against. That field encoded one file → one collection, which was never
+true: content-addressing merges byte-identical sources, and 43 collections in
+the committed lock have two or more contributors. Schema /4 replaces it with
+`outputs.collections[].from`, a list, in the honest direction.

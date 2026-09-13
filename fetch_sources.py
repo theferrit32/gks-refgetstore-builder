@@ -31,15 +31,18 @@ import shutil
 import socket
 import sys
 import threading
+from collections.abc import Callable, Iterable
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from dataclasses import dataclass, field
 import urllib.error
 import urllib.request
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from build_store import (apply_locked_sources, load_config, mirror_cache_path,
-                         provider_checksum_matches, resolve_sources)  # noqa: E402
-from build_lock import load_lock, sha256_file  # noqa: E402
+from build_store import (ResolvedSource, load_config, mirror_cache_path,  # noqa: E402
+                         provider_checksum_matches, resolve_sources,
+                         sha256_file)
+from build_lock import apply_locked_sources, load_lock, lock_files  # noqa: E402
 
 CHUNK = 1 << 20  # 1 MiB
 
@@ -105,6 +108,88 @@ def download(url: str, target: Path, timeout: int, retries: int) -> int:
     raise RuntimeError(f"failed after {retries} attempts: {last_exc}")
 
 
+@dataclass
+class FetchOutcome:
+    """What one concurrent download pass did."""
+
+    fetched: int = 0
+    failed: int = 0
+    total_bytes: int = 0
+    failures: list[tuple[str, str]] = field(default_factory=list)
+    aborted_for_disk_space: bool = False
+
+    @property
+    def ok(self) -> bool:
+        return not self.failed and not self.aborted_for_disk_space
+
+
+def fetch_many(
+    queued: Iterable[tuple[ResolvedSource, Path]],
+    cache_dir: Path,
+    *,
+    timeout: int,
+    retries: int,
+    jobs: int,
+    min_free_gb: float,
+    accept: Callable[[Path, ResolvedSource], bool] = provider_checksum_matches,
+    label: Callable[[ResolvedSource, Path], str] | None = None,
+) -> FetchOutcome:
+    """Download ``(source, target)`` pairs concurrently, rejecting bad bytes.
+
+    Providers throttle per connection, not per client -- a second stream
+    measured full speed while the first kept its own -- so one serial stream
+    leaves most of the link idle. The pool is kept modest to stay polite to
+    public FTP endpoints.
+
+    ``accept`` decides whether the downloaded bytes are the ones the caller
+    wanted; a rejected file is unlinked and counted as a failure rather than
+    left in the cache to be mistaken for a good one. ``fetch`` accepts the
+    provider's checksum; ``repair`` accepts only the lock's SHA-256, because
+    repair restores the locked state and never re-baselines it.
+    """
+    outcome = FetchOutcome()
+    queued = list(queued)
+    if not queued:
+        return outcome
+    label = label or (lambda source, target: str(target.relative_to(cache_dir)))
+
+    def fetch_one(item: tuple[ResolvedSource, Path]) -> int:
+        source, target = item
+        print(f"  get   {label(source, target)}", flush=True)
+        n = download(source.url, target, timeout, retries)
+        if not accept(target, source):
+            target.unlink(missing_ok=True)
+            raise RuntimeError("downloaded bytes rejected")
+        return n
+
+    guard = threading.Lock()
+    with ThreadPoolExecutor(max_workers=max(1, jobs)) as pool:
+        futures = {}
+        for item in queued:
+            if free_gb(cache_dir) < min_free_gb:
+                print(f"ABORT: free disk {free_gb(cache_dir):.1f}GB below "
+                      f"--min-free-gb {min_free_gb}", file=sys.stderr)
+                outcome.aborted_for_disk_space = True
+                break
+            futures[pool.submit(fetch_one, item)] = item
+        for future in as_completed(futures):
+            source, target = futures[future]
+            try:
+                n = future.result()
+            except Exception as exc:  # noqa: BLE001
+                with guard:
+                    outcome.failed += 1
+                    outcome.failures.append((source.url, str(exc)))
+                print(f"        FAILED {label(source, target)}: {exc}",
+                      file=sys.stderr)
+                continue
+            with guard:
+                outcome.fetched += 1
+                outcome.total_bytes += n
+            print(f"        {human(n)}  {label(source, target)}")
+    return outcome
+
+
 def run_fetch(args) -> int:
     """Pre-populate the mirrored source cache from the manifest.
 
@@ -143,30 +228,35 @@ def run_fetch(args) -> int:
         print(f"{verb} {n_partial} interrupted download(s), {human(partial_bytes)}",
               file=sys.stderr)
 
-    fetched = skipped = failed = 0
-    aborted_for_disk_space = False
-    total_bytes = 0
-    failures: list[tuple[str, str]] = []
-    locked_by_url = ({entry["url"]: entry for entry in lock.get("sources", [])}
+    skipped = 0
+    pre_failed: list[tuple[str, str]] = []
+    locked_by_url = ({record["url"]: record for record in lock_files(lock)}
                      if lock else {})
 
     # Pass 1 (serial): classify every source. Checksum verification of cached
     # files is local work, and keeping it ordered keeps the log readable.
-    queued: list[tuple[int, object, Path, Path]] = []
+    queued: list[tuple[object, Path]] = []
     for i, source in enumerate(sources, 1):
         owner, url = source.owner, source.url
         target = mirror_cache_path(args.cache_dir, url)
         rel = target.relative_to(args.cache_dir)
         if args.locked_sources:
-            locked = locked_by_url[url]
-            if (not target.exists() or target.stat().st_size == 0
-                    or sha256_file(target) != locked.get("sha256")):
-                failed += 1
-                failures.append((url, "locked cache file missing or SHA-256 mismatch"))
-                print(f"[{i}/{len(sources)}] FAIL  {owner}  {rel}")
+            # A source the lock does not cover is a reportable mismatch, not a
+            # crash. Raising a KeyError here aborted mid-loop with some files
+            # already fetched and no summary of what had happened.
+            locked = locked_by_url.get(url)
+            if locked is None:
+                reason = "not covered by the lock"
+            elif not target.exists() or target.stat().st_size == 0:
+                reason = "locked cache file missing"
+            elif sha256_file(target) != locked.get("sha256"):
+                reason = "locked cache file SHA-256 mismatch"
             else:
                 skipped += 1
                 print(f"[{i}/{len(sources)}] LOCK  {owner}  {rel}")
+                continue
+            pre_failed.append((url, reason))
+            print(f"[{i}/{len(sources)}] FAIL  {owner}  {rel}  ({reason})")
             continue
         if target.exists() and target.stat().st_size > 0:
             if not provider_checksum_matches(target, source):
@@ -178,51 +268,23 @@ def run_fetch(args) -> int:
         if args.dry_run:
             print(f"[{i}/{len(sources)}] FETCH {owner}  {rel}")
             continue
-        queued.append((i, source, target, rel))
+        queued.append((source, target))
 
-    # Pass 2 (concurrent): providers throttle per connection, not per client --
-    # a second stream measured full speed while the first kept its own. One
-    # serial stream therefore leaves most of the link idle, so downloads run
-    # in a small pool. Kept modest to stay polite to public FTP endpoints.
-    def fetch_one(item):
-        i, source, target, rel = item
-        print(f"[{i}/{len(sources)}] get   {source.owner}  {rel}", flush=True)
-        n = download(source.url, target, args.timeout, args.retries)
-        if not provider_checksum_matches(target, source):
-            target.unlink(missing_ok=True)
-            raise RuntimeError("provider checksum mismatch")
-        return n
+    # Pass 2 (concurrent), shared with repair.
+    outcome = fetch_many(
+        queued, args.cache_dir, timeout=args.timeout, retries=args.retries,
+        jobs=args.jobs, min_free_gb=args.min_free_gb,
+        label=lambda source, target: (
+            f"{source.owner}  {target.relative_to(args.cache_dir)}"
+        ),
+    )
+    failures = pre_failed + outcome.failures
+    failed = len(pre_failed) + outcome.failed
 
-    if queued:
-        lock_ = threading.Lock()
-        with ThreadPoolExecutor(max_workers=max(1, args.jobs)) as pool:
-            futures = {}
-            for item in queued:
-                if free_gb(args.cache_dir) < args.min_free_gb:
-                    print(f"ABORT: free disk {free_gb(args.cache_dir):.1f}GB below "
-                          f"--min-free-gb {args.min_free_gb}", file=sys.stderr)
-                    aborted_for_disk_space = True
-                    break
-                futures[pool.submit(fetch_one, item)] = item
-            for future in as_completed(futures):
-                _, source, _, rel = futures[future]
-                try:
-                    n = future.result()
-                except Exception as exc:  # noqa: BLE001
-                    with lock_:
-                        failed += 1
-                        failures.append((source.url, str(exc)))
-                    print(f"           FAILED {rel}: {exc}", file=sys.stderr)
-                    continue
-                with lock_:
-                    fetched += 1
-                    total_bytes += n
-                print(f"           {human(n)}  {rel}")
-
-    print(f"\nfetched={fetched} skipped={skipped} failed={failed} "
-          f"downloaded={human(total_bytes)}", file=sys.stderr)
+    print(f"\nfetched={outcome.fetched} skipped={skipped} failed={failed} "
+          f"downloaded={human(outcome.total_bytes)}", file=sys.stderr)
     if failures:
         print("failures:", file=sys.stderr)
         for url, exc in failures:
             print(f"  {url}\n    {exc}", file=sys.stderr)
-    return 1 if failed or aborted_for_disk_space else 0
+    return 1 if failed or outcome.aborted_for_disk_space else 0
