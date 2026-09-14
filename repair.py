@@ -39,10 +39,11 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 import build_lock
-import build_store
 import fetch_sources
+import store_census
+import store_sync
 import verify
-from build_store import ResolvedSource, sha256_file
+from sources import ResolvedSource, load_config, sha256_file
 
 # verify codes this module knows how to act on. A code absent from both tables
 # is reported and left alone, which is the safe default for a tool that mutates.
@@ -186,8 +187,6 @@ def _collections_publishing(
     """
     from gtars.refget import RefgetStore
 
-    import store_census
-
     store = RefgetStore.open_local(str(store_dir))
     store.set_quiet(True)
     found: set[str] = set()
@@ -272,10 +271,9 @@ def repair_store(plan: RepairPlan, lock: dict, args) -> bool:
     load_for_mutation -> remove -> re-ingest -> write -> reconcile in the only
     order gtars makes safe.
     """
-    import store_sync
     from gtars.refget import RefgetStore
 
-    _, seqsets = build_store.load_config(args.config)
+    _, seqsets = load_config(args.config)
     by_rel = {r["cache_path"]: r for r in build_lock.lock_files(lock)}
     records = [by_rel[rel] for rel in plan.store_files
                if rel in by_rel and by_rel[rel]["kind"] == "seqset"]

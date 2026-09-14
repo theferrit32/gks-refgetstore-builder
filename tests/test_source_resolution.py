@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import hashlib
+import re
 import zipfile
 from pathlib import Path
+from urllib.parse import urlsplit
 
 import pytest
 
@@ -10,10 +12,11 @@ import build_lock
 import build_store
 import store_census
 from build_lock import apply_locked_sources
-from build_store import (ResolvedSource, SeqsetConfig, load_config,
-                         parse_checksum_manifest,
-                         parse_ensembl_checksum_manifest, resolve_sources)
 from conftest import file_record, v4_lock
+from sources import (DERIVED_SUFFIXES, SEQSET_FORMATS, RecordExclusion,
+                     ResolvedSource, SeqsetConfig, bsd_sum_file, load_config,
+                     mirror_cache_path, parse_checksum_manifest,
+                     parse_ensembl_checksum_manifest, resolve_sources)
 
 
 BASE = "https://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/"
@@ -44,7 +47,7 @@ def test_config_source_modes_are_exclusive_and_pattern_pair_is_required() -> Non
 
 def test_derived_fasta_resolvers_cover_every_non_fasta_format() -> None:
     assert set(build_store.DERIVED_FASTA_RESOLVERS) | {"fasta"} == set(
-        build_store.SEQSET_FORMATS
+        SEQSET_FORMATS
     )
 
 
@@ -64,7 +67,7 @@ def test_ensembl_checksum_parser_and_bsd_sum(tmp_path: Path) -> None:
     }
     path = tmp_path / "one"
     path.write_bytes(b"A")
-    assert build_store.bsd_sum_file(path) == ("00065", 1)
+    assert bsd_sum_file(path) == ("00065", 1)
     with pytest.raises(ValueError, match="unsafe"):
         parse_ensembl_checksum_manifest("1 1 ../one.fa.gz\n")
 
@@ -147,7 +150,7 @@ def test_lock_records_ncbi_md5_as_generic_provider_checksum(tmp_path: Path) -> N
         "seqset", "rna", BASE + "human.1.rna.fna.gz", "a" * 32,
         checksum_url=MANIFEST,
     )
-    target = build_store.mirror_cache_path(tmp_path, source.url)
+    target = mirror_cache_path(tmp_path, source.url)
     target.parent.mkdir(parents=True)
     target.write_bytes(b"cached")
     record = build_lock.file_record(source, tmp_path, hash_files=False)
@@ -191,7 +194,7 @@ def test_seqset_ingestion_reuses_prepared_cache_without_downloading(
 ) -> None:
     url = "https://example.test/one.fa"
     seqset = SeqsetConfig("one", "x", url_template=url)
-    target = build_store.mirror_cache_path(tmp_path, url)
+    target = mirror_cache_path(tmp_path, url)
     target.parent.mkdir(parents=True)
     target.write_bytes(b">one\nA\n")
 
@@ -231,12 +234,12 @@ def test_partial_lock_merge_replaces_complete_touched_scopes(
     added_url = "https://example.test/added.fa"
     keep_url = "https://example.test/keep.fa"
     for url, content in ((changed_url, b"new changed"), (added_url, b"added")):
-        path = build_store.mirror_cache_path(cache, url)
+        path = mirror_cache_path(cache, url)
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(content)
 
     def rel(url: str) -> str:
-        return str(build_store.mirror_cache_path(cache, url).relative_to(cache))
+        return str(mirror_cache_path(cache, url).relative_to(cache))
 
     alpha, beta = sorted(store_census.collection_census(tiny_store))
     existing = v4_lock(
@@ -285,7 +288,7 @@ def test_locked_sources_with_force_download_remains_offline(
     config.write_text('[[seqset]]\nname="one"\nnamespace="x"\n'
                       f'url_template="{url}"\n')
     cache = tmp_path / "cache"
-    target = build_store.mirror_cache_path(cache, url)
+    target = mirror_cache_path(cache, url)
     target.parent.mkdir(parents=True)
     target.write_bytes(b">one\nA\n")
     lock_path = tmp_path / "lock.json"
@@ -351,7 +354,7 @@ def test_pre_v4_lock_stops_build_before_store_is_opened(
     config.write_text('[[seqset]]\nname="one"\nnamespace="x"\n'
                       'url_template="https://example.test/one.fa"\n')
     cache = tmp_path / "cache"
-    target = build_store.mirror_cache_path(cache, "https://example.test/one.fa")
+    target = mirror_cache_path(cache, "https://example.test/one.fa")
     target.parent.mkdir(parents=True)
     target.write_bytes(b">x\nA\n")
     lock_path = tmp_path / "lock.json"
@@ -407,11 +410,11 @@ def test_checked_in_config_loads_and_resolves_without_duplicates(monkeypatch: py
             )
         if Path(url).name != "CHECKSUMS":
             return manifests[Path(url).name]
-        match = build_store.re.search(r"release-(\d+)", url)
+        match = re.search(r"release-(\d+)", url)
         assert match
         release = int(match.group(1))
         assembly = "GRCh37.75" if release == 75 else "GRCh38"
-        directory = Path(build_store.urlsplit(url).path).parent.name
+        directory = Path(urlsplit(url).path).parent.name
         suffix = {
             "dna": "dna.toplevel.fa.gz", "cdna": "cdna.all.fa.gz",
             "ncrna": "ncrna.fa.gz", "pep": "pep.all.fa.gz",
@@ -548,7 +551,7 @@ def test_real_store_release_aliases_survive_write_and_reopen(tmp_path: Path) -> 
         (2, b">shared\nG\n"),
     ):
         url = f"https://example.test/r{release}.fa"
-        target = build_store.mirror_cache_path(cache, url)
+        target = mirror_cache_path(cache, url)
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_bytes(fasta)
         entries.append(SeqsetConfig(
@@ -666,7 +669,7 @@ def test_lrg_seqset_ingest_emits_both_genomic_aliases(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     url = "https://ftp.example.test/lrgex/fasta/LRG_public_fasta_files.zip"
-    target = build_store.mirror_cache_path(tmp_path, url)
+    target = mirror_cache_path(tmp_path, url)
     target.parent.mkdir(parents=True)
     _write_lrg_zip(target, {"LRG_1.fasta": _lrg_member("LRG_1")})
     seqset = SeqsetConfig("lrg_public", "lrg", urls=[url], format="lrg_zip")
@@ -704,7 +707,7 @@ def test_real_store_ingests_mixed_lrg_nucleotide_and_protein_records(
 ) -> None:
     cache = tmp_path / "cache"
     url = "https://ftp.example.test/lrgex/fasta/LRG_public_fasta_files.zip"
-    target = build_store.mirror_cache_path(cache, url)
+    target = mirror_cache_path(cache, url)
     target.parent.mkdir(parents=True)
     _write_lrg_zip(target, {
         "LRG_1.fasta": _lrg_member("LRG_1"),
@@ -769,7 +772,7 @@ def _shard_seqset(tmp_path: Path, names: list[str]) -> SeqsetConfig:
     urls = []
     for name in names:
         url = f"https://example.test/{name}"
-        target = build_store.mirror_cache_path(tmp_path, url)
+        target = mirror_cache_path(tmp_path, url)
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_bytes(b">x\nA\n")
         urls.append(url)
@@ -794,7 +797,7 @@ def test_seqset_ingests_every_shard_in_one_batched_call(tmp_path: Path) -> None:
     # provenance is keyed by source cache path, one entry per shard, in order
     assert [Path(k).name for k in provenance] == ["a.fa", "b.fa", "c.fa"]
     assert provenance[
-        str(build_store.mirror_cache_path(tmp_path, "https://example.test/b.fa"))
+        str(mirror_cache_path(tmp_path, "https://example.test/b.fa"))
     ]["collection_digest"] == "coll-b"
 
 
@@ -850,7 +853,7 @@ def test_batched_and_serial_ingest_produce_the_same_real_store(
     payloads = [b">one\nACGT\n>two\nGGTT\n", b">three\nTTTT\n"]
     for cache in ("batched", "serial"):
         for name, payload in zip(names, payloads):
-            t = build_store.mirror_cache_path(
+            t = mirror_cache_path(
                 tmp_path / cache, f"https://example.test/{name}"
             )
             t.parent.mkdir(parents=True, exist_ok=True)
@@ -876,7 +879,7 @@ def test_disk_preflight_aborts_below_threshold_and_warns_on_tight_projection(
     tmp_path: Path, caplog: pytest.LogCaptureFixture, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     url = "https://example.test/big.fa.gz"
-    target = build_store.mirror_cache_path(tmp_path, url)
+    target = mirror_cache_path(tmp_path, url)
     target.parent.mkdir(parents=True)
     target.write_bytes(b"x" * 4096)
     sources = [ResolvedSource("seqset", "s", url)]
@@ -1027,7 +1030,7 @@ def test_filter_drops_prefixed_records_and_records_them_in_an_audit_log(
     _write_fasta(src, PADDED)
     out = tmp_path / "out.fa.gz"
     audit = build_store.excluded_log_path(src)
-    exclusion = build_store.RecordExclusion(("dna.toplevel",), ("CHR_",))
+    exclusion = RecordExclusion(("dna.toplevel",), ("CHR_",))
 
     kept, dropped = build_store.filter_fasta_records(src, out, exclusion, audit)
 
@@ -1051,14 +1054,14 @@ def test_filter_raises_when_a_declared_exclusion_matches_nothing(
     with pytest.raises(ValueError, match="matched no records"):
         build_store.filter_fasta_records(
             src, tmp_path / "out.fa.gz",
-            build_store.RecordExclusion(("dna.toplevel",), ("CHR_",)),
+            RecordExclusion(("dna.toplevel",), ("CHR_",)),
         )
 
 
 def test_filtered_fasta_is_cached_until_force(tmp_path: Path) -> None:
     src = tmp_path / "in.fa.gz"
     _write_fasta(src, PADDED)
-    exclusion = build_store.RecordExclusion(("dna.toplevel",), ("CHR_",))
+    exclusion = RecordExclusion(("dna.toplevel",), ("CHR_",))
 
     first = build_store.resolve_filtered_fasta(src, exclusion, False)
     stamp = first.stat().st_mtime_ns
@@ -1076,12 +1079,12 @@ def test_exclusion_only_touches_the_declared_file_classes(tmp_path: Path) -> Non
                                       "record_prefixes": ["CHR_"]})
     for url, records in (("https://x/dna.fa.gz", PADDED),
                          ("https://x/cdna.fa.gz", [("CHR_LOOKALIKE", "ACGT")])):
-        _write_fasta(build_store.mirror_cache_path(cache, url), records)
+        _write_fasta(mirror_cache_path(cache, url), records)
 
     build_store.prepare_filtered_sources([entry], cache, jobs=2)
 
-    dna = build_store.mirror_cache_path(cache, "https://x/dna.fa.gz")
-    cdna = build_store.mirror_cache_path(cache, "https://x/cdna.fa.gz")
+    dna = mirror_cache_path(cache, "https://x/dna.fa.gz")
+    cdna = mirror_cache_path(cache, "https://x/cdna.fa.gz")
     assert build_store.filtered_fasta_path(dna).exists()
     assert not build_store.filtered_fasta_path(cdna).exists()
 
@@ -1095,10 +1098,10 @@ def test_preflight_is_deterministic_across_job_counts(tmp_path: Path) -> None:
         cache = tmp_path / f"cache{jobs}"
         for url, records in (("https://x/dna.fa.gz", PADDED),
                              ("https://x/cdna.fa.gz", [("ENST1", "ACGT")])):
-            _write_fasta(build_store.mirror_cache_path(cache, url), records)
+            _write_fasta(mirror_cache_path(cache, url), records)
         build_store.prepare_filtered_sources([entry], cache, jobs=jobs)
         out = build_store.filtered_fasta_path(
-            build_store.mirror_cache_path(cache, "https://x/dna.fa.gz"))
+            mirror_cache_path(cache, "https://x/dna.fa.gz"))
         digests.append(hashlib.sha256(gzip.open(out, "rb").read()).hexdigest())
     assert digests[0] == digests[1]
 
@@ -1110,7 +1113,7 @@ def test_process_seqset_reuses_the_preflight_output(tmp_path: Path) -> None:
                                       "record_prefixes": ["CHR_"]})
     for url, records in (("https://x/dna.fa.gz", PADDED),
                          ("https://x/cdna.fa.gz", [("ENST1", "ACGT")])):
-        _write_fasta(build_store.mirror_cache_path(cache, url), records)
+        _write_fasta(mirror_cache_path(cache, url), records)
     build_store.prepare_filtered_sources([entry], cache, jobs=1)
 
     store = build_store.RefgetStore.in_memory()
@@ -1128,19 +1131,19 @@ def test_seqset_without_exclude_writes_no_derived_file(tmp_path: Path) -> None:
     cache = tmp_path / "cache"
     entry = _toplevel_seqset()
     for url in ("https://x/dna.fa.gz", "https://x/cdna.fa.gz"):
-        _write_fasta(build_store.mirror_cache_path(cache, url), [("1", "ACGT")])
+        _write_fasta(mirror_cache_path(cache, url), [("1", "ACGT")])
 
     assert build_store.prepare_filtered_sources([entry], cache, jobs=1) == {}
     store = build_store.RefgetStore.in_memory()
     stats = build_store.process_seqset(store, entry, cache)
     assert stats.records_excluded == 0
     assert not build_store.filtered_fasta_path(
-        build_store.mirror_cache_path(cache, "https://x/dna.fa.gz")).exists()
+        mirror_cache_path(cache, "https://x/dna.fa.gz")).exists()
 
 
 def test_derived_suffixes_recover_the_source_path_for_lock_backfill() -> None:
     """records_from_log strips these to map a derived file back to its source."""
-    for suffix in build_store.DERIVED_SUFFIXES:
+    for suffix in DERIVED_SUFFIXES:
         path = "/cache/host/thing.fa.gz" + suffix
         assert path.endswith(suffix)
         assert path[: -len(suffix)] == "/cache/host/thing.fa.gz"

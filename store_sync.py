@@ -33,9 +33,11 @@ import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
-import build_store
-from build_store import (INGEST_JOBS_DEFAULT, SeqsetConfig, _write_alias_tsv,
+import build_lock
+from build_store import (INGEST_JOBS_DEFAULT, _write_alias_tsv,
                          prepare_filtered_sources, process_seqset)
+from sources import (SeqsetConfig, load_config, mirror_cache_path,
+                     resolve_sources)
 
 logger = logging.getLogger("store_sync")
 
@@ -169,8 +171,6 @@ def apply_plan(
        seqsets, and reconciling it needs the complete desired alias map, so
        every contributor to a touched namespace is reprocessed.
     """
-    import build_lock
-
     report = SyncReport()
     by_name = {entry.name: entry for entry in seqsets}
     touched_paths = (
@@ -279,14 +279,12 @@ def run_sync(args) -> int:
     """Execute the ``sync`` subcommand."""
     from gtars.refget import RefgetStore
 
-    import build_lock
-
     logging.basicConfig(
         level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s"
     )
-    assemblies, seqsets = build_store.load_config(args.config)
+    assemblies, seqsets = load_config(args.config)
     lock = build_lock.load_lock(args.lock)
-    sources = build_store.resolve_sources(assemblies, seqsets)
+    sources = resolve_sources(assemblies, seqsets)
     plan = build_lock.plan_sync(
         sources, lock, args.cache_dir, seqsets=seqsets,
         hash_files=not args.no_hash,
@@ -349,7 +347,7 @@ def _owners_of(plan, seqsets, download_dir: Path) -> set[str]:
     rel_to_owner: dict[str, str] = {}
     for entry in seqsets:
         for _, url in entry.iter_shard_urls():
-            path = build_store.mirror_cache_path(download_dir, url)
+            path = mirror_cache_path(download_dir, url)
             try:
                 rel = str(path.relative_to(download_dir))
             except ValueError:

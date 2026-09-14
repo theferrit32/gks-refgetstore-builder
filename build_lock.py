@@ -40,11 +40,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import store_census
-# build_store imports this module lazily (inside run_build) to avoid a circular
-# import, so importing from it at module load is safe here.
-import build_store
-from build_store import (ResolvedSource, SeqsetConfig, mirror_cache_path,
-                         sha256_file)
+from sources import (DERIVED_SUFFIXES, ResolvedSource, SeqsetConfig,
+                     load_config, mirror_cache_path, resolve_sources,
+                     sha256_file)
 
 logger = logging.getLogger("build_lock")
 
@@ -137,11 +135,13 @@ def records_from_log(log_path: Path) -> dict[str, dict]:
             out[path] = rec
             # Derived FASTAs are named by appending a suffix to the source
             # artifact, so stripping it recovers the cache path the lock is
-            # keyed on. The suffix list lives in build_store beside the
-            # resolvers that produce these names; a resolver that invents its
-            # own suffix without registering it there would break this mapping
-            # silently, leaving the collection with an empty ``from``.
-            for suffix in build_store.DERIVED_SUFFIXES:
+            # keyed on. The suffix list lives in sources.DERIVED_SUFFIXES,
+            # alongside the model these paths describe; the resolvers that
+            # produce the names are in build_store.DERIVED_FASTA_RESOLVERS. A
+            # resolver that invents its own suffix without registering it would
+            # break this mapping silently, leaving the collection's ``from``
+            # empty.
+            for suffix in DERIVED_SUFFIXES:
                 if path.endswith(suffix):
                     out[path[: -len(suffix)]] = rec
                     break
@@ -330,7 +330,7 @@ def file_record(
     """The ``inputs.files`` record for one manifest-referenced remote source.
 
     ``url`` is mapped to its expected local cache location with
-    :func:`build_store.mirror_cache_path`. The record intentionally captures the
+    :func:`sources.mirror_cache_path`. The record intentionally captures the
     local cache state at lock-generation time rather than making a remote
     request:
 
@@ -560,7 +560,7 @@ def apply_locked_sources(
 ) -> list[ResolvedSource]:
     """Use concrete lock entries without performing live discovery.
 
-    Lives here rather than in ``build_store`` so it reads the lock through the
+    Lives here rather than in ``sources`` so it reads the lock through the
     accessors, and so there is exactly one place that knows which schema carries
     concrete sources. Construction is by keyword: ``ResolvedSource`` has nine
     fields, six of them optional strings, and positional construction from
@@ -803,8 +803,6 @@ def run_lock(args) -> int:
     import sys
 
     from gtars.refget import RefgetStore  # local import: keeps module light
-
-    from build_store import load_config, resolve_sources
 
     assemblies, seqsets = load_config(args.config)
     collection_by_cachepath = records_from_log(args.from_log)

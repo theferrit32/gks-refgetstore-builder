@@ -16,7 +16,7 @@ import sys
 from pathlib import Path
 
 from gtars.refget import RefgetStore
-from build_store import load_config, mirror_cache_path
+from sources import load_config, mirror_cache_path
 
 HERE = Path(__file__).resolve().parent
 STORE_PATH = HERE / "store"

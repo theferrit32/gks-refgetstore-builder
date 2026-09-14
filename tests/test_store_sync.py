@@ -15,8 +15,9 @@ import pytest
 
 import build_lock
 import store_sync
-from build_store import ResolvedSource, SeqsetConfig
 from conftest import file_record, v4_lock
+from sources import (ResolvedSource, SeqsetConfig, load_config,
+                     mirror_cache_path)
 from store_sync import MutationOrderError
 
 
@@ -26,9 +27,7 @@ def _no_network(*args, **kwargs):
 
 def _present(root: Path, url: str) -> Path:
     """Materialize a cache file at the mirrored path a build would use."""
-    import build_store
-
-    path = build_store.mirror_cache_path(root, url)
+    path = mirror_cache_path(root, url)
     path.parent.mkdir(parents=True, exist_ok=True)
     if not path.exists():
         path.write_bytes(b"x")
@@ -289,15 +288,13 @@ def test_committed_config_against_committed_lock_targets_only_padded_releases(
     """
     import re
 
-    import build_store
-
     repo = Path(__file__).resolve().parent.parent
     lock_path = repo / "build.lock.json"
     if not lock_path.exists():  # a build artifact, not always present
         pytest.skip("build.lock.json not present")
-    monkeypatch.setattr(build_store, "_fetch_text", _no_network)
+    monkeypatch.setattr("sources._fetch_text", _no_network)
 
-    _, seqsets = build_store.load_config(repo / "sources.toml")
+    _, seqsets = load_config(repo / "sources.toml")
     lock = build_lock.load_lock(lock_path)
     sources = build_lock.apply_locked_sources(seqsets, lock)
     # Mirror the cache layout under tmp_path so presence checks pass without

@@ -11,7 +11,7 @@ import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
-from build_store import load_config, resolve_sources
+from sources import load_config, resolve_sources
 
 
 def remote_size(url: str) -> int | None:

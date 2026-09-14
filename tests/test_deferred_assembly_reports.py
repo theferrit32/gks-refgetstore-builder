@@ -6,6 +6,7 @@ from types import SimpleNamespace
 import pytest
 
 import build_store
+from sources import mirror_cache_path
 
 
 REPORT_COLUMNS = (
@@ -31,7 +32,7 @@ def write_report(path: Path, accession: str, rows: list[tuple[str, str, str, str
 
 
 def cached_path(cache: Path, url: str) -> Path:
-    path = build_store.mirror_cache_path(cache, url)
+    path = mirror_cache_path(cache, url)
     path.parent.mkdir(parents=True, exist_ok=True)
     return path
 

@@ -70,7 +70,7 @@ from pathlib import Path
 
 import build_lock
 import store_census
-from build_store import sha256_file
+from sources import load_config, resolve_sources, sha256_file
 
 REPO_ROOT = Path(__file__).resolve().parent
 DEFAULT_KNOWN_BAD = (
@@ -508,8 +508,6 @@ def verify_manifest(lock: dict, config_path: Path) -> VerifyReport:
     A finding here means the *lock* is stale, not that the store is broken --
     the distinction the whole four-target split exists to make.
     """
-    from build_store import load_config, resolve_sources
-
     report = VerifyReport()
     if sha256_file(config_path) != build_lock.lock_sources_toml_sha256(lock):
         report.add(Finding(
@@ -635,8 +633,6 @@ def run_status(args) -> int:
     **Always exits 0.** ``status`` describes; ``verify`` judges and gates CI.
     Conflating the two produces a command nobody can run casually.
     """
-    from build_store import load_config, resolve_sources
-
     lock = build_lock.load_lock(args.lock)
     print(f"lock      {args.lock}")
     print(f"          written {lock['build']['timestamp_utc']} "
