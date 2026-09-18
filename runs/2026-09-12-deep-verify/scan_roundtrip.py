@@ -21,10 +21,7 @@ import sys
 import time
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(REPO_ROOT))
-
-import store_census  # noqa: E402
+from gks_refgetstore import store_census
 
 # Diagnosed by comparing the decoded payload against the source FASTA record for
 # each group, not inferred. Keyed by alphabet because that is what separates

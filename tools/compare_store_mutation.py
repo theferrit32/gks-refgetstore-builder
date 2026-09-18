@@ -24,8 +24,7 @@ import csv
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from store_census import collection_census, seq_path  # noqa: E402
+from gks_refgetstore.store_census import collection_census, seq_path
 
 
 class Checks:

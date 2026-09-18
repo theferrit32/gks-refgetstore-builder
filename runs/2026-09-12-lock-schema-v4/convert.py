@@ -40,13 +40,12 @@ from __future__ import annotations
 
 import argparse
 import json
-import sys
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-sys.path.insert(0, str(REPO_ROOT))
+from gks_refgetstore import build_lock
 
-import build_lock  # noqa: E402
+# Only for the --config default; the package itself resolves through the install.
+REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 
 V2_SCHEMA = "gks-refgetstore-build-lock/2"
 

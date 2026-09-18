@@ -7,8 +7,8 @@ from pathlib import Path
 
 import pytest
 
-import generate_ncbi_source_candidates as gen
-from build_store import load_config
+from gks_refgetstore import generate_ncbi_source_candidates as gen
+from gks_refgetstore.sources import load_config
 
 
 HEADER = ("#assembly_accession\trefseq_category\ttaxid\tversion_status\t"

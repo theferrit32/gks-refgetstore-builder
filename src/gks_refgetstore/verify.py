@@ -68,9 +68,8 @@ from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from pathlib import Path
 
-import build_lock
-import store_census
-from sources import load_config, resolve_sources, sha256_file
+from . import build_lock, store_census
+from .sources import load_config, resolve_sources, sha256_file
 
 REPO_ROOT = Path(__file__).resolve().parent
 DEFAULT_KNOWN_BAD = (

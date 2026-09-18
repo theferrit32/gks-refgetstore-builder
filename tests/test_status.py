@@ -13,9 +13,8 @@ from pathlib import Path
 
 import pytest
 
-import build_lock
-import verify
 from conftest import file_record, lock_for_store, v4_lock
+from gks_refgetstore import build_lock, verify
 
 
 def args_for(tmp_path: Path, lock_path: Path, store_dir: Path, **overrides):
@@ -139,7 +138,7 @@ def test_status_refuses_a_lock_it_cannot_read(tmp_path: Path,
 def test_status_summarizes_a_sync_plan_when_online(
     tmp_path: Path, lock_path: Path, tiny_store_dir, monkeypatch, capsys,
 ) -> None:
-    import build_store
+    from gks_refgetstore import build_store
 
     monkeypatch.setattr(build_store, "load_config", lambda _p: ([], []))
     monkeypatch.setattr(build_store, "resolve_sources", lambda *_a: [])

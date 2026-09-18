@@ -38,12 +38,8 @@ import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
-import build_lock
-import fetch_sources
-import store_census
-import store_sync
-import verify
-from sources import ResolvedSource, load_config, sha256_file
+from . import build_lock, fetch_sources, store_census, store_sync, verify
+from .sources import ResolvedSource, load_config, sha256_file
 
 # verify codes this module knows how to act on. A code absent from both tables
 # is reported and left alone, which is the safe default for a tool that mutates.

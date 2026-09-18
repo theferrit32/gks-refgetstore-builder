@@ -12,9 +12,8 @@ import gzip
 import hashlib
 from pathlib import Path
 
-import build_lock
-import verify
 from conftest import file_record, v4_lock
+from gks_refgetstore import build_lock, verify
 
 REL = "host/path/file.fa.gz"
 

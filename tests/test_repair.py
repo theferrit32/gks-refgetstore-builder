@@ -19,10 +19,8 @@ from pathlib import Path
 
 import pytest
 
-import build_lock
-import repair
-import verify
 from conftest import file_record, v4_lock
+from gks_refgetstore import build_lock, repair, verify
 
 REL_A = "host/a.fa.gz"
 REL_B = "host/b.fa.gz"
@@ -147,7 +145,7 @@ def test_repair_accepts_only_the_locked_bytes(tmp_path: Path, monkeypatch) -> No
         target.write_bytes(served["bytes"])
         return len(served["bytes"])
 
-    import fetch_sources
+    from gks_refgetstore import fetch_sources
     monkeypatch.setattr(fetch_sources, "download", fake_download)
     args = type("Args", (), {
         "cache_dir": tmp_path, "timeout": 1, "retries": 1, "jobs": 1,
@@ -302,7 +300,7 @@ def test_a_missing_payload_resolves_to_its_collections_contributors(
 ) -> None:
     from conftest import lock_for_store
 
-    import store_census
+    from gks_refgetstore import store_census
 
     digests = sorted(store_census.collection_census(tiny_store))
     victim = sorted(store_census.collection_members(tiny_store, digests[0]))[0]

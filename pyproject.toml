@@ -18,22 +18,15 @@ dev = [
 ]
 
 [project.scripts]
-gks-refgetstore = "cli:main"
+gks-refgetstore = "gks_refgetstore.cli:main"
+gks-refgetstore-check = "gks_refgetstore.verify_store:main"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-include = [
-    "cli.py",
-    "build_store.py",
-    "build_lock.py",
-    "fetch_sources.py",
-    "generate_ncbi_source_candidates.py",
-    "inventory_sources.py",
-    "sources.toml",
-]
+packages = ["src/gks_refgetstore"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

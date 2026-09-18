@@ -38,10 +38,9 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-from sources import (ResolvedSource, load_config, mirror_cache_path,  # noqa: E402
-                     provider_checksum_matches, resolve_sources, sha256_file)
-from build_lock import apply_locked_sources, load_lock, lock_files  # noqa: E402
+from .build_lock import apply_locked_sources, load_lock, lock_files
+from .sources import (ResolvedSource, load_config, mirror_cache_path,
+                      provider_checksum_matches, resolve_sources, sha256_file)
 
 CHUNK = 1 << 20  # 1 MiB
 

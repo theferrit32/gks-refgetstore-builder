@@ -9,10 +9,9 @@ from pathlib import Path
 
 import pytest
 
-import build_lock
-import store_census
-from build_store import ResolvedSource
 from conftest import file_record, v4_lock
+from gks_refgetstore import build_lock, store_census
+from gks_refgetstore.sources import ResolvedSource
 
 REL_A = "host/a.fa.gz"
 REL_B = "host/b.fa.gz"

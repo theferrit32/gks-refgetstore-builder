@@ -10,13 +10,10 @@ where a manifest is genuinely under test.
 
 from __future__ import annotations
 
-import sys
 import urllib.request
 from pathlib import Path
 
 import pytest
-
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 
 def _blocked(*args, **kwargs):
@@ -42,7 +39,7 @@ def block_network(monkeypatch: pytest.MonkeyPatch) -> None:
 
 def file_record(cache_path: str, **overrides) -> dict:
     """A complete ``inputs.files`` record with every field present."""
-    import build_lock
+    from gks_refgetstore import build_lock
 
     record = {
         "kind": "seqset",
@@ -79,8 +76,8 @@ def v4_lock(
     sequences_root: str | None = None,
 ) -> dict:
     """A schema-/4 lock that satisfies ``validate_lock``."""
-    import build_lock
-    import store_census
+    from gks_refgetstore import build_lock
+    from gks_refgetstore import store_census
 
     files = files or []
     collections = collections or []
@@ -108,7 +105,7 @@ def v4_lock(
 
 def lock_for_store(store, store_dir, files=None, from_map=None) -> dict:
     """A lock whose ``outputs`` is a census of a real store."""
-    import build_lock
+    from gks_refgetstore import build_lock
 
     lock = v4_lock(files or [])
     lock["outputs"] = build_lock.store_outputs(store, from_map or {})

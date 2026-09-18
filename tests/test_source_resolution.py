@@ -8,15 +8,16 @@ from urllib.parse import urlsplit
 
 import pytest
 
-import build_lock
-import build_store
-import store_census
-from build_lock import apply_locked_sources
 from conftest import file_record, v4_lock
-from sources import (DERIVED_SUFFIXES, SEQSET_FORMATS, RecordExclusion,
-                     ResolvedSource, SeqsetConfig, bsd_sum_file, load_config,
-                     mirror_cache_path, parse_checksum_manifest,
-                     parse_ensembl_checksum_manifest, resolve_sources)
+from gks_refgetstore import build_lock, build_store, store_census
+from gks_refgetstore.build_lock import apply_locked_sources
+from gks_refgetstore.sources import (DERIVED_SUFFIXES, SEQSET_FORMATS,
+                                     RecordExclusion, ResolvedSource,
+                                     SeqsetConfig, bsd_sum_file, load_config,
+                                     mirror_cache_path,
+                                     parse_checksum_manifest,
+                                     parse_ensembl_checksum_manifest,
+                                     resolve_sources)
 
 
 BASE = "https://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/"
@@ -916,7 +917,7 @@ def test_disk_preflight_tolerates_sources_missing_from_cache(tmp_path: Path) -> 
 
 
 def test_partial_downloads_are_reported_then_swept(tmp_path: Path) -> None:
-    import fetch_sources
+    from gks_refgetstore import fetch_sources
 
     cache = tmp_path / "cache"
     (cache / "host/deep").mkdir(parents=True)
@@ -941,7 +942,7 @@ def test_download_renames_atomically_and_cleans_up_on_failure(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """A partial must never occupy the real filename."""
-    import fetch_sources
+    from gks_refgetstore import fetch_sources
 
     target = tmp_path / "out.fa.gz"
     part = target.with_suffix(target.suffix + ".part")

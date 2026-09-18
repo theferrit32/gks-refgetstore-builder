@@ -31,12 +31,7 @@ import argparse
 import logging
 from pathlib import Path
 
-import build_lock
-import build_store
-import fetch_sources
-import repair
-import store_sync
-import verify
+from . import build_lock, build_store, fetch_sources, repair, store_sync, verify
 
 REPO_ROOT = Path(__file__).resolve().parent
 DEFAULT_CONFIG = REPO_ROOT / "sources.toml"

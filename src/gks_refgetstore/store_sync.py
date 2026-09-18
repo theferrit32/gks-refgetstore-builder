@@ -33,11 +33,11 @@ import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
-import build_lock
-from build_store import (INGEST_JOBS_DEFAULT, _write_alias_tsv,
-                         prepare_filtered_sources, process_seqset)
-from sources import (SeqsetConfig, load_config, mirror_cache_path,
-                     resolve_sources)
+from . import build_lock
+from .build_store import (INGEST_JOBS_DEFAULT, _write_alias_tsv,
+                          prepare_filtered_sources, process_seqset)
+from .sources import (SeqsetConfig, load_config, mirror_cache_path,
+                      resolve_sources)
 
 logger = logging.getLogger("store_sync")
 

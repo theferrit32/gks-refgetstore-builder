@@ -22,10 +22,8 @@ from pathlib import Path
 
 import pytest
 
-import build_lock
-import store_census
-import verify
 from conftest import lock_for_store, write_fasta
+from gks_refgetstore import build_lock, store_census, verify
 
 
 @pytest.fixture

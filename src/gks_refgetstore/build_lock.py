@@ -39,10 +39,10 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 
-import store_census
-from sources import (DERIVED_SUFFIXES, ResolvedSource, SeqsetConfig,
-                     load_config, mirror_cache_path, resolve_sources,
-                     sha256_file)
+from . import store_census
+from .sources import (DERIVED_SUFFIXES, ResolvedSource, SeqsetConfig,
+                      load_config, mirror_cache_path, resolve_sources,
+                      sha256_file)
 
 logger = logging.getLogger("build_lock")
 

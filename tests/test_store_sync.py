@@ -13,12 +13,11 @@ from pathlib import Path
 
 import pytest
 
-import build_lock
-import store_sync
 from conftest import file_record, v4_lock
-from sources import (ResolvedSource, SeqsetConfig, load_config,
-                     mirror_cache_path)
-from store_sync import MutationOrderError
+from gks_refgetstore import build_lock, store_sync
+from gks_refgetstore.sources import (ResolvedSource, SeqsetConfig, load_config,
+                                     mirror_cache_path)
+from gks_refgetstore.store_sync import MutationOrderError
 
 
 def _no_network(*args, **kwargs):
@@ -292,7 +291,7 @@ def test_committed_config_against_committed_lock_targets_only_padded_releases(
     lock_path = repo / "build.lock.json"
     if not lock_path.exists():  # a build artifact, not always present
         pytest.skip("build.lock.json not present")
-    monkeypatch.setattr("sources._fetch_text", _no_network)
+    monkeypatch.setattr("gks_refgetstore.sources._fetch_text", _no_network)
 
     _, seqsets = load_config(repo / "sources.toml")
     lock = build_lock.load_lock(lock_path)

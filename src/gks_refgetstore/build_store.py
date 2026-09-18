@@ -24,11 +24,11 @@ from typing import Callable, Iterator
 
 from gtars.refget import RefgetStore
 
-import build_lock
-from sources import (NA_VALUES, AssemblyConfig, RecordExclusion, ResolvedSource,
-                     SeqsetConfig, load_config, md5_file, mirror_cache_path,
-                     natural_sort_key, provider_checksum_matches,
-                     resolve_sources, sha256_file)
+from . import build_lock
+from .sources import (NA_VALUES, AssemblyConfig, RecordExclusion,
+                      ResolvedSource, SeqsetConfig, load_config, md5_file,
+                      mirror_cache_path, natural_sort_key,
+                      provider_checksum_matches, resolve_sources, sha256_file)
 
 logger = logging.getLogger("build_store")
 

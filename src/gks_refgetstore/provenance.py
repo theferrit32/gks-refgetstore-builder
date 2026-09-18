@@ -28,9 +28,8 @@ import argparse
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-import build_lock  # noqa: E402
-from store_census import collection_members, strip_sq  # noqa: E402
+from . import build_lock
+from .store_census import collection_members, strip_sq
 
 REPO_ROOT = Path(__file__).resolve().parent
 

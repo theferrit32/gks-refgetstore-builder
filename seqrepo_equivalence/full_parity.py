@@ -7,15 +7,13 @@ import argparse
 import csv
 import json
 import re
-import sys
 from collections import Counter
 from pathlib import Path
 
 from gtars.refget import RefgetStore
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-import build_lock  # noqa: E402
-from store_census import collection_members  # noqa: E402
+from gks_refgetstore import build_lock
+from gks_refgetstore.store_census import collection_members
 
 from verify_seqrepo_equivalence import (
     DEFAULT_SEQREPO, EXPECTED_OMIT, NAMESPACE_MAP, build_refget_digest_set,

@@ -5,8 +5,8 @@ from types import SimpleNamespace
 
 import pytest
 
-import build_store
-from sources import mirror_cache_path
+from gks_refgetstore import build_store
+from gks_refgetstore.sources import mirror_cache_path
 
 
 REPORT_COLUMNS = (

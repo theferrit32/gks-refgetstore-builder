@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-import store_census as sc
+from gks_refgetstore import store_census as sc
 
 
 def test_digest_root_is_order_and_duplicate_independent():
