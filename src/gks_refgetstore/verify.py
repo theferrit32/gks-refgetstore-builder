@@ -71,10 +71,11 @@ from pathlib import Path
 from . import build_lock, store_census
 from .sources import load_config, resolve_sources, sha256_file
 
-REPO_ROOT = Path(__file__).resolve().parent
-DEFAULT_KNOWN_BAD = (
-    REPO_ROOT / "seqrepo_equivalence" / "known_divergence"
-    / "gtars_encoding_roundtrip.tsv"
+# Relative to the current directory; see cli.DEFAULT_CONFIG. The baseline is a
+# checked-in fixture rather than package data, so it travels with the repo, not
+# with the install.
+DEFAULT_KNOWN_BAD = Path(
+    "seqrepo_equivalence/known_divergence/gtars_encoding_roundtrip.tsv"
 )
 
 ERROR, WARN, INFO = "error", "warn", "info"

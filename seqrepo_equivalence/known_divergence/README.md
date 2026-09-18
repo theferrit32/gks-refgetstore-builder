@@ -11,7 +11,7 @@ measurement, and a generator kept beside it.
 
 | fixture | question | consumed by |
 |---|---|---|
-| `ensembl_vs_seqrepo_digest_divergence.tsv` | why does this store's digest differ from seqrepo's for the same accession? | `verify_store.py` |
+| `ensembl_vs_seqrepo_digest_divergence.tsv` | why does this store's digest differ from seqrepo's for the same accession? | `gks-refgetstore-check` |
 | `gtars_encoding_roundtrip.tsv` | which stored payloads do not re-digest to the digest they are filed under? | `gks-refgetstore verify --store --deep` |
 
 ---
@@ -25,7 +25,7 @@ store than in the biocommons seqrepo `2024-12-20` snapshot.
 
 - **`ensembl_vs_seqrepo_digest_divergence.tsv`** — the fixture. 116 rows,
   `accession · seqrepo_seq_id · refget_sha512t24u · cause`. Consumed by
-  `verify_store.py`, which validates it against the pinned `ensembl-113`
+  `gks-refgetstore-check`, which validates it against the pinned `ensembl-113`
   namespace. Read the header comments before changing anything.
 - **`diagnose_mismatches.py`** — the generator. Byte-diagnoses every
   shared-alias mismatch emitted by `../full_parity.py` and assigns each a cause.

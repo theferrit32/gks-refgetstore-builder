@@ -31,7 +31,7 @@ from pathlib import Path
 from . import build_lock
 from .store_census import collection_members, strip_sq
 
-REPO_ROOT = Path(__file__).resolve().parent
+# Defaults are relative to the current directory; see cli.DEFAULT_CONFIG.
 
 
 def _open_store(store_dir: Path):
@@ -62,8 +62,8 @@ def main() -> int:
     ap = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
-    ap.add_argument("--lock", type=Path, default=REPO_ROOT / "build.lock.json")
-    ap.add_argument("--store-dir", type=Path, default=REPO_ROOT / "store")
+    ap.add_argument("--lock", type=Path, default=Path("build.lock.json"))
+    ap.add_argument("--store-dir", type=Path, default=Path("store"))
     g = ap.add_mutually_exclusive_group(required=True)
     g.add_argument("--file", type=str, help="source URL/cache-path/owner substring")
     g.add_argument("--digest", type=str, help="a sequence sha512t24u (SQ. optional)")

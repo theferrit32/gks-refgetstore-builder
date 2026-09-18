@@ -48,18 +48,23 @@ header names. The only runtime dependency is `gtars`.
 
     sources.toml                   # declarative, authoritative source manifest
     sources.dev.toml               # every config shape, ~3 GB: the fast edit-test loop
-    cli.py                         # gks-refgetstore CLI (build/verify/status/repair/sync/fetch/lock)
-    build_store.py                 # build engine + shared helpers (config, cache paths, ingest)
-    build_lock.py                  # the build lock: schema, accessors, validation, sync planning
-    store_census.py                # read-only store primitives (counts, roots, membership, re-digest)
-    verify.py                      # verify + status: cache, store, manifest, remote
-    repair.py                      # restore the locked state after verify finds damage
-    store_sync.py                  # incremental add/remove against a built store
-    fetch_sources.py               # cache pre-fetch (fetch subcommand) + the shared downloader
-    inventory_sources.py           # exact remote sizes + pre-download space-budget gate
-    provenance.py                  # file <-> refget-digest queries from the lock + store
     build.lock.json                # provenance lock for the most recent build (see below)
-    verify_store.py                # post-build gtars self-checks (standalone, semantics-driven)
+    src/gks_refgetstore/
+        cli.py                     # gks-refgetstore CLI (build/verify/status/repair/sync/fetch/lock)
+        sources.py                 # the source model: manifest schema, resolution, cache paths, digests
+        build_store.py             # build engine: download, convert, filter, ingest, alias
+        build_lock.py              # the build lock: schema, accessors, validation, sync planning
+        store_census.py            # read-only store primitives (counts, roots, membership, re-digest)
+        verify.py                  # verify + status: cache, store, manifest, remote
+        repair.py                  # restore the locked state after verify finds damage
+        store_sync.py              # incremental add/remove against a built store
+        fetch_sources.py           # cache pre-fetch (fetch subcommand) + the shared downloader
+        inventory_sources.py       # exact remote sizes + pre-download space-budget gate
+        provenance.py              # file <-> refget-digest queries from the lock + store
+        verify_store.py            # post-build gtars self-checks (gks-refgetstore-check)
+        generate_ncbi_source_candidates.py  # draft manifest entries from an NCBI assembly listing
+    tests/                         # pytest suite (resolves through the installed package)
+    tools/                         # run records, store diffing, upstream drift probes
     seqrepo_equivalence/           # optional backwards-compat check vs a seqrepo snapshot
     RUNBOOK.md                     # reproducible run-record lifecycle and policies
     runs/                          # compact historical manifests, summaries, logs, evidence
@@ -67,13 +72,16 @@ header names. The only runtime dependency is `gtars`.
     store/                         # local output/playground RefgetStore (gitignored)
     store.2026-07-22/              # preserved published store (local, gitignored)
 
+The package is a `src/` layout, so the code only ever resolves through the
+install (`uv sync`) — a stale copy in the working directory cannot shadow it.
+
 ## CLI
 
 Everything runs through one CLI, `gks-refgetstore`. Two equivalent invocation
 styles:
 
-    gks-refgetstore <cmd> ...     # installed console script (after `uv sync`)
-    uv run cli.py <cmd> ...       # run the source directly, no install
+    gks-refgetstore <cmd> ...                    # installed console script (after `uv sync`)
+    uv run python -m gks_refgetstore.cli <cmd> ...   # same code, via the module
 
 | subcommand | does | exits non-zero on |
 | --- | --- | --- |
@@ -88,6 +96,12 @@ styles:
 Global: `-v/--verbose` for debug logging. Every subcommand shares
 `--config` (default `./sources.toml`) and `--cache-dir` (default `./downloads`).
 `gks-refgetstore <cmd> --help` prints the full flag list.
+
+Every relative default — `sources.toml`, `downloads/`, `store/`,
+`build.lock.json` — resolves against the **current directory**, so run the CLI
+from the repo root or pass the paths explicitly. The manifest, the cache and the
+store are your data; the installed package does not reach back into itself for
+them.
 
 ### The development manifest
 
@@ -104,8 +118,9 @@ minutes, `status` instant.
 
 It shares `downloads/` with the production manifest rather than using its own
 cache directory. That is forced, not incidental: `fasta_path` resolves relative
-to the repo root, derived artifacts are written beside their source, and
-re-deriving release 76's filtered toplevel costs 273 seconds. The header of
+to the manifest, which sits at the repo root alongside `downloads/`; derived
+artifacts are written beside their source; and re-deriving release 76's filtered
+toplevel costs 273 seconds. The header of
 `sources.dev.toml` lists which entry covers which shape, and which one shape is
 deliberately left out.
 
@@ -292,10 +307,10 @@ Reconstructs the file→collection mapping from a build log and re-hashes the
 cache, producing the same lock a full build would. Use it to backfill a lock
 for a build that already ran.
 
-### Post-build store self-check (separate script)
+### Post-build store self-check (separate entry point)
 
-    uv run python verify_store.py            # gtars-only checks on ./store
-    uv run python verify_store.py PATH        # explicit store dir
+    gks-refgetstore-check                     # gtars-only checks on ./store
+    gks-refgetstore-check PATH                # explicit store dir
 
 ## Build lock & verification
 
@@ -380,9 +395,9 @@ build; `verify` handles the interim gap gracefully.)
    the store records each collection's membership, so composing the two answers
    file↔digest questions on demand without storing a table:
 
-       uv run python provenance.py --file human.6.rna   # digests from that file
-       uv run python provenance.py --digest <sha512t24u> # source file(s) for a digest
-       uv run python provenance.py --list                # all collections + contributors
+       uv run python -m gks_refgetstore.provenance --file human.6.rna    # digests from that file
+       uv run python -m gks_refgetstore.provenance --digest <sha512t24u> # source file(s) for a digest
+       uv run python -m gks_refgetstore.provenance --list                # all collections + contributors
 
    `--digest` is an O(all collections) scan, ~56s on the production store.
    That is deliberately not backed by a cached reverse index: 1.8M entries to
@@ -441,7 +456,7 @@ Each `[[assembly]]` block:
 | `fasta_url` | when `load_fasta=true` | URL of NCBI `*_genomic.fna.gz`. gtars ingests `.gz` directly. |
 | `report_url` | yes | URL of the corresponding `*_assembly_report.txt`. |
 | `load_fasta` | no, default `true` | If false, do not ingest a FASTA; the assembly report adds aliases only for digests already in the store. Use this for a report-only release or a deliberate alias-only namespace. |
-| `fasta_path` | no | Local path overriding the downloaded FASTA (relative to repo root). |
+| `fasta_path` | no | Local path overriding the downloaded FASTA, relative to the directory holding this manifest. |
 | `checksum_manifest_url` | no | NCBI directory `md5checksums.txt`; genomic FASTA MD5 is required when configured. Some assembly reports have no provider MD5 and are pinned by lock SHA-256. |
 
 Each `[[seqset]]` block (flat FASTA where the header name is the accession):

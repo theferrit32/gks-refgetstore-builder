@@ -13,10 +13,11 @@
 #
 # The cache is `downloads/` -- the same one the production manifest uses, not a
 # separate directory. Three things force that: `fasta_path` resolves relative to
-# the repo root, derived artifacts (`.filtered.fa.gz`, `.fasta`) are written as
-# siblings of their source, and re-deriving release 76's filtered toplevel costs
-# 273 seconds. Every file below is already cached and still matches its provider
-# checksum, so a dev build downloads nothing.
+# the directory holding this manifest, which is the repo root, so the override
+# below can only name a path under it; derived artifacts (`.filtered.fa.gz`,
+# `.fasta`) are written as siblings of their source; and re-deriving release 76's
+# filtered toplevel costs 273 seconds. Every file below is already cached and
+# still matches its provider checksum, so a dev build downloads nothing.
 #
 # Artifacts: `store.dev/` (already ignored by `/store*/`) and
 # `build.dev.lock.json` (ignored explicitly). This file is tracked.
@@ -87,9 +88,9 @@ load_fasta = false
 
 # The only `fasta_path` user anywhere. Production never sets it, so without this
 # entry the local-override branch of `resolve_sources`/`ingest_assembly` -- which
-# suppresses the `assembly_fasta` source entirely and ingests from a repo-root
-# relative path -- has no coverage at all. The path points into the shared cache,
-# so nothing extra is downloaded; `fasta_url` is still required by
+# suppresses the `assembly_fasta` source entirely and ingests from a path
+# relative to this manifest -- has no coverage at all. The path points into the
+# shared cache, so nothing extra is downloaded; `fasta_url` is still required by
 # `AssemblyConfig`, and is still the authoritative origin the override stands in
 # for.
 [[assembly]]

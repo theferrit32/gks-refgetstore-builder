@@ -52,6 +52,67 @@ def test_derived_fasta_resolvers_cover_every_non_fasta_format() -> None:
     )
 
 
+def _manifest_with_fasta_path(directory: Path, fasta_path: str) -> Path:
+    directory.mkdir(parents=True, exist_ok=True)
+    path = directory / "sources.toml"
+    path.write_text(
+        '[[assembly]]\n'
+        'namespace = "GRCh37.p13"\n'
+        'report_url = "https://x/report.txt"\n'
+        'fasta_url = "https://x/genomic.fna.gz"\n'
+        f'fasta_path = "{fasta_path}"\n'
+    )
+    return path
+
+
+def test_fasta_path_resolves_against_the_manifest_not_the_cwd(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A manifest means the same thing wherever it is read from.
+
+    The build previously joined ``fasta_path`` onto the repo root inferred from
+    ``build_store.__file__``, which stopped being the repo root once the modules
+    moved into the package. Anchoring on the manifest's own directory keeps a
+    manifest self-contained and independent of the current directory -- so this
+    asserts the resolved path *and* that chdir'ing somewhere else cannot move it.
+    """
+    manifest = _manifest_with_fasta_path(tmp_path / "cfg", "local/genomic.fna.gz")
+    expected = (tmp_path / "cfg" / "local" / "genomic.fna.gz").resolve()
+
+    assemblies, _ = load_config(manifest)
+    assert assemblies[0].resolved_fasta_path == expected
+
+    elsewhere = tmp_path / "elsewhere"
+    elsewhere.mkdir()
+    monkeypatch.chdir(elsewhere)
+    assemblies, _ = load_config(manifest)
+    assert assemblies[0].resolved_fasta_path == expected
+
+
+def test_fasta_path_resolution_escapes_the_manifest_directory_when_asked(
+    tmp_path: Path
+) -> None:
+    """``..`` is honoured, not clamped -- it is an explicit local override."""
+    manifest = _manifest_with_fasta_path(tmp_path / "cfg", "../shared/g.fna.gz")
+    assemblies, _ = load_config(manifest)
+    assert assemblies[0].resolved_fasta_path == (
+        tmp_path / "shared" / "g.fna.gz"
+    ).resolve()
+
+
+def test_an_assembly_without_fasta_path_resolves_to_none(tmp_path: Path) -> None:
+    """Absent means absent: ingest falls through to the mirrored cache path."""
+    path = tmp_path / "sources.toml"
+    path.write_text(
+        '[[assembly]]\n'
+        'namespace = "GRCh38"\n'
+        'report_url = "https://x/report.txt"\n'
+        'fasta_url = "https://x/genomic.fna.gz"\n'
+    )
+    assemblies, _ = load_config(path)
+    assert assemblies[0].resolved_fasta_path is None
+
+
 @pytest.mark.parametrize("text", [
     "not-a-record", "0" * 32 + "  dir/file.gz", "0" * 32 + "  ../file.gz",
     "0" * 32 + "  file.gz\n" + "1" * 32 + "  file.gz",

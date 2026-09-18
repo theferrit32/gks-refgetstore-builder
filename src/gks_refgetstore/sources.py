@@ -72,6 +72,12 @@ class AssemblyConfig:
     load_fasta: bool = True
     fasta_path: str | None = None
     checksum_manifest_url: str | None = None
+    #: ``fasta_path`` resolved against the manifest's own directory, filled in by
+    #: :func:`load_config` -- the same non-init pattern ``SeqsetConfig`` uses for
+    #: ``resolved_sources`` and ``exclusion``. ``None`` when no ``fasta_path``
+    #: was declared. Resolving here rather than at ingest keeps the engine free
+    #: of any notion of where the manifest lives.
+    resolved_fasta_path: Path | None = field(default=None, init=False)
 
     def __post_init__(self) -> None:
         if self.load_fasta and not self.fasta_url:
@@ -545,9 +551,22 @@ def resolve_sources(
 def load_config(
     path: Path,
 ) -> tuple[list[AssemblyConfig], list[SeqsetConfig]]:
+    """Parse a source manifest, validating it and resolving its local paths.
+
+    A relative ``fasta_path`` resolves against the **manifest's own directory**,
+    so a manifest is self-contained: it means the same thing wherever it is read
+    from, and moving one moves its local inputs with it. Nothing here depends on
+    the current directory or on where this package is installed.
+    """
+    manifest_dir = path.resolve().parent
     with path.open("rb") as fh:
         data = tomllib.load(fh)
     assemblies = [AssemblyConfig(**entry) for entry in data.get("assembly", [])]
+    for assembly in assemblies:
+        if assembly.fasta_path:
+            assembly.resolved_fasta_path = (
+                manifest_dir / assembly.fasta_path
+            ).resolve()
     seqsets = [SeqsetConfig(**entry) for entry in data.get("seqset", [])]
     names = [entry.name for entry in seqsets]
     if len(names) != len(set(names)):

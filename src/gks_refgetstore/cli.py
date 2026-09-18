@@ -11,11 +11,15 @@ Subcommands:
   fetch    pre-populate the download cache from the manifest (no ingest)
   lock     (re)generate a build.lock.json for a build that already ran
 
-All subcommands share one library: config loading + cache-path mapping
+All subcommands share one library: the source model -- manifest schema, source
+resolution, cache-path mapping (``sources``) -- the build engine
 (``build_store``), the lock core (``build_lock``), the read-only store
 primitives (``store_census``), and the fetcher (``fetch_sources``). Runnable via
-the ``gks-refgetstore`` console script or directly with
-``uv run cli.py <subcommand> ...``.
+the ``gks-refgetstore`` console script or with
+``python -m gks_refgetstore.cli <subcommand> ...``.
+
+Relative path defaults resolve against the current directory, so run this from
+the repo root or pass ``--config``/``--store-dir``/``--cache-dir``/``--lock``.
 
 For a fast edit-test loop, point everything at the development manifest, which
 covers every config shape in minutes rather than hours (measured: build ~6m,
@@ -33,11 +37,14 @@ from pathlib import Path
 
 from . import build_lock, build_store, fetch_sources, repair, store_sync, verify
 
-REPO_ROOT = Path(__file__).resolve().parent
-DEFAULT_CONFIG = REPO_ROOT / "sources.toml"
-DEFAULT_STORE = REPO_ROOT / "store"
-DEFAULT_CACHE = REPO_ROOT / "downloads"
-DEFAULT_LOCK = REPO_ROOT / "build.lock.json"
+# Relative to the current directory, not to the package: the manifest, the
+# cache and the store are the *user's* data, and an installed tool has no
+# business reaching back into its own install tree for them. Run from the repo
+# root, or pass the paths explicitly.
+DEFAULT_CONFIG = Path("sources.toml")
+DEFAULT_STORE = Path("store")
+DEFAULT_CACHE = Path("downloads")
+DEFAULT_LOCK = Path("build.lock.json")
 
 
 def _add_build(sub: argparse._SubParsersAction) -> None:

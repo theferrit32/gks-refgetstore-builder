@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Upload a built RefgetStore (the store/ directory from build_store.py) to object
+# Upload a built RefgetStore (the store/ directory from gks-refgetstore build) to object
 # storage as individual objects, preserving the relative tree.
 #
 # A gtars RefgetStore is read lazily, object-by-object (range requests against

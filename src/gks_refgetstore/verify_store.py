@@ -19,10 +19,10 @@ from gtars.refget import RefgetStore
 
 from .sources import load_config, mirror_cache_path
 
-HERE = Path(__file__).resolve().parent
-STORE_PATH = HERE / "store"
-DOWNLOAD_DIR = HERE / "downloads"
-CONFIG_PATH = HERE / "sources.toml"
+# Relative to the current directory, not to the package; see cli.DEFAULT_CONFIG.
+STORE_PATH = Path("store")
+DOWNLOAD_DIR = Path("downloads")
+CONFIG_PATH = Path("sources.toml")
 
 EXPECTED_COLL_NAMESPACES = {"refseq", "insdc"}
 FORBIDDEN_SEQ_NAMESPACES = {
@@ -420,8 +420,10 @@ def section_ensembl(store: RefgetStore, r: Report) -> None:
     )
 
 
-KNOWN_DIVERGENT_PATH = (HERE / "seqrepo_equivalence" / "known_divergence"
-                        / "ensembl_vs_seqrepo_digest_divergence.tsv")
+KNOWN_DIVERGENT_PATH = Path(
+    "seqrepo_equivalence/known_divergence/"
+    "ensembl_vs_seqrepo_digest_divergence.tsv"
+)
 
 
 def section_known_divergent(store: RefgetStore, r: Report) -> None:

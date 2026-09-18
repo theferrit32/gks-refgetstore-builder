@@ -36,7 +36,7 @@ def test_each_module_imports_in_isolation(module: str) -> None:
     """A fresh interpreter per module, so import order cannot mask a cycle."""
     result = subprocess.run(
         [sys.executable, "-c", f"import gks_refgetstore.{module}"],
-        capture_output=True, text=True,
+        capture_output=True, text=True, check=False,
     )
     assert result.returncode == 0, (
         f"gks_refgetstore.{module} failed to import on its own:\n{result.stderr}"
@@ -83,11 +83,13 @@ def test_importing_the_package_does_not_pull_in_the_engine() -> None:
     ``__init__`` re-exporting submodules would drag in gtars and the whole
     ingest path, which is what the CLI's lazy dispatch exists to avoid.
     """
+    probe = (
+        "import sys, gks_refgetstore; "
+        "print([m for m in sys.modules "
+        "if m.startswith('gks_refgetstore.') or m == 'gtars'])"
+    )
     result = subprocess.run(
-        [sys.executable, "-c",
-         "import sys, gks_refgetstore; "
-         "print([m for m in sys.modules if m.startswith('gks_refgetstore.') "
-         "or m == 'gtars'])"],
+        [sys.executable, "-c", probe],
         capture_output=True, text=True, check=True,
     )
     assert result.stdout.strip() == "[]", result.stdout

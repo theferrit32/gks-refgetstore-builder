@@ -32,11 +32,6 @@ from .sources import (NA_VALUES, AssemblyConfig, RecordExclusion,
 
 logger = logging.getLogger("build_store")
 
-REPO_ROOT = Path(__file__).resolve().parent
-DEFAULT_CONFIG = Path(__file__).parent / "sources.toml"
-DEFAULT_STORE = Path(__file__).parent / "store"
-DEFAULT_DOWNLOADS = Path(__file__).parent / "downloads"
-
 SQ_PREFIX = "SQ."
 
 # Files imported concurrently per batched ingest call. Capped well below the
@@ -835,10 +830,9 @@ def ingest_assembly(
     logger.info("=== %s ===", entry.namespace)
     fasta_path: Path | None = None
     if entry.load_fasta:
-        if entry.fasta_path:
-            local = (REPO_ROOT / entry.fasta_path).resolve()
-            if local.exists():
-                fasta_path = local
+        # Already resolved against the manifest's directory by load_config.
+        if entry.resolved_fasta_path and entry.resolved_fasta_path.exists():
+            fasta_path = entry.resolved_fasta_path
         if fasta_path is None:
             assert entry.fasta_url is not None
             fasta_path = require_prepared_source(
