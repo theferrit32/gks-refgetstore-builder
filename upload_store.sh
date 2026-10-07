@@ -160,7 +160,16 @@ fi
 
 # --- upload -----------------------------------------------------------------
 RCLONE_OPTS=(--transfers "$TRANSFERS" --checkers "$CHECKERS" --fast-list
-             --s3-no-check-bucket --progress --stats-one-line)
+             --s3-no-check-bucket --stats-one-line)
+# --progress redraws a terminal line and suppresses rclone's periodic logged
+# stats, so a detached run (nohup, run_record exec) would log nothing until the
+# end. Use it only on a terminal; otherwise log stats every --stats interval
+# (default 1m; override with RCLONE_STATS), to RCLONE_LOG_FILE when set.
+if [ -t 1 ]; then
+    RCLONE_OPTS+=(--progress)
+else
+    RCLONE_OPTS+=(--stats "${RCLONE_STATS:-1m}" --stats-log-level NOTICE)
+fi
 [ "$DRY_RUN" = 1 ] && RCLONE_OPTS+=(--dry-run)
 
 echo "Uploading (rclone ${MODE}) ..."
