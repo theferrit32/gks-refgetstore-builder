@@ -14,12 +14,14 @@ there** and nothing else:
 
 Two things it will not do, for reasons worth stating rather than discovering:
 
-* **``store.seq_digest_mismatch`` is unrepairable.** Those sequences decode to
-  something other than what their digest promises because gtars' encoder is
-  lossy for them -- no ``U`` in the protein alphabet, and short proteins
-  misdetected as nucleotide. Re-ingesting reproduces the defect exactly. The fix
-  is upstream in gtars, and ``verify --deep``'s baseline is what will report it
-  when it lands.
+* **``store.seq_digest_mismatch`` is not repaired.** The sequence decodes to
+  something other than what its digest promises. Re-ingesting cannot fix that:
+  gtars skips a sequence whose digest the store already holds, so the existing
+  payload stays, and with a gtars whose encoder is lossy for that sequence a
+  fresh import would reproduce it anyway. The cause -- an encoder defect or a
+  damaged payload -- needs diagnosing first. Stores built with gtars <= 0.10 hit
+  this for 133 sequences; the fix was a rebuild with a corrected gtars (see the
+  README's "gtars revision").
 * **A root mismatch with no attributable cause is refused.** If the store's
   digest set differs from the lock's but no collection is missing and no payload
   is absent, the store has diverged in a way repair cannot name. That is what
@@ -53,9 +55,10 @@ STORE_CODES = frozenset({
 })
 UNREPAIRABLE = {
     "store.seq_digest_mismatch": (
-        "the stored payload does not re-digest to its own digest. This is a "
-        "gtars encoder limitation, not bit rot: re-ingesting reproduces it "
-        "byte for byte. Track it in the --deep baseline; fix it upstream."
+        "the stored payload does not re-digest to its own digest. Re-ingesting "
+        "leaves an existing payload in place, so repair cannot fix it. Diagnose "
+        "whether it is an encoder defect or a damaged payload; an encoder "
+        "defect is fixed by rebuilding with a corrected gtars."
     ),
     "store.sequences_root_mismatch": (
         "the store's sequence set is not the lock's, and no missing collection "

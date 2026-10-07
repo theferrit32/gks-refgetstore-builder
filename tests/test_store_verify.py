@@ -297,8 +297,10 @@ def test_an_absent_baseline_is_an_empty_baseline(tmp_path: Path) -> None:
 def test_the_checked_in_baseline_parses() -> None:
     if not verify.DEFAULT_KNOWN_BAD.exists():
         pytest.skip("baseline not generated in this checkout")
+    # Empty is valid: it means every stored sequence round-trips. Any row that
+    # is present must still carry a diagnosed cause and a differing redigest.
     rows = verify.load_known_bad(verify.DEFAULT_KNOWN_BAD)
-    assert rows
+    assert isinstance(rows, dict)
     assert all(row["cause"] for row in rows.values())
     assert all(row["redigest"] != digest for digest, row in rows.items())
 

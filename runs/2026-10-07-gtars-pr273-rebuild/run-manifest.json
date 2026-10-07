@@ -1,0 +1,188 @@
+{
+  "schema": "gks-refgetstore-run/1",
+  "run_id": "2026-10-07-gtars-pr273-rebuild",
+  "kind": "build",
+  "title": "Full rebuild with gtars from databio/gtars#273 (theferrit32/gtars@7831e09f), from the validated cache",
+  "status": "succeeded",
+  "timestamps": {
+    "initialized_utc": "2026-10-07T13:49:42.475823+00:00",
+    "finalized_utc": "2026-10-07T16:10:50.544858+00:00"
+  },
+  "baseline_run_id": "2026-08-26-full-rebuild",
+  "evidence": {
+    "quality": "captured",
+    "missing": []
+  },
+  "git": {
+    "commit": "ffb1aeef12e17876921061fb5b07bc94f5fbb09c",
+    "dirty": true,
+    "status_text": "M README.md\n M pyproject.toml\n M src/gks_refgetstore/build_lock.py\n M src/gks_refgetstore/build_store.py\n M src/gks_refgetstore/store_sync.py\n M src/gks_refgetstore/verify.py\n M tests/test_lock_schema.py\n M tests/test_source_resolution.py\n M uv.lock\n?? build.rebuild.lock.json\n?? issues/",
+    "diff_sha256": "ec9d180a4bea23cebc4bfe9d0c150ab9d13280a74d9bc1cee2a8389cf855ea57"
+  },
+  "tool_versions": {
+    "python": "3.14.7",
+    "git": "git version 2.50.1 (Apple Git-155)",
+    "uv": "uv 0.12.12 (Homebrew 2026-09-09 aarch64-apple-darwin)",
+    "gtars": "0.11.0"
+  },
+  "commands": [
+    {
+      "label": "tests",
+      "argv": [
+        "uv",
+        "run",
+        "pytest",
+        "tests/",
+        "-q"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-07T13:49:47.400702+00:00",
+      "finished_utc": "2026-10-07T13:50:19.162794+00:00",
+      "exit_code": 0,
+      "log": "logs/tests.log",
+      "log_bytes": 341,
+      "log_sha256": "51c7f8ae16bcc4dfe811eade39f7eb2502a92ec5ecc3a807effa87d606e2fc90"
+    },
+    {
+      "label": "build",
+      "argv": [
+        "uv",
+        "run",
+        "gks-refgetstore",
+        "build",
+        "--store-dir",
+        "store.rebuild",
+        "--lock",
+        "build.rebuild.lock.json",
+        "--locked-sources"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-07T13:50:25.398052+00:00",
+      "finished_utc": "2026-10-07T13:52:32.412710+00:00",
+      "exit_code": 1,
+      "log": "logs/build.log",
+      "log_bytes": 6839,
+      "log_sha256": "35b176585d82ed1c37c9be8aef13078d58932703aaef36a4d1cd5528ec436290"
+    },
+    {
+      "label": "tests-2",
+      "argv": [
+        "uv",
+        "run",
+        "pytest",
+        "tests/",
+        "-q"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-07T13:55:44.113617+00:00",
+      "finished_utc": "2026-10-07T13:56:16.063872+00:00",
+      "exit_code": 0,
+      "log": "logs/tests-2.log",
+      "log_bytes": 341,
+      "log_sha256": "e9ed8c9009a35f7c1863b36291e1eef9bb156b5b4a57a762d0b7c0393af0251b"
+    },
+    {
+      "label": "build-2",
+      "argv": [
+        "uv",
+        "run",
+        "gks-refgetstore",
+        "build",
+        "--store-dir",
+        "store.rebuild",
+        "--lock",
+        "build.rebuild.lock.json",
+        "--locked-sources"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-07T13:56:20.736247+00:00",
+      "finished_utc": "2026-10-07T14:23:08.254616+00:00",
+      "exit_code": 0,
+      "log": "logs/build-2.log",
+      "log_bytes": 180985,
+      "log_sha256": "eee08753d5ad89e9c1e46c1e1323bf75bf8b2cc34a2962a632a994d4be8e89ab"
+    },
+    {
+      "label": "verify-deep",
+      "argv": [
+        "uv",
+        "run",
+        "gks-refgetstore",
+        "verify",
+        "--store",
+        "--deep",
+        "--store-dir",
+        "store.rebuild",
+        "--lock",
+        "build.rebuild.lock.json",
+        "--known-bad",
+        "/private/tmp/claude-502/-Users-kferrite-dev-gks-refgetstore-builder/bead8e63-06f7-4a2b-8040-41c837c54a06/scratchpad/rebuild/empty-known-bad.tsv"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-07T14:25:43.876103+00:00",
+      "finished_utc": "2026-10-07T14:36:11.349560+00:00",
+      "exit_code": 0,
+      "log": "logs/verify-deep.log",
+      "log_bytes": 988,
+      "log_sha256": "06f5f457df31498e6c2db9466b024c03274fd670db20bbba01cb8b6335f0a45e"
+    },
+    {
+      "label": "tests-after-swap",
+      "argv": [
+        "uv",
+        "run",
+        "pytest",
+        "tests/",
+        "-q"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-07T16:10:17.978108+00:00",
+      "finished_utc": "2026-10-07T16:10:50.388880+00:00",
+      "exit_code": 0,
+      "log": "logs/tests-after-swap.log",
+      "log_bytes": 341,
+      "log_sha256": "5a346b87ec097c93c4a50d9ee6b0dd32be2c68886549b2469aa22a7093457c28"
+    }
+  ],
+  "artifacts": [
+    {
+      "role": "prior-known-bad-baseline",
+      "path": "artifacts/prior-gtars_encoding_roundtrip.tsv",
+      "bytes": 29453,
+      "sha256": "96d04c64caeb4601765dbd720c9b6b9d69ee0ba4f6dcb808b9fab186a58c9f47"
+    },
+    {
+      "role": "written-lock",
+      "path": "artifacts/build.lock.json",
+      "bytes": 353714,
+      "sha256": "8b8247c486e0fbbf3c2278b64d36eee870c3fde115718cc9841743d933d31f24"
+    },
+    {
+      "role": "gtars-fork-commit-patch",
+      "path": "artifacts/0001-gtars-zstd-bindings.patch",
+      "bytes": 3338,
+      "sha256": "9f3063fbbc312116db1d86a2c53e76cb576dcd16241f0afcb72247cca4c8f661"
+    },
+    {
+      "role": "gtars-verify",
+      "path": "artifacts/gtars-verify.txt",
+      "bytes": 185,
+      "sha256": "f992e1f5f6bcf93c25f399c9539ab29bf33add17c6c820a91e17a85edb2ee60b"
+    },
+    {
+      "role": "cache-verify",
+      "path": "artifacts/verify-cache.txt",
+      "bytes": 106,
+      "sha256": "554854a122898a92464e4a3ddc329434f4399a2f271ac11ffa971b8188a9c7e7"
+    },
+    {
+      "role": "empty-known-bad-baseline",
+      "path": "artifacts/empty-known-bad.tsv",
+      "bytes": 43,
+      "sha256": "99af5ba75f1648cc93991692ecb95d85e37da9de81486be13e9eea5e846ecde6"
+    }
+  ],
+  "result_summary": {},
+  "validations": [],
+  "publication": null
+}

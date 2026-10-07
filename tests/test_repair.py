@@ -100,7 +100,8 @@ def test_an_encoder_round_trip_defect_is_unrepairable() -> None:
     )
     assert plan.unrepairable == [("store.seq_digest_mismatch", "SOMEDIGEST")]
     assert not plan.touched
-    assert "reproduces it" in repair.UNREPAIRABLE["store.seq_digest_mismatch"]
+    assert "leaves an existing payload in place" in (
+        repair.UNREPAIRABLE["store.seq_digest_mismatch"])
 
 
 def test_an_unattributable_root_mismatch_points_at_sync() -> None:

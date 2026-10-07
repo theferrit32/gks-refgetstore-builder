@@ -1,0 +1,2 @@
+gtars verify(): checked=1,779,052 ok=1,779,052 failed=0 in 196s
+by_alphabet [checked, failed]: {'protein': (351881, 0), 'dna2bit': (1426421, 0), 'dna3bit': (643, 0), 'dnaio': (107, 0)}

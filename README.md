@@ -275,20 +275,11 @@ and corrupting one fires L2 while L0 and L1 stay clean.
 `--store`** — a root is a digest over the complete set, so a partial one is not
 a weaker check, it is a different number that means nothing.
 
-#### Known encoder defects (`--deep`)
+#### Encoder round-trip baseline (`--deep`)
 
-`--deep` on the production store reports 133 sequences whose stored payload does
-not re-digest to the digest it is filed under. They are **not** bit rot, and
-re-ingesting reproduces them exactly:
-
-- **106 proteins** — gtars' `protein` alphabet has no `U` (selenocysteine), so
-  every selenoprotein loses that residue on encode. `ENSP00000473614` (GPX4,
-  180 aa) has `U` at position 109; the store returns `A`.
-- **27 short proteins** — residues that happen to all be legal IUPAC nucleotide
-  codes get misdetected as nucleotide and encoded lossily
-  (`ENSP00000499040.1`, 12 aa).
-
-They are pinned as a **baseline**
+`--deep` re-digests every stored sequence from the bytes the store returns and
+compares the result with the digest it is filed under. Sequences known not to
+round-trip are listed in a **baseline**
 (`seqrepo_equivalence/known_divergence/gtars_encoding_roundtrip.tsv`) rather
 than suppressed, which gives three outcomes instead of two:
 
@@ -296,11 +287,15 @@ than suppressed, which gives three outcomes instead of two:
 | --- | --- | --- |
 | yes | no | `warn` — known defect, rendered with its diagnosed cause |
 | **no** | **no** | **`error`** — a new defect; this is the regression that matters |
-| **yes** | **yes** | `info` — gtars was fixed; update the baseline and re-ingest |
+| **yes** | **yes** | `info` — the encoder was fixed; update the baseline and re-ingest |
 
-That third row is why this is a baseline and not a `--ignore` flag: it turns the
-upstream fix into something the tool reports rather than something we have to
-remember to check. See
+**The baseline is empty**, and a full `--deep` run over the store passes with 0
+errors. Stores built with gtars 0.10 or earlier return 133 sequences with
+different residues than were imported (106 selenoproteins whose `U` is returned
+as `A`, and 27 `dnaio` sequences whose `D`/`H` are returned as `H`/`V`). That is
+what the [gtars revision](#gtars-revision) pin fixes. The earlier list is kept in
+[`runs/2026-10-07-gtars-pr273-rebuild/`](runs/2026-10-07-gtars-pr273-rebuild/README.md);
+see also
 [`seqrepo_equivalence/known_divergence/README.md`](seqrepo_equivalence/known_divergence/README.md).
 
 ### `status` — describe, don't judge
@@ -328,8 +323,12 @@ lock records and never re-baselines — new upstream bytes are a `sync` or
 
 Two deliberate refusals:
 
-- **`store.seq_digest_mismatch` is unrepairable.** Re-ingesting reproduces the
-  encoder defect byte for byte. The fix is upstream in gtars.
+- **`store.seq_digest_mismatch` is not repaired.** Repair re-ingests from the
+  same source bytes, and gtars skips a sequence whose digest the store already
+  holds, so the existing payload would be left in place. A mismatch means an
+  encoder defect or a damaged payload, and needs diagnosing before anything is
+  rewritten. A store built with a gtars that has an encoder defect is fixed by
+  rebuilding with a gtars that does not.
 - **A root mismatch with no attributable cause is refused.** If the store's
   digest set differs from the lock's but no collection is missing and no payload
   is absent, the store has diverged in a way repair cannot name. That is `sync`.
@@ -360,7 +359,8 @@ jobs, which is what the shape is organized around:
 ```json
 {
   "schema": "gks-refgetstore-build-lock/4",
-  "build":   {"timestamp_utc": …, "git": {…}, "gtars_version": "0.9.2"},
+  "build":   {"timestamp_utc": …, "git": {…}, "gtars_version": "0.11.0",
+              "gtars_source": {"url", "vcs", "commit", "subdirectory"} | null},
   "inputs":  {"sources_toml_sha256": …,
               "files": [{"kind","owner","url","cache_path","mutable",
                          "sha256","bytes","present","provider_checksum",

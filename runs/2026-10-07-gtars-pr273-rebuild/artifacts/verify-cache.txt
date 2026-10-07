@@ -1,0 +1,4 @@
+cache   335 locked file(s) checked
+        335 ok, 0 with findings
+PASS (0 error(s), 0 warning(s))
+exit=0

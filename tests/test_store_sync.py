@@ -275,18 +275,18 @@ def test_reingest_scope_of_an_unattributed_file_is_itself() -> None:
     assert build_lock.reingest_scope(lock, [REL_TOP]) == {REL_TOP}
 
 
-def test_committed_config_against_committed_lock_targets_only_padded_releases(
+def test_committed_config_and_committed_lock_are_in_sync(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Guards the real migration: releases 76-109 plus the one lrg_zip source.
+    """The committed lock was built from the committed manifest, so a sync
+    between them has nothing to do. A manifest edit that is not followed by a
+    sync or rebuild leaves them apart, and this is what notices.
 
     Sources come from the lock via ``apply_locked_sources`` rather than from
     live discovery. Resolving them for real would fetch provider manifests, so
     the test would depend on what NCBI and Ensembl are publishing today -- it
     failed exactly that way when a ninth RefSeqGene shard appeared upstream.
     """
-    import re
-
     repo = Path(__file__).resolve().parent.parent
     lock_path = repo / "build.lock.json"
     if not lock_path.exists():  # a build artifact, not always present
@@ -306,16 +306,11 @@ def test_committed_config_against_committed_lock_targets_only_padded_releases(
         sources, lock, tmp_path, seqsets=seqsets, hash_files=False,
     )
     assert not plan.missing
-    releases = {
-        int(m.group(1))
-        for rel, _ in plan.reingest
-        if (m := re.search(r"release-(\d+)", rel))
-    }
-    assert releases == set(range(76, 110))
-    # Everything re-ingested is either a padded Ensembl release or the lrg_zip
-    # source, whose conversion the lock cannot vouch for.
-    non_ensembl = [rel for rel, _ in plan.reingest if "release-" not in rel]
-    assert len(non_ensembl) == 1 and non_ensembl[0].endswith(".zip")
+    assert not plan.touched, (
+        f"manifest and lock disagree: added={plan.added} "
+        f"removed={[r['cache_path'] for r in plan.removed]} "
+        f"reingest={plan.reingest}"
+    )
 
 
 # --------------------------------------------------------------------------
