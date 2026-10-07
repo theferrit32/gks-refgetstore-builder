@@ -41,12 +41,11 @@ sources.toml.bak.*
 /runs/**/*.fa.gz
 
 # Local-only working notes / one-off analysis (kept on disk, not part of the repo)
-# Drafted upstream bug reports stay local until they are actually filed; the
-# findings they rest on live in runs/ and seqrepo_equivalence/, which are tracked.
-/ISSUE-gtars-encoder-alphabet.md
 /TODO.md
 /UPLOAD_PLAN.md
 /SEQREPO_PARITY.md
+# Local backups of write-ups under issues/.
+/issues/**/*.bak
 
 # Python
 __pycache__/
