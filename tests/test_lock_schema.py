@@ -337,3 +337,34 @@ def test_build_lock_dict_never_emits_an_unvalidatable_lock(
     )
     build_lock.validate_lock(lock)
     assert build_lock.files_by_collection(lock)[digests[0]] == []
+
+
+# ------------------------------------------------------------- build metadata
+
+class _FakeDistribution:
+    def __init__(self, direct_url: str | None) -> None:
+        self._direct_url = direct_url
+
+    def read_text(self, name: str) -> str | None:
+        return self._direct_url if name == "direct_url.json" else None
+
+
+def test_gtars_built_from_a_commit_records_that_commit(monkeypatch) -> None:
+    direct_url = json.dumps({
+        "url": "https://github.com/example/gtars",
+        "vcs_info": {"vcs": "git", "commit_id": "c" * 40,
+                     "requested_revision": "c" * 40},
+        "subdirectory": "gtars-python",
+    })
+    monkeypatch.setattr("importlib.metadata.distribution",
+                        lambda name: _FakeDistribution(direct_url))
+    assert build_lock._gtars_source() == {
+        "url": "https://github.com/example/gtars", "vcs": "git",
+        "commit": "c" * 40, "subdirectory": "gtars-python",
+    }
+
+
+def test_gtars_from_a_registry_wheel_records_no_source(monkeypatch) -> None:
+    monkeypatch.setattr("importlib.metadata.distribution",
+                        lambda name: _FakeDistribution(None))
+    assert build_lock._gtars_source() is None

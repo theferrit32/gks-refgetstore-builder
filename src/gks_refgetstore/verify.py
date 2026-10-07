@@ -635,8 +635,11 @@ def run_status(args) -> int:
     """
     lock = build_lock.load_lock(args.lock)
     print(f"lock      {args.lock}")
+    source = lock["build"].get("gtars_source") or {}
+    built_from = (f" ({source['url']} @ {source['commit'][:8]})"
+                  if source.get("commit") else "")
     print(f"          written {lock['build']['timestamp_utc']} "
-          f"by gtars {lock['build']['gtars_version']}")
+          f"by gtars {lock['build']['gtars_version']}{built_from}")
     print(f"          {len(build_lock.lock_files(lock))} input file(s), "
           f"{lock['outputs']['n_collections']} collection(s), "
           f"{lock['outputs']['n_sequences']:,} sequence(s)")

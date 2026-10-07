@@ -110,6 +110,32 @@ def _gtars_version() -> str | None:
         return None
 
 
+def _gtars_source() -> dict | None:
+    """Where the installed gtars was built from, when it was not a registry wheel.
+
+    A version string alone cannot tell a release from a build of an unreleased
+    commit that carries the same version number. When gtars is installed from a
+    VCS URL, its PEP 610 ``direct_url.json`` names the repository and the exact
+    commit, which is what makes such a build reproducible. ``None`` for a
+    PyPI install, which ``gtars_version`` already identifies.
+    """
+    try:
+        from importlib.metadata import distribution
+        raw = distribution("gtars").read_text("direct_url.json")
+    except Exception:  # noqa: BLE001
+        return None
+    if not raw:
+        return None
+    info = json.loads(raw)
+    vcs = info.get("vcs_info") or {}
+    return {
+        "url": info.get("url"),
+        "vcs": vcs.get("vcs"),
+        "commit": vcs.get("commit_id"),
+        "subdirectory": info.get("subdirectory"),
+    }
+
+
 def records_from_log(log_path: Path) -> dict[str, dict]:
     """Reconstruct file -> collection from a build log (for backfilling a lock).
 
@@ -381,6 +407,7 @@ def _build_meta(config_path: Path) -> dict:
         "timestamp_utc": datetime.now(timezone.utc).isoformat(),
         "git": _git_info(Path(config_path).resolve().parent),
         "gtars_version": _gtars_version(),
+        "gtars_source": _gtars_source(),
     }
 
 
