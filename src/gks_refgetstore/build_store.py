@@ -969,9 +969,11 @@ def ingest_fastas(
     if not paths:
         return []
     try:
+        # An ImportReport, whose ``collections`` holds the per-file results in
+        # expanded-input order; its counters are not needed here.
         results = store.add_sequence_collections_from_fastas(
             [str(p) for p in paths], jobs=jobs
-        )
+        ).collections
     except Exception as exc:  # noqa: BLE001
         logger.warning(
             "batched ingest of %d file(s) failed (%s); retrying serially to "

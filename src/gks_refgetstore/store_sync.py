@@ -6,13 +6,17 @@ classifies each source against the build lock, removes only the collections
 whose ingest inputs moved, re-ingests those, and rewrites only the affected
 alias namespaces -- leaving the rest of the store byte-identical.
 
-Three gtars 0.9.2 behaviours shape this module, all established empirically
-against the installed package:
+Three gtars behaviours shape this module, all established empirically against
+the installed package:
 
-1. ``remove_collection(remove_orphan_sequences=True)`` collects **nothing** on a
-   lazily loaded store, silently. Collections open as metadata stubs, and orphan
-   detection consults only loaded ones. :func:`load_for_mutation` is therefore
-   mandatory, and :func:`remove_collections` refuses to run without it.
+1. Orphan collection must see every collection. On gtars 0.9.2,
+   ``remove_collection(remove_orphan_sequences=True)`` collected **nothing** on
+   a lazily loaded store, silently, because orphan detection consulted only
+   loaded collections. gtars 0.10.0 collects correctly on a lazy store, but
+   :func:`load_for_mutation` is kept and :func:`remove_collections` still
+   refuses to run without it: a missed orphan is cheap, a sequence collected
+   while another collection still references it is not, and the guard costs
+   one load per sync.
 
 2. Removal **persists immediately** -- orphaned ``.seq`` files are unlinked and
    the indexes rewritten without waiting for ``write()``. There is no in-memory
@@ -68,7 +72,7 @@ def load_for_mutation(store) -> int:
     production store; it loads collection *metadata*, not sequence payloads.
     """
     store.load_all_collections()
-    loaded = int(store.stats()["n_collections_loaded"])
+    loaded = int(store.stats()["n_collections_in_memory"])
     logger.info("loaded %d collection(s) for mutation", loaded)
     return loaded
 
@@ -81,11 +85,11 @@ def remove_collections(store, digests: list[str]) -> int:
     gone. Interleaving remove-and-ingest per source reclaims almost nothing.
     """
     stats = store.stats()
-    if int(stats["n_collections_loaded"]) < int(stats["n_collections"]):
+    if int(stats["n_collections_in_memory"]) < int(stats["n_collections"]):
         raise MutationOrderError(
-            "collections are not fully loaded: orphan collection would "
-            "silently free nothing. Call load_for_mutation() first "
-            f"(loaded {stats['n_collections_loaded']} of {stats['n_collections']})"
+            "collections are not fully loaded: orphan collection must see "
+            "every collection. Call load_for_mutation() first "
+            f"(loaded {stats['n_collections_in_memory']} of {stats['n_collections']})"
         )
     removed = 0
     for digest in digests:

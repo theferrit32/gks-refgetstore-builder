@@ -809,7 +809,8 @@ class BatchStore:
         if self.batch_error is not None:
             raise self.batch_error
         kept = paths[: len(paths) - self.short_by] if self.short_by else paths
-        return [(self._meta(p), True) for p in kept]
+        collections = [(self._meta(p), True) for p in kept]
+        return type("ImportReport", (), {"collections": collections})()
 
     def add_sequence_collection_from_fasta(self, path):
         self.single_calls.append(str(path))

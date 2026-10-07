@@ -8,8 +8,15 @@ classifiers = [
     "License :: OSI Approved :: Apache Software License",
 ]
 dependencies = [
-    "gtars>=0.8.0",
+    "gtars>=0.11.0",
 ]
+
+[tool.uv.sources]
+# gtars is built from source at a pinned commit until a release includes
+# databio/gtars#273 (sequences that change when stored in encoded mode). The
+# commit is that PR's head plus one fix so the Python bindings compile; see
+# README.md "gtars revision". Building it needs a Rust toolchain.
+gtars = { git = "https://github.com/theferrit32/gtars", rev = "7831e09f596042e3983c7a123c3f6c019ca6c05f", subdirectory = "gtars-python" }
 
 [dependency-groups]
 dev = [

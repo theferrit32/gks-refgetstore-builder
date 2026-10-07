@@ -30,7 +30,9 @@ header names. The only runtime dependency is `gtars`.
 
 - Python >= 3.11 (uses `tomllib`).
 - [`uv`](https://docs.astral.sh/uv/) for environment + dependency management.
-- `gtars` (installed via `uv sync`).
+- `gtars`, installed via `uv sync`. It is currently built from source at a
+  pinned commit (see [gtars revision](#gtars-revision)), so `uv sync` also needs
+  a Rust toolchain (`rustup`, stable).
 - Network access to `ftp.ncbi.nlm.nih.gov` and `ftp.ensembl.org` (or
   pre-populated cache dirs).
 - Disk: the default manifest includes 23 NCBI assembly releases, complete
@@ -43,6 +45,43 @@ header names. The only runtime dependency is `gtars`.
 ## Setup
 
     uv sync
+
+### gtars revision
+
+gtars is pinned to a commit rather than a PyPI release:
+
+| | |
+| --- | --- |
+| repository | [`theferrit32/gtars`](https://github.com/theferrit32/gtars), a fork of [`databio/gtars`](https://github.com/databio/gtars) |
+| branch | [`fix/encodings-buildable`](https://github.com/theferrit32/gtars/tree/fix/encodings-buildable) |
+| commit | [`7831e09f596042e3983c7a123c3f6c019ca6c05f`](https://github.com/theferrit32/gtars/commit/7831e09f596042e3983c7a123c3f6c019ca6c05f) |
+| package version | `0.11.0` (unreleased; no 0.11.0 wheels were published to PyPI) |
+
+The commit is the head of [databio/gtars#273](https://github.com/databio/gtars/pull/273)
+(`bbe7fd97`, "Fix sequences that change when stored in encoded mode") plus one
+commit that adds the missing `StorageMode::Zstd` case to the Python and R
+bindings, without which the Python package does not compile. #273 corrects the
+encoded-storage round trip for `D`/`H` and RNA `U` in the IUPAC nucleotide
+alphabet and for `U`/`B`/`Z`/`O`/`J` in the protein alphabet. With an earlier
+gtars, 133 sequences in the store are returned with different residues than
+were imported; see
+[`issues/gtars-encoder-alphabet/`](issues/gtars-encoder-alphabet/README.md).
+
+The pin lives in `pyproject.toml` under `[tool.uv.sources]`, and `uv.lock`
+records the resolved commit. Every build lock records it too: alongside
+`gtars_version`, the lock's `build.gtars_source` names the repository and commit
+gtars was built from, read from the installed package's metadata (`null` for a
+PyPI wheel).
+
+Stores written with this revision use residue codes that gtars 0.10 and earlier
+do not know about, and those versions decode them as different letters without
+raising an error (selenocysteine `U` reads back as `X`). The store format
+version is unchanged, so nothing prevents an older gtars from opening such a
+store. Read stores built here with this revision or a later release that
+includes #273.
+
+Move to a PyPI release once one includes #273: replace the
+`[tool.uv.sources]` entry with a version constraint, then `uv lock`.
 
 ## Layout
 
