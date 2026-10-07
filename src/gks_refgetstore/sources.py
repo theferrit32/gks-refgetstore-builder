@@ -250,7 +250,17 @@ class SeqsetConfig:
 
         ``iter_shard_urls`` drops per-index metadata, so callers that need the
         file class alongside the URL enumerate and ask here.
+
+        Resolved sources carry their own class, and that wins: sources applied
+        from a lock (``--locked-sources``) arrive in the lock's order, sorted by
+        cache path, not in ``file_classes`` order. Indexing ``file_classes``
+        positionally there handed an Ensembl release's ``cdna`` file the
+        ``dna.toplevel`` exclusion rule.
         """
+        if self.resolved_sources is not None and index < len(self.resolved_sources):
+            resolved = self.resolved_sources[index].file_class
+            if resolved is not None:
+                return resolved
         if self.file_classes is not None:
             return self.file_classes[index] if index < len(self.file_classes) else None
         return self.file_class

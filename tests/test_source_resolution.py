@@ -1221,3 +1221,24 @@ def test_checked_in_config_declares_exclusions_only_for_padded_releases() -> Non
         if entry.exclusion is not None:
             assert entry.exclusion.file_classes == ("dna.toplevel",)
             assert entry.exclusion.record_prefixes == ("CHR_",)
+
+
+def test_locked_sources_keep_each_files_class_when_lock_order_differs() -> None:
+    """The lock lists a seqset's files sorted by cache path, which for an Ensembl
+    release puts ``cdna`` before ``dna``: the reverse of ``file_classes``. Looking
+    the class up by position handed the cdna file the dna.toplevel exclusion."""
+    seqset = _toplevel_seqset(exclude={"file_classes": ["dna.toplevel"],
+                                       "record_prefixes": ["CHR_"]})
+    apply_locked_sources([seqset], v4_lock([
+        file_record("x/cdna.fa.gz", owner="rel", url="https://x/cdna.fa.gz",
+                    file_class="cdna"),
+        file_record("x/dna.fa.gz", owner="rel", url="https://x/dna.fa.gz",
+                    file_class="dna.toplevel"),
+    ]))
+    shards = list(seqset.iter_shard_urls())
+    assert {url: seqset.file_class_for_index(i) for i, (_, url) in enumerate(shards)} == {
+        "https://x/cdna.fa.gz": "cdna", "https://x/dna.fa.gz": "dna.toplevel",
+    }
+    filtered = [url for i, (_, url) in enumerate(shards)
+                if seqset.exclusion.applies_to(seqset.file_class_for_index(i))]
+    assert filtered == ["https://x/dna.fa.gz"]
