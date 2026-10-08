@@ -35,6 +35,10 @@ header names. The only runtime dependency is `gtars`.
   a Rust toolchain (`rustup`, stable).
 - Network access to `ftp.ncbi.nlm.nih.gov` and `ftp.ensembl.org` (or
   pre-populated cache dirs).
+- A **case-sensitive filesystem for the store directory**. The defaults on
+  macOS (APFS) and Windows (NTFS) are case-insensitive, and a store written to
+  one cannot be published. See
+  [Case-sensitive store directory](#case-sensitive-store-directory).
 - Disk: the default manifest includes 23 NCBI assembly releases, complete
   published GRCh37/GRCh38 RefSeq release history, and all four canonical FASTA
   classes for Ensembl releases 75–116.
@@ -82,6 +86,63 @@ includes #273.
 
 Move to a PyPI release once one includes #273: replace the
 `[tool.uv.sources]` entry with a version constraint, then `uv lock`.
+
+### Case-sensitive store directory
+
+gtars stores each sequence payload at
+`sequences/<first two characters of its digest>/<digest>.seq`. Digests are
+base64url, so `zz`, `Zz`, `zZ` and `ZZ` are four different shard directories.
+
+macOS APFS and Windows NTFS are case-insensitive by default (case-preserving,
+but lookups ignore case), so on them those four shards become one directory,
+named after whichever was created first. Nothing local notices: lookups ignore
+case, so the store builds, reads and passes `verify --deep`. The damage shows up
+once the store leaves that filesystem. Copied to a case-sensitive filesystem, or
+uploaded to object storage such as R2 or S3, whose keys are case-sensitive,
+about two thirds of payloads sit at a path no reader requests. A full store
+needs 4,096 shard directories; a case-insensitive filesystem holds at most
+1,444.
+
+`build`, `sync --apply` and `repair --apply` check this before doing anything
+else and refuse a store directory on a case-insensitive filesystem. The check
+writes a probe file in the store directory, or in its nearest existing parent,
+tests whether the uppercase spelling of its name refers to the same file, and
+removes it. `--allow-case-insensitive-fs` skips the refusal for a store that is
+only ever read in place, such as a local dev store.
+
+**On macOS**, put the store on a case-sensitive APFS volume. A volume shares
+free space with the other volumes in its container, grows and shrinks with its
+contents, and needs no size set in advance:
+
+    diskutil apfs list                                  # find the container, e.g. disk3
+    diskutil apfs addVolume disk3 APFSX RefgetStores    # mounts at /Volumes/RefgetStores
+
+Creating it asks for an administrator's authorization, because it changes the
+internal disk's container. Add `-passprompt` to encrypt it. The volume belongs
+to the user who creates it, and needs no special rights to use afterwards.
+
+Then build onto it, and point `./store` at it so every command's default
+`--store-dir` keeps working (the checkout this README describes is set up this
+way):
+
+    gks-refgetstore build --store-dir /Volumes/RefgetStores/store
+    ln -s /Volumes/RefgetStores/store store
+
+`.gitignore` ignores the `store` symlink. The case check follows it, so it
+passes for the volume, not for the repository's own filesystem. The download
+cache can stay on the default volume, since its file names do not depend on
+case.
+
+**On Linux**, ext4 and xfs are case-sensitive by default, and nothing needs
+setting up. **On Windows**, build inside WSL2's own Linux filesystem rather than
+under `/mnt/c`.
+
+A store already built on a case-insensitive filesystem cannot be fixed where it
+is, because each of its shard directories holds several prefixes' files and the
+filesystem cannot separate them. Either copy it to a case-sensitive filesystem
+and move each payload into the directory named by its own digest prefix, or
+rebuild it there: with `--locked-sources` and an intact cache a full rebuild
+takes about half an hour and reproduces the same digests and payload bytes.
 
 ## Layout
 
@@ -151,9 +212,14 @@ cached and still matches its provider checksum, so it downloads nothing.
 Measured: build ~6 minutes, `verify --all` 23 seconds, `sync --apply` ~2
 minutes, `status` instant.
 
-    gks-refgetstore build  --config sources.dev.toml --store-dir store.dev --lock build.dev.lock.json
+    gks-refgetstore build  --config sources.dev.toml --store-dir store.dev --lock build.dev.lock.json --allow-case-insensitive-fs
     gks-refgetstore verify --config sources.dev.toml --store-dir store.dev --lock build.dev.lock.json --all
     gks-refgetstore status --config sources.dev.toml --store-dir store.dev --lock build.dev.lock.json
+
+`store.dev/` is only ever read in place, so on a case-insensitive filesystem it
+is built with `--allow-case-insensitive-fs`. Drop the flag, or point
+`--store-dir` at a case-sensitive volume, if the dev store is to be copied or
+uploaded.
 
 It shares `downloads/` with the production manifest rather than using its own
 cache directory. That is forced, not incidental: `fasta_path` resolves relative
@@ -172,7 +238,7 @@ deliberately left out.
 
 Reads the cache (never re-downloads unless `--force-download`); a missing file
 is fetched on demand. Writes/refreshes the build lock at the end (see
-[Build lock](#build-lock--cache-verification)).
+[Build lock](#build-lock--verification)).
 
     --store-dir PATH       output RefgetStore (default: ./store)
     --assembly NAME        only this assembly namespace; --seqset NAME only this seqset
@@ -181,6 +247,8 @@ is fetched on demand. Writes/refreshes the build lock at the end (see
     --ingest-jobs N        FASTAs imported concurrently per seqset (default: min(8, cores))
     --filter-jobs N        source files filtered concurrently in the preflight (default: min(8, cores))
     --min-free-gb N        refuse to start if free disk is below this (default 25)
+    --allow-case-insensitive-fs
+                           build even if --store-dir is case-insensitive (local-only stores; see Prerequisites)
     --lock PATH            build-lock to check against + write (default ./build.lock.json)
     --lock-check-mode {strict,subset,ignore}   pre-flight check vs the lock (default strict)
     --no-lock              don't write the lock (the pre-flight check still runs)

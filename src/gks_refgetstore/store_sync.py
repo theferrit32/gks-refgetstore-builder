@@ -37,7 +37,7 @@ import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from . import build_lock
+from . import build_lock, fs_checks
 from .build_store import (INGEST_JOBS_DEFAULT, _write_alias_tsv,
                           prepare_filtered_sources, process_seqset)
 from .sources import (SeqsetConfig, load_config, mirror_cache_path,
@@ -283,6 +283,8 @@ def run_sync(args) -> int:
     """Execute the ``sync`` subcommand."""
     from gtars.refget import RefgetStore
 
+    if args.apply:
+        fs_checks.preflight_store_dir(args)
     logging.basicConfig(
         level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s"
     )

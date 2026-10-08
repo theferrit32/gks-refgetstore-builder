@@ -24,7 +24,7 @@ from typing import Callable, Iterator
 
 from gtars.refget import RefgetStore
 
-from . import build_lock
+from . import build_lock, fs_checks
 from .sources import (NA_VALUES, AssemblyConfig, RecordExclusion,
                       ResolvedSource, SeqsetConfig, load_config, md5_file,
                       mirror_cache_path, natural_sort_key,
@@ -1400,6 +1400,7 @@ def run_build(args) -> int:
     only touched sources. Content drift or a strict file-set mismatch suppresses
     a lock write unless the caller explicitly forces a re-baseline.
     """
+    fs_checks.preflight_store_dir(args)
     assemblies, seqsets = load_config(args.config)
     logger.info(
         "loaded %d assembly + %d seqset entries from %s",

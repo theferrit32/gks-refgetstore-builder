@@ -26,7 +26,12 @@ covers every config shape in minutes rather than hours (measured: build ~6m,
 ``verify --all`` 23s):
 
     gks-refgetstore build --config sources.dev.toml \\
-        --store-dir store.dev --lock build.dev.lock.json
+        --store-dir store.dev --lock build.dev.lock.json \\
+        --allow-case-insensitive-fs   # local-only dev store; see README
+
+Commands that write store payloads (``build``, ``sync --apply``,
+``repair --apply``) first refuse a store directory on a case-insensitive
+filesystem; see ``fs_checks``.
 """
 
 from __future__ import annotations
@@ -35,7 +40,15 @@ import argparse
 import logging
 from pathlib import Path
 
-from . import build_lock, build_store, fetch_sources, repair, store_sync, verify
+from . import (
+    build_lock,
+    build_store,
+    fetch_sources,
+    fs_checks,
+    repair,
+    store_sync,
+    verify,
+)
 
 # Relative to the current directory, not to the package: the manifest, the
 # cache and the store are the *user's* data, and an installed tool has no
@@ -45,6 +58,17 @@ DEFAULT_CONFIG = Path("sources.toml")
 DEFAULT_STORE = Path("store")
 DEFAULT_CACHE = Path("downloads")
 DEFAULT_LOCK = Path("build.lock.json")
+
+
+def _add_case_flag(p: argparse.ArgumentParser) -> None:
+    """The escape hatch for the case-sensitivity preflight, shared by every
+    command that writes store payloads."""
+    p.add_argument(fs_checks.ALLOW_FLAG, action="store_true",
+                   help="write the store even if --store-dir is on a "
+                        "case-insensitive filesystem (macOS and Windows "
+                        "defaults). Only for a store read in place there: its "
+                        "shard directories will not match digest prefixes once "
+                        "copied or uploaded")
 
 
 def _add_build(sub: argparse._SubParsersAction) -> None:
@@ -88,6 +112,7 @@ def _add_build(sub: argparse._SubParsersAction) -> None:
                    help="write the lock even if a discrepancy would suppress it")
     p.add_argument("--locked-sources", action="store_true",
                    help="use concrete URLs and SHA-256 values from --lock; no discovery")
+    _add_case_flag(p)
     p.set_defaults(func=build_store.run_build)
 
 
@@ -118,6 +143,7 @@ def _add_sync(sub: argparse._SubParsersAction) -> None:
                    default=build_store.INGEST_JOBS_DEFAULT)
     p.add_argument("--filter-jobs", type=int,
                    default=build_store.INGEST_JOBS_DEFAULT)
+    _add_case_flag(p)
     p.set_defaults(func=store_sync.run_sync)
 
 
@@ -207,6 +233,7 @@ def _add_repair(sub: argparse._SubParsersAction) -> None:
                    default=build_store.INGEST_JOBS_DEFAULT)
     p.add_argument("--filter-jobs", type=int,
                    default=build_store.INGEST_JOBS_DEFAULT)
+    _add_case_flag(p)
     p.set_defaults(func=repair.run_repair)
 
 

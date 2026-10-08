@@ -40,7 +40,7 @@ import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from . import build_lock, fetch_sources, store_census, store_sync, verify
+from . import build_lock, fetch_sources, fs_checks, store_census, store_sync, verify
 from .sources import ResolvedSource, load_config, sha256_file
 
 # verify codes this module knows how to act on. A code absent from both tables
@@ -314,6 +314,8 @@ def run_repair(args) -> int:
     targets = {t for t in ("cache", "store") if getattr(args, t, False)}
     if not targets:
         targets = {"cache", "store"}
+    if args.apply and "store" in targets:
+        fs_checks.preflight_store_dir(args)
 
     lock = build_lock.load_lock(args.lock)
 

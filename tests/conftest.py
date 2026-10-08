@@ -6,6 +6,11 @@ what upstream published today: one failed exactly that way when a ninth
 RefSeqGene shard appeared. Drive resolution from the build lock
 (``apply_locked_sources``) or from fixtures instead, and inject ``fetch_text``
 where a manifest is genuinely under test.
+
+No test may depend on the case sensitivity of the filesystem it runs on.
+Commands that write a store refuse a case-insensitive one, and ``tmp_path`` is
+case-insensitive on a default macOS install but not on Linux. The probe is
+stubbed as case-sensitive everywhere except tests marked ``real_case_probe``.
 """
 
 from __future__ import annotations
@@ -28,6 +33,21 @@ def _blocked(*args, **kwargs):
 def block_network(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(urllib.request, "urlopen", _blocked)
     monkeypatch.setattr(urllib.request, "urlretrieve", _blocked)
+
+
+def pytest_configure(config: pytest.Config) -> None:
+    config.addinivalue_line(
+        "markers",
+        "real_case_probe: run the filesystem case-sensitivity probe for real",
+    )
+
+
+@pytest.fixture(autouse=True)
+def case_sensitive_store_dirs(request: pytest.FixtureRequest,
+                              monkeypatch: pytest.MonkeyPatch) -> None:
+    if request.node.get_closest_marker("real_case_probe") is None:
+        monkeypatch.setattr("gks_refgetstore.fs_checks.is_case_sensitive",
+                            lambda directory: True)
 
 
 # ---------------------------------------------------------------------- locks
