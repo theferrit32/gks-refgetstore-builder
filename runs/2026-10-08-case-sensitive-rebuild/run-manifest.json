@@ -1,0 +1,107 @@
+{
+  "schema": "gks-refgetstore-run/1",
+  "run_id": "2026-10-08-case-sensitive-rebuild",
+  "kind": "build",
+  "title": "Rebuild onto a case-sensitive APFS volume so sequence shard directories match digest prefixes",
+  "status": "succeeded",
+  "timestamps": {
+    "initialized_utc": "2026-10-08T20:51:54.818779+00:00",
+    "finalized_utc": "2026-10-08T21:57:23.130903+00:00"
+  },
+  "baseline_run_id": "2026-10-07-gtars-pr273-rebuild",
+  "evidence": {
+    "quality": "captured",
+    "missing": []
+  },
+  "git": {
+    "commit": "7aad2ae9931a6de32a560c24a4d0c6eaafbcf874",
+    "dirty": false,
+    "status_text": "",
+    "diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "tool_versions": {
+    "python": "3.14.7",
+    "git": "git version 2.50.1 (Apple Git-155)",
+    "uv": "uv 0.12.12 (Homebrew 2026-09-09 aarch64-apple-darwin)",
+    "gtars": "0.11.0"
+  },
+  "commands": [
+    {
+      "label": "tests",
+      "argv": [
+        "uv",
+        "run",
+        "pytest",
+        "tests/",
+        "-q"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-08T20:51:54.921443+00:00",
+      "finished_utc": "2026-10-08T20:52:26.663895+00:00",
+      "exit_code": 0,
+      "log": "logs/tests.log",
+      "log_bytes": 341,
+      "log_sha256": "b34eeabeb19eae3132604d3bf678ae1159467d522ba820d9b51efd2f76c16c7d"
+    },
+    {
+      "label": "build",
+      "argv": [
+        "uv",
+        "run",
+        "gks-refgetstore",
+        "build",
+        "--store-dir",
+        "/Volumes/RefgetStores/store",
+        "--lock",
+        "/private/tmp/claude-502/-Users-kferrite-dev-gks-refgetstore-builder/bead8e63-06f7-4a2b-8040-41c837c54a06/scratchpad/2026-10-08-case-sensitive-rebuild/build.lock.json",
+        "--locked-sources"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-08T20:52:32.449141+00:00",
+      "finished_utc": "2026-10-08T21:17:29.898479+00:00",
+      "exit_code": 0,
+      "log": "logs/build.log",
+      "log_bytes": 181163,
+      "log_sha256": "aa830cd7126199824bfad4c98fb550468b677271f0e9161dc7c47f78cb1f52b6"
+    },
+    {
+      "label": "verify-deep",
+      "argv": [
+        "uv",
+        "run",
+        "gks-refgetstore",
+        "verify",
+        "--store",
+        "--deep",
+        "--store-dir",
+        "/Volumes/RefgetStores/store",
+        "--lock",
+        "/private/tmp/claude-502/-Users-kferrite-dev-gks-refgetstore-builder/bead8e63-06f7-4a2b-8040-41c837c54a06/scratchpad/2026-10-08-case-sensitive-rebuild/build.lock.json"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-08T21:21:01.503205+00:00",
+      "finished_utc": "2026-10-08T21:32:28.649960+00:00",
+      "exit_code": 0,
+      "log": "logs/verify-deep.log",
+      "log_bytes": 989,
+      "log_sha256": "2ebd6a5b40af20cd75be70baab248bf582cd703229845dfd00ddedff0adec01c"
+    }
+  ],
+  "artifacts": [
+    {
+      "role": "written-lock",
+      "path": "artifacts/build.lock.json",
+      "bytes": 353714,
+      "sha256": "901cfda5b291856dfb19eab1caf6eb66536e8bf389d945f2e8d13042d137dcd8"
+    },
+    {
+      "role": "comparison",
+      "path": "artifacts/comparison.txt",
+      "bytes": 959,
+      "sha256": "063221a69cc0d11fad119a7670ee641eebed8e8a64542ed88d1caed06a61b998"
+    }
+  ],
+  "result_summary": {},
+  "validations": [],
+  "publication": null
+}

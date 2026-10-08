@@ -1,0 +1,6 @@
+ERROR : S3 bucket theferrit32-public path refgetstore/2026-10-07: not deleting files as there were IO errors
+ERROR : S3 bucket theferrit32-public path refgetstore/2026-10-07: not deleting directories as there were IO errors
+ERROR : Attempt 1/3 failed with 7 errors and: operation error S3: PutObject, exceeded maximum number of attempts, 1, https response error StatusCode: 502, RequestID: , HostID: , error while deserializing xml error response : XML syntax error on line 6: element <hr> closed by </body>
+ERROR : Attempt 2/3 succeeded
+NOTICE: S3 bucket theferrit32-public path refgetstore/2026-10-07: 0 differences found
+NOTICE: S3 bucket theferrit32-public path refgetstore/2026-10-07: 1779362 matching files

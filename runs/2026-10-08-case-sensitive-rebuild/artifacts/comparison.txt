@@ -1,0 +1,15 @@
+Lock written by this build vs the committed build.lock.json
+  inputs identical:              True
+  outputs.n_sequences       identical: True  (1779052)
+  outputs.n_collections     identical: True  (235)
+  outputs.sequences_root    identical: True  (sha256:3ecf0d7221a60fa038aa12baac6b1da646b4917513b176a1d0661b1541ed921c)
+  outputs.collections_root  identical: True  (sha256:829d3700161d1f151efc53cddb7e41d97fabc0e032eec5a6d0b93eeebac41f5c)
+  outputs.collections       identical: True  (235 entries)
+
+Shard layout: 4096 directories; payloads in a directory that differs from their digest prefix: 0 of 1,779,052
+Byte-for-byte comparison with the previous store (built on case-insensitive APFS), 2026-10-08
+payloads compared: 1,779,052; byte-identical: 1,779,052; differ: 0; missing in previous store: 0
+sequences.rgsi identical: True
+collections.rgci identical: True
+collections/ file sets identical: True
+rgstore.json differs only in created_at and modified

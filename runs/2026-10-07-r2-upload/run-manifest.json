@@ -1,0 +1,76 @@
+{
+  "schema": "gks-refgetstore-run/1",
+  "run_id": "2026-10-07-r2-upload",
+  "kind": "publication",
+  "title": "Cloudflare R2 upload of the gtars #273 rebuild to refgetstore/2026-10-07",
+  "status": "failed",
+  "timestamps": {
+    "initialized_utc": "2026-10-07T17:01:52.729532+00:00",
+    "finalized_utc": "2026-10-08T21:56:49.343246+00:00"
+  },
+  "baseline_run_id": "2026-07-22-published-store",
+  "evidence": {
+    "quality": "captured",
+    "missing": []
+  },
+  "git": {
+    "commit": "7aad2ae9931a6de32a560c24a4d0c6eaafbcf874",
+    "dirty": false,
+    "status_text": "",
+    "diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "tool_versions": {
+    "python": "3.14.7",
+    "git": "git version 2.50.1 (Apple Git-155)",
+    "uv": "uv 0.12.12 (Homebrew 2026-09-09 aarch64-apple-darwin)",
+    "gtars": "0.11.0"
+  },
+  "commands": [
+    {
+      "label": "upload",
+      "argv": [
+        "./upload_store.sh",
+        "--remote",
+        "theferrit32-public",
+        "--bucket",
+        "theferrit32-public",
+        "--prefix",
+        "refgetstore/2026-10-07",
+        "--transfers",
+        "64",
+        "--checkers",
+        "64"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-07T17:01:59.023047+00:00",
+      "finished_utc": "2026-10-07T21:38:37.303082+00:00",
+      "exit_code": 0,
+      "log": "logs/upload.log",
+      "log_bytes": 15331,
+      "log_sha256": "3590cd9efdba40cbc542f1a4ba2f1d69676b3d0ab88d84c2a27d55b9eddfca85"
+    }
+  ],
+  "artifacts": [
+    {
+      "role": "published-manifest",
+      "path": "artifacts/published-manifest.json",
+      "bytes": 14995,
+      "sha256": "97f4a43ba51f7a39bf0751ab093ee87065515e0ea00808c75ba022adebfe84b5"
+    },
+    {
+      "role": "rclone-summary",
+      "path": "artifacts/rclone-summary.txt",
+      "bytes": 713,
+      "sha256": "911079cd481ec9ceca47c9ad23b6c431649b59869de2bc4f71bf9835a9a3c933"
+    },
+    {
+      "role": "uploaded-layout",
+      "path": "artifacts/uploaded-layout.txt",
+      "bytes": 188,
+      "sha256": "b2733552dd68101e0bc2ab5ef2a84e92fb6330b9bfda304467fc2117c55e073f"
+    }
+  ],
+  "result_summary": {},
+  "validations": [],
+  "publication": null
+}

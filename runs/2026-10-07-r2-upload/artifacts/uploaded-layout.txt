@@ -1,0 +1,2 @@
+shard directories uploaded: 1444 (a case-sensitive layout of this store has 4096)
+payloads uploaded under a directory that differs from their digest prefix: 1,151,582 of 1,779,052 (64.7%)
