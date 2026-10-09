@@ -169,8 +169,7 @@ takes about half an hour and reproduces the same digests and payload bytes.
     RUNBOOK.md                     # reproducible run-record lifecycle and policies
     runs/                          # compact historical manifests, summaries, logs, evidence
     downloads/                     # cached FASTA + assembly_report.txt (gitignored)
-    store/                         # local output/playground RefgetStore (gitignored)
-    store.2026-07-22/              # preserved published store (local, gitignored)
+    store -> /Volumes/RefgetStores/store   # the store, on a case-sensitive volume (gitignored symlink)
 
 The package is a `src/` layout, so the code only ever resolves through the
 install (`uv sync`) — a stale copy in the working directory cannot shadow it.
@@ -684,13 +683,20 @@ DNA sequences are not affected.
 
 ## Published store, experiments, and run records
 
-The current published artifact is the preserved `store.2026-07-22/` build:
-1,213,617 sequences and 107 collections, uploaded at
-`theferrit32-public:theferrit32-public/refgetstore/2026-07-22`. Its authoritative
-manifest remains inside that store; the compact audit record is
-[`runs/2026-07-22-published-store/`](runs/2026-07-22-published-store/).
+The published store is
+`theferrit32-public:theferrit32-public/refgetstore/2026-10-07`, served at
+<https://static.ferriter.dev/refgetstore/2026-10-07/>: 1,779,052 sequences and
+235 collections, built from the current `sources.toml` with the gtars revision
+above (see [gtars revision](#gtars-revision) for which gtars can read it). Its
+build is [`runs/2026-10-08-case-sensitive-rebuild/`](runs/2026-10-08-case-sensitive-rebuild/)
+and its upload [`runs/2026-10-08-r2-resync/`](runs/2026-10-08-r2-resync/),
+whose `published-manifest.json` is the manifest uploaded with it.
 
-The local `store/` is a build target and is not published automatically. The
+The earlier published prefixes, `refgetstore/2026-06-24` and
+`refgetstore/2026-07-22`, were deleted from the bucket; their records remain in
+[`runs/`](runs/).
+
+The local `store` is a build target and is not published automatically. The
 prior isolated release-116 experiment is documented at
 [`runs/2026-07-23-ensembl-r116-genomic-experiment/`](runs/2026-07-23-ensembl-r116-genomic-experiment/).
 Do not infer publication status from a local store directory.

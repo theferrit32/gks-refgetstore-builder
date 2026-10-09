@@ -1,0 +1,207 @@
+{
+  "schema": "gks-refgetstore-run/1",
+  "run_id": "2026-10-09-retire-r2-prefixes",
+  "kind": "publication",
+  "title": "Delete the superseded refgetstore/2026-06-24 and refgetstore/2026-07-22 prefixes from R2",
+  "status": "succeeded",
+  "timestamps": {
+    "initialized_utc": "2026-10-09T13:58:35.465037+00:00",
+    "finalized_utc": "2026-10-09T16:05:41.973616+00:00"
+  },
+  "baseline_run_id": "2026-10-08-r2-resync",
+  "evidence": {
+    "quality": "captured",
+    "missing": []
+  },
+  "git": {
+    "commit": "71829fb95af99f6686d4a137a2d16f649a1d650a",
+    "dirty": false,
+    "status_text": "",
+    "diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "tool_versions": {
+    "python": "3.14.7",
+    "git": "git version 2.50.1 (Apple Git-155)",
+    "uv": "uv 0.12.12 (Homebrew 2026-09-09 aarch64-apple-darwin)",
+    "gtars": "0.11.0"
+  },
+  "commands": [
+    {
+      "label": "size-before-2026-06-24",
+      "argv": [
+        "rclone",
+        "size",
+        "--fast-list",
+        "theferrit32-public:theferrit32-public/refgetstore/2026-06-24"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-09T13:58:42.431497+00:00",
+      "finished_utc": "2026-10-09T14:04:23.323983+00:00",
+      "exit_code": 0,
+      "log": "logs/size-before-2026-06-24.log",
+      "log_bytes": 73,
+      "log_sha256": "77e71d0fa3ce664ae494e1f60e6a837d221d5cce5bf760042b0685bd6111f1a4"
+    },
+    {
+      "label": "size-before-2026-07-22",
+      "argv": [
+        "rclone",
+        "size",
+        "--fast-list",
+        "theferrit32-public:theferrit32-public/refgetstore/2026-07-22"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-09T14:04:23.507345+00:00",
+      "finished_utc": "2026-10-09T14:13:38.906791+00:00",
+      "exit_code": 0,
+      "log": "logs/size-before-2026-07-22.log",
+      "log_bytes": 72,
+      "log_sha256": "6d166af32764b6f659c054d933895d7b87bee9f0c4a24f7ac9cdd176670c7047"
+    },
+    {
+      "label": "size-before-2026-10-07",
+      "argv": [
+        "rclone",
+        "size",
+        "--fast-list",
+        "theferrit32-public:theferrit32-public/refgetstore/2026-10-07"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-09T14:13:39.115950+00:00",
+      "finished_utc": "2026-10-09T14:26:37.966136+00:00",
+      "exit_code": 0,
+      "log": "logs/size-before-2026-10-07.log",
+      "log_bytes": 74,
+      "log_sha256": "7534af02d7921d1afc6364e71d5bd3ec74261a7fa74b7458cc69c3fde7593bfc"
+    },
+    {
+      "label": "dryrun-delete-2026-06-24",
+      "argv": [
+        "rclone",
+        "delete",
+        "--dry-run",
+        "--fast-list",
+        "--checkers",
+        "64",
+        "theferrit32-public:theferrit32-public/refgetstore/2026-06-24"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-09T14:26:52.780016+00:00",
+      "finished_utc": "2026-10-09T14:32:22.810493+00:00",
+      "exit_code": 0,
+      "log": "logs/dryrun-delete-2026-06-24.log",
+      "log_bytes": 98370237,
+      "log_sha256": "f8b639ec20af26e7db46113ed5ed1e9c69aebe178d75279495a787c731e3ac2f"
+    },
+    {
+      "label": "dryrun-delete-2026-07-22",
+      "argv": [
+        "rclone",
+        "delete",
+        "--dry-run",
+        "--fast-list",
+        "--checkers",
+        "64",
+        "theferrit32-public:theferrit32-public/refgetstore/2026-07-22"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-09T14:32:26.860120+00:00",
+      "finished_utc": "2026-10-09T14:40:54.399517+00:00",
+      "exit_code": 0,
+      "log": "logs/dryrun-delete-2026-07-22.log",
+      "log_bytes": 152574757,
+      "log_sha256": "db41447bc381c676ab15c7714bb5ea2d7970525e1459c7f30bda1fbce92c1aea"
+    },
+    {
+      "label": "purge-2026-06-24",
+      "argv": [
+        "rclone",
+        "purge",
+        "--fast-list",
+        "--checkers",
+        "64",
+        "--log-level",
+        "NOTICE",
+        "--stats",
+        "1m",
+        "--stats-log-level",
+        "NOTICE",
+        "theferrit32-public:theferrit32-public/refgetstore/2026-06-24"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-09T14:41:14.454454+00:00",
+      "finished_utc": "2026-10-09T15:05:17.486843+00:00",
+      "exit_code": 0,
+      "log": "logs/purge-2026-06-24.log",
+      "log_bytes": 100934,
+      "log_sha256": "077d5481f04368650bb2639bbbc3429b355b449aa5fd1c13c159001a15e95332"
+    },
+    {
+      "label": "purge-2026-07-22",
+      "argv": [
+        "rclone",
+        "purge",
+        "--fast-list",
+        "--checkers",
+        "64",
+        "--log-level",
+        "NOTICE",
+        "--stats",
+        "1m",
+        "--stats-log-level",
+        "NOTICE",
+        "theferrit32-public:theferrit32-public/refgetstore/2026-07-22"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-09T15:05:18.120881+00:00",
+      "finished_utc": "2026-10-09T15:51:28.882801+00:00",
+      "exit_code": 0,
+      "log": "logs/purge-2026-07-22.log",
+      "log_bytes": 158214,
+      "log_sha256": "bc4cad60d287c911ad6751adb4c79c8013e27a9ef77ecb6b751d2f99aed026a8"
+    },
+    {
+      "label": "prefixes-after",
+      "argv": [
+        "rclone",
+        "lsf",
+        "--dirs-only",
+        "theferrit32-public:theferrit32-public/refgetstore/"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-09T15:51:49.542458+00:00",
+      "finished_utc": "2026-10-09T15:51:51.662328+00:00",
+      "exit_code": 0,
+      "log": "logs/prefixes-after.log",
+      "log_bytes": 12,
+      "log_sha256": "7205441bc187f9ebae9cd7861188db9ec32c93e0ae2ab3b234723a27910251f2"
+    },
+    {
+      "label": "size-after-2026-10-07",
+      "argv": [
+        "rclone",
+        "size",
+        "--fast-list",
+        "theferrit32-public:theferrit32-public/refgetstore/2026-10-07"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-09T15:51:52.379493+00:00",
+      "finished_utc": "2026-10-09T16:05:12.103193+00:00",
+      "exit_code": 0,
+      "log": "logs/size-after-2026-10-07.log",
+      "log_bytes": 74,
+      "log_sha256": "7534af02d7921d1afc6364e71d5bd3ec74261a7fa74b7458cc69c3fde7593bfc"
+    }
+  ],
+  "artifacts": [
+    {
+      "role": "verification",
+      "path": "artifacts/verification.txt",
+      "bytes": 231,
+      "sha256": "7178ea82ad3468e1ff394f9faa599e7ec1014af9cd8b2ec885d3ec3a1253258b"
+    }
+  ],
+  "result_summary": {},
+  "validations": [],
+  "publication": null
+}

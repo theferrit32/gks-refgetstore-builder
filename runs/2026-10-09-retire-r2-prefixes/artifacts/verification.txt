@@ -1,0 +1,7 @@
+prefixes after:
+2026-10-07/
+public 2026-06-24/rgstore.json -> HTTP 404
+public 2026-07-22/rgstore.json -> HTTP 404
+public 2026-10-07/rgstore.json -> HTTP 200
+Total objects: 1.779M (1779362)
+Total size: 22.172 GiB (23807123936 Byte)
