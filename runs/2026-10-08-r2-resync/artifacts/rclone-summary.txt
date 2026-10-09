@@ -1,0 +1,8 @@
+Dry run (rclone sync --dry-run --checksum) before the sync:
+  would copy:   1151583  (1,151,582 payloads + rgstore.json)
+  would delete: 1151583  (1,151,582 wrong-key payloads + manifest.json)
+
+rclone, sync and check:
+  NOTICE: S3 bucket theferrit32-public path refgetstore/2026-10-07: 0 differences found
+  NOTICE: S3 bucket theferrit32-public path refgetstore/2026-10-07: 1779362 matching files
+  error lines in rclone.log: 0

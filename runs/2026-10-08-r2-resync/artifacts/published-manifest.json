@@ -1,0 +1,433 @@
+{
+  "schema": "refgetstore-manifest/1",
+  "upload_date": "2026-10-08",
+  "destination": "theferrit32-public:theferrit32-public/refgetstore/2026-10-07",
+  "repo": {
+    "name": "gks-refgetstore-builder",
+    "commit": "51a1b9db292fb75693ef5a6536f18ef88d6d9826",
+    "describe": "51a1b9d",
+    "dirty": false
+  },
+  "gtars_version": "0.11.0",
+  "object_count": 1779361,
+  "total_bytes": 23807108941,
+  "assemblies": [
+    {
+      "namespace": "GRCh38",
+      "fasta_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.26_GRCh38/GCF_000001405.26_GRCh38_genomic.fna.gz",
+      "report_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.26_GRCh38/GCF_000001405.26_GRCh38_assembly_report.txt"
+    },
+    {
+      "namespace": "GRCh38.p1",
+      "fasta_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.27_GRCh38.p1/GCF_000001405.27_GRCh38.p1_genomic.fna.gz",
+      "report_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.27_GRCh38.p1/GCF_000001405.27_GRCh38.p1_assembly_report.txt"
+    },
+    {
+      "namespace": "GRCh38.p2",
+      "fasta_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.28_GRCh38.p2/GCF_000001405.28_GRCh38.p2_genomic.fna.gz",
+      "report_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.28_GRCh38.p2/GCF_000001405.28_GRCh38.p2_assembly_report.txt"
+    },
+    {
+      "namespace": "GRCh38.p3",
+      "fasta_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.29_GRCh38.p3/GCF_000001405.29_GRCh38.p3_genomic.fna.gz",
+      "report_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.29_GRCh38.p3/GCF_000001405.29_GRCh38.p3_assembly_report.txt"
+    },
+    {
+      "namespace": "GRCh38.p4",
+      "fasta_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.30_GRCh38.p4/GCF_000001405.30_GRCh38.p4_genomic.fna.gz",
+      "report_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.30_GRCh38.p4/GCF_000001405.30_GRCh38.p4_assembly_report.txt"
+    },
+    {
+      "namespace": "GRCh38.p5",
+      "fasta_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.31_GRCh38.p5/GCF_000001405.31_GRCh38.p5_genomic.fna.gz",
+      "report_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.31_GRCh38.p5/GCF_000001405.31_GRCh38.p5_assembly_report.txt"
+    },
+    {
+      "namespace": "GRCh38.p6",
+      "fasta_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.32_GRCh38.p6/GCF_000001405.32_GRCh38.p6_genomic.fna.gz",
+      "report_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.32_GRCh38.p6/GCF_000001405.32_GRCh38.p6_assembly_report.txt"
+    },
+    {
+      "namespace": "GRCh38.p7",
+      "fasta_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.33_GRCh38.p7/GCF_000001405.33_GRCh38.p7_genomic.fna.gz",
+      "report_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.33_GRCh38.p7/GCF_000001405.33_GRCh38.p7_assembly_report.txt"
+    },
+    {
+      "namespace": "GRCh38.p8",
+      "fasta_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.34_GRCh38.p8/GCF_000001405.34_GRCh38.p8_genomic.fna.gz",
+      "report_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.34_GRCh38.p8/GCF_000001405.34_GRCh38.p8_assembly_report.txt"
+    },
+    {
+      "namespace": "GRCh38.p9",
+      "fasta_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.35_GRCh38.p9/GCF_000001405.35_GRCh38.p9_genomic.fna.gz",
+      "report_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.35_GRCh38.p9/GCF_000001405.35_GRCh38.p9_assembly_report.txt"
+    },
+    {
+      "namespace": "GRCh38.p10",
+      "fasta_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.36_GRCh38.p10/GCF_000001405.36_GRCh38.p10_genomic.fna.gz",
+      "report_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.36_GRCh38.p10/GCF_000001405.36_GRCh38.p10_assembly_report.txt"
+    },
+    {
+      "namespace": "GRCh38.p11",
+      "fasta_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.37_GRCh38.p11/GCF_000001405.37_GRCh38.p11_genomic.fna.gz",
+      "report_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.37_GRCh38.p11/GCF_000001405.37_GRCh38.p11_assembly_report.txt"
+    },
+    {
+      "namespace": "GRCh38.p12",
+      "fasta_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.38_GRCh38.p12/GCF_000001405.38_GRCh38.p12_genomic.fna.gz",
+      "report_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.38_GRCh38.p12/GCF_000001405.38_GRCh38.p12_assembly_report.txt"
+    },
+    {
+      "namespace": "GRCh38.p13",
+      "fasta_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_genomic.fna.gz",
+      "report_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_assembly_report.txt"
+    },
+    {
+      "namespace": "GRCh38.p14",
+      "fasta_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_genomic.fna.gz",
+      "report_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_assembly_report.txt"
+    },
+    {
+      "namespace": "GRCh37",
+      "fasta_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.13_GRCh37/GCF_000001405.13_GRCh37_genomic.fna.gz",
+      "report_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.13_GRCh37/GCF_000001405.13_GRCh37_assembly_report.txt"
+    },
+    {
+      "namespace": "GRCh37.p2",
+      "fasta_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.14_GRCh37.p2/GCF_000001405.14_GRCh37.p2_genomic.fna.gz",
+      "report_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.14_GRCh37.p2/GCF_000001405.14_GRCh37.p2_assembly_report.txt"
+    },
+    {
+      "namespace": "GRCh37.p5",
+      "fasta_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.17_GRCh37.p5/GCF_000001405.17_GRCh37.p5_genomic.fna.gz",
+      "report_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.17_GRCh37.p5/GCF_000001405.17_GRCh37.p5_assembly_report.txt"
+    },
+    {
+      "namespace": "GRCh37.p9",
+      "fasta_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.21_GRCh37.p9/GCF_000001405.21_GRCh37.p9_genomic.fna.gz",
+      "report_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.21_GRCh37.p9/GCF_000001405.21_GRCh37.p9_assembly_report.txt"
+    },
+    {
+      "namespace": "GRCh37.p10",
+      "fasta_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.22_GRCh37.p10/GCF_000001405.22_GRCh37.p10_genomic.fna.gz",
+      "report_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.22_GRCh37.p10/GCF_000001405.22_GRCh37.p10_assembly_report.txt"
+    },
+    {
+      "namespace": "GRCh37.p11",
+      "fasta_url": null,
+      "report_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.23_GRCh37.p11/GCF_000001405.23_GRCh37.p11_assembly_report.txt"
+    },
+    {
+      "namespace": "GRCh37.p12",
+      "fasta_url": null,
+      "report_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.24_GRCh37.p12/GCF_000001405.24_GRCh37.p12_assembly_report.txt"
+    },
+    {
+      "namespace": "GRCh37.p13",
+      "fasta_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.25_GRCh37.p13/GCF_000001405.25_GRCh37.p13_genomic.fna.gz",
+      "report_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.25_GRCh37.p13/GCF_000001405.25_GRCh37.p13_assembly_report.txt"
+    }
+  ],
+  "seqsets": [
+    {
+      "name": "refseq_human_rna",
+      "namespace": "refseq",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "refseq_human_protein",
+      "namespace": "refseq",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "refseq_human_refseqgene",
+      "namespace": "refseq",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "lrg_public",
+      "namespace": "lrg",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "refseq_history_grch37_rna",
+      "namespace": "refseq",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "refseq_history_grch37_protein",
+      "namespace": "refseq",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "refseq_history_grch38_rna",
+      "namespace": "refseq",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "refseq_history_grch38_protein",
+      "namespace": "refseq",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "ensembl_release_75",
+      "namespace": "ensembl-75",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "ensembl_release_76",
+      "namespace": "ensembl-76",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "ensembl_release_77",
+      "namespace": "ensembl-77",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "ensembl_release_78",
+      "namespace": "ensembl-78",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "ensembl_release_79",
+      "namespace": "ensembl-79",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "ensembl_release_80",
+      "namespace": "ensembl-80",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "ensembl_release_81",
+      "namespace": "ensembl-81",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "ensembl_release_82",
+      "namespace": "ensembl-82",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "ensembl_release_83",
+      "namespace": "ensembl-83",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "ensembl_release_84",
+      "namespace": "ensembl-84",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "ensembl_release_85",
+      "namespace": "ensembl-85",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "ensembl_release_86",
+      "namespace": "ensembl-86",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "ensembl_release_87",
+      "namespace": "ensembl-87",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "ensembl_release_88",
+      "namespace": "ensembl-88",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "ensembl_release_89",
+      "namespace": "ensembl-89",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "ensembl_release_90",
+      "namespace": "ensembl-90",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "ensembl_release_91",
+      "namespace": "ensembl-91",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "ensembl_release_92",
+      "namespace": "ensembl-92",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "ensembl_release_93",
+      "namespace": "ensembl-93",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "ensembl_release_94",
+      "namespace": "ensembl-94",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "ensembl_release_95",
+      "namespace": "ensembl-95",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "ensembl_release_96",
+      "namespace": "ensembl-96",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "ensembl_release_97",
+      "namespace": "ensembl-97",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "ensembl_release_98",
+      "namespace": "ensembl-98",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "ensembl_release_99",
+      "namespace": "ensembl-99",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "ensembl_release_100",
+      "namespace": "ensembl-100",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "ensembl_release_101",
+      "namespace": "ensembl-101",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "ensembl_release_102",
+      "namespace": "ensembl-102",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "ensembl_release_103",
+      "namespace": "ensembl-103",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "ensembl_release_104",
+      "namespace": "ensembl-104",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "ensembl_release_105",
+      "namespace": "ensembl-105",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "ensembl_release_106",
+      "namespace": "ensembl-106",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "ensembl_release_107",
+      "namespace": "ensembl-107",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "ensembl_release_108",
+      "namespace": "ensembl-108",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "ensembl_release_109",
+      "namespace": "ensembl-109",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "ensembl_release_110",
+      "namespace": "ensembl-110",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "ensembl_release_111",
+      "namespace": "ensembl-111",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "ensembl_release_112",
+      "namespace": "ensembl-112",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "ensembl_release_113",
+      "namespace": "ensembl-113",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "ensembl_release_114",
+      "namespace": "ensembl-114",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "ensembl_release_115",
+      "namespace": "ensembl-115",
+      "url_template": null,
+      "shard_range": null
+    },
+    {
+      "name": "ensembl_release_116",
+      "namespace": "ensembl-116",
+      "url_template": null,
+      "shard_range": null
+    }
+  ]
+}

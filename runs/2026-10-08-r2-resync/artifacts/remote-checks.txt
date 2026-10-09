@@ -1,0 +1,8 @@
+Bucket and public-URL checks after the sync, 2026-10-08
+shard prefixes under sequences/ in the bucket: 4096
+open_remote https://static.ferriter.dev/refgetstore/2026-10-07/:
+  ENSP00000473614 (GPX4) z_3gTL7__q3R6SR1-8NLSFz7-H1RbDdV: residue[109]='U', round-trips
+  NR_103745.1 o_Juegh-7Rliguu4uJ72pColqqJQt4mz: residue[852]='D', round-trips
+60 sampled payloads with mixed- or upper-case digest prefixes:
+  correct key (sequences/<digest[:2]>/<digest>.seq): HTTP 206 x60
+  a different-case shard key: HTTP 404 x60

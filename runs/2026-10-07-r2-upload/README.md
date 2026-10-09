@@ -5,8 +5,8 @@ An upload of the store from
 to `theferrit32-public:theferrit32-public/refgetstore/2026-10-07`. The transfer
 completed and `rclone check` passed, but the published layout was wrong: most
 payloads were at keys no reader requests. Status **failed**. The prefix was
-corrected in place by a later sync from a case-sensitive rebuild; see the
-[runs index](../README.md).
+corrected in place by
+[`../2026-10-08-r2-resync/`](../2026-10-08-r2-resync/README.md).
 
 ## What ran
 

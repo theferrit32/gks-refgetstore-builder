@@ -25,6 +25,9 @@ Durable records currently retained:
   the current store: the same contents rebuilt onto a case-sensitive APFS
   volume, which `./store` now links to. Byte-identical payloads, correct shard
   layout.
+- [`2026-10-08-r2-resync/`](2026-10-08-r2-resync/) — `refgetstore/2026-10-07`
+  corrected in place from that store: `rclone check` reports 0 differences, and
+  reads over the public URL return the right residues.
 
 Removed: `2026-07-02-seqrepo-parity/`. Its build and parity analysis were fully
 superseded by `2026-08-26-full-rebuild/`, which covers a larger source set and
