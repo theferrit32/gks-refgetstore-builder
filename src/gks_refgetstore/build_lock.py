@@ -35,6 +35,7 @@ import hashlib
 import json
 import logging
 import subprocess
+import dataclasses
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -608,6 +609,20 @@ def apply_locked_sources(
             file_class=record.get("file_class"),
         )
         for record in lock_files(lock)
+    ]
+    # The lock records an efetch source's URL, which pins its list's digest but
+    # not the list. Re-attach the manifest's list when it is still that list,
+    # so a locked source can be re-fetched (repair); otherwise it stays
+    # cache-only.
+    efetch_ids = {
+        url: seqset.efetch_ids
+        for seqset in seqsets if seqset.efetch_ids is not None
+        for _, url in seqset.iter_shard_urls()
+    }
+    sources = [
+        dataclasses.replace(source, efetch_ids=efetch_ids[source.url])
+        if source.url in efetch_ids else source
+        for source in sources
     ]
     by_owner: dict[str, list[ResolvedSource]] = {}
     for source in sources:

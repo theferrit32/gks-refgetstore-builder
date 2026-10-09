@@ -38,6 +38,7 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
+from . import efetch
 from .build_lock import apply_locked_sources, load_lock, lock_files
 from .sources import (ResolvedSource, load_config, mirror_cache_path,
                       provider_checksum_matches, resolve_sources, sha256_file)
@@ -154,7 +155,15 @@ def fetch_many(
     def fetch_one(item: tuple[ResolvedSource, Path]) -> int:
         source, target = item
         print(f"  get   {label(source, target)}", flush=True)
-        n = download(source.url, target, timeout, retries)
+        if source.efetch_ids is not None:
+            # Paced by efetch's process-wide limiter, not by this pool.
+            n = efetch.materialize(
+                efetch.efetch_db_of(source.url), source.efetch_ids, target
+            ).bytes
+        elif efetch.is_efetch_url(source.url):
+            raise RuntimeError("efetch source has no accession list")
+        else:
+            n = download(source.url, target, timeout, retries)
         if not accept(target, source):
             target.unlink(missing_ok=True)
             raise RuntimeError("downloaded bytes rejected")

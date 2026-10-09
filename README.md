@@ -289,6 +289,8 @@ aborts.
 
 Idempotent (skips files already cached), atomic, disk-guarded
 (`--min-free-gb`). Useful to warm the cache before a long build, or offline.
+`efetch_accessions` sources are retrieved from NCBI E-utilities at NCBI's rate
+limit rather than downloaded; see [efetch sources](#efetch-sources).
 
 ### `verify` — check the cache and the store
 
@@ -574,6 +576,8 @@ Each `[[seqset]]` block (flat FASTA where the header name is the accession):
 | `url_template` | one of | URL with `{shard}` placeholder, or plain URL if unsharded. |
 | `urls` | one of | Explicit list of URLs (alternative to `url_template`; not valid with `shard_range`). |
 | `url_pattern` | one of | HTTPS URL whose basename contains a glob; requires `checksum_manifest_url`. |
+| `efetch_accessions` | one of | Path, relative to this manifest, of a sorted `accession.version` list fetched one accession at a time from NCBI E-utilities `efetch` into one FASTA. For versions no bulk release carries. |
+| `efetch_db` | no, default `nuccore` | `efetch` database for `efetch_accessions`: `nuccore` or `protein`. |
 | `checksum_manifest_url` | with `url_pattern` | HTTPS NCBI `*.files.installed` URL in the same directory. |
 | `md5_manifest_urls` | no | Per-URL NCBI `md5checksums.txt` list for explicit historical inputs. |
 | `checksum_manifest_urls` | no | Per-URL Ensembl `CHECKSUMS` list; BSD checksum and 1 KiB block count are validated. |
@@ -585,7 +589,8 @@ Each `[[seqset]]` block (flat FASTA where the header name is the accession):
 | `format` | no, default `fasta` | `fasta`; `gbff` to convert a GenBank flat file to FASTA before ingest; or `lrg_zip` to concatenate the `LRG_N.fasta` members of an EBI LRG bundle, in natural-sorted member order, into one FASTA. Non-FASTA formats are cached as `<artifact>.fasta` beside the download and regenerate offline. |
 | `exclude` | no | Table `{file_classes = [...], record_prefixes = [...]}` dropping records from the named file classes before ingest. Matching is on the record name only, never on sequence content. The filtered FASTA is cached as `<artifact>.filtered.fa.gz` beside the download, with `<artifact>.excluded.tsv` listing every dropped record. A rule matching nothing is an error. |
 
-Exactly one of `url_template`, `urls`, or `url_pattern` is required.
+Exactly one of `url_template`, `urls`, `url_pattern`, or `efetch_accessions` is
+required.
 `shard_range` is valid only with `url_template`; `checksum_manifest_url` is
 valid and required only with `url_pattern`. Pattern matching is local to safe
 manifest basenames. Records must be strict `MD5 filename` lines; malformed,
@@ -605,6 +610,50 @@ The [RefSeqGene README](https://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/RefSeqGene
 describes its numbered subsets and frequent updates. Current RefSeq feeds are
 therefore intentionally dynamic; historical RefSeq releases, assemblies, and
 Ensembl releases remain explicit URLs.
+
+### efetch sources
+
+An `efetch_accessions` seqset is one source whose URL is the `efetch` request
+plus the digest of its accession list:
+
+    https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&rettype=fasta&retmode=text#<name>-<first 16 hex of the list's sha256>.fna.gz
+
+It caches at `downloads/eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi/<name>-<digest>.fna.gz`.
+Everything keyed on a source URL — the lock record, drift checks, `sync`'s plan —
+therefore follows the list: editing it adds a new source and removes the old
+one, exactly as a new upstream file would.
+
+`fetch` and `build` retrieve the list in POST batches of 200 on a few threads.
+One process-wide limiter paces every request at NCBI's limit: 3 requests/s, or
+10/s when `NCBI_API_KEY` is set. When NCBI answers HTTP 429, or with its JSON
+`API rate limit exceeded` body, all requests pause for the server's
+`Retry-After`, and the request interval doubles, recovering gradually as
+requests succeed. Server errors and dropped connections are retried with
+exponential backoff; a batch that still fails fails the fetch, so a partial
+result is never cached. Requests carry `tool=gks-refgetstore-builder`, plus
+`email=` when `NCBI_EMAIL` is set.
+
+Records are written in list order with a fixed gzip header, so the same list
+and the same upstream records produce the same bytes, and the lock's SHA-256 is
+reproducible across fetches. `efetch` silently omits an id it cannot retrieve
+when other ids in the request succeed, and rejects a request in which none
+succeeds with HTTP 400. A rejected batch is bisected down to the
+unretrievable ids. Those are left out with a warning and listed in
+`<artifact>.missing.txt`.
+
+The RefSeqGene history list, `accession_lists/refseqgene_superseded.txt`, is
+generated:
+
+    gks-refgetstore refseqgene-history \
+        --seqrepo-aliases /path/to/seqrepo/<snapshot>/aliases.sqlite3
+
+It reads NCBI's current `gene_RefSeqGene` table and lists every earlier version
+of each current `NG_` accession: RefSeq version numbers are dense, so `NG_x.3`
+implies `.1` and `.2`. It adds every version of any `NG_` accession already in
+the list, or supplied with `--seed` or `--seqrepo-aliases`, that is no longer
+current. Entries are only ever added, so an accession that NCBI retires from
+`gene_RefSeqGene` keeps its history. The current versions themselves come from
+the RefSeqGene FTP seqset.
 
 ## What gets written
 
@@ -652,6 +701,11 @@ membership of mutable current RefSeq feeds from official checksum manifests. It 
 - **NCBI RefSeq:** current mRNA, protein, and RefSeqGene shards, plus every RNA
   and protein FASTA discoverable in the official GRCh37/GRCh38 assembly and
   taxid-9606 annotation-release histories.
+- **RefSeqGene history:** every superseded version of each current `NG_`
+  accession, and every version of `NG_` accessions since retired from
+  `gene_RefSeqGene`, fetched per accession from E-utilities (see
+  [efetch sources](#efetch-sources)). The RefSeqGene FTP publishes only current
+  versions.
 - **Ensembl:** releases **75–116**, each with unmasked `dna.toplevel`, cDNA,
   ncRNA, and peptide FASTAs. CDS, masked DNA, and redundant chromosome or
   primary-assembly subsets are deliberately excluded.

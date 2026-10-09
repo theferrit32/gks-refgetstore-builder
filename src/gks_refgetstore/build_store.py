@@ -24,7 +24,7 @@ from typing import Callable, Iterator
 
 from gtars.refget import RefgetStore
 
-from . import build_lock, fs_checks
+from . import build_lock, efetch, fs_checks
 from .sources import (NA_VALUES, AssemblyConfig, RecordExclusion,
                       ResolvedSource, SeqsetConfig, load_config, md5_file,
                       mirror_cache_path, natural_sort_key,
@@ -480,6 +480,13 @@ def ensure_download(url: str, target: Path, force: bool,
             )
             return target
         logger.warning("cached provider checksum mismatch; re-downloading %s", target)
+    if source is not None and source.efetch_ids is not None:
+        logger.info("fetching %d accessions from E-utilities -> %s",
+                    len(source.efetch_ids), target)
+        efetch.materialize(efetch.efetch_db_of(url), source.efetch_ids, target)
+        return target
+    if efetch.is_efetch_url(url):
+        raise ValueError(f"efetch source has no accession list: {url}")
     logger.info("downloading %s -> %s", url, target)
     tmp = target.with_suffix(target.suffix + ".part")
     urllib.request.urlretrieve(url, tmp)  # noqa: S310

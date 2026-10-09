@@ -1,10 +1,10 @@
 {
   "schema": "gks-refgetstore-build-lock/4",
   "build": {
-    "timestamp_utc": "2026-10-07T14:23:02.964932+00:00",
+    "timestamp_utc": "2026-10-09T20:31:26.332532+00:00",
     "git": {
-      "commit": "ffb1aeef12e17876921061fb5b07bc94f5fbb09c",
-      "describe": "ffb1aee-dirty",
+      "commit": "e72669d1ddb4a3a50417f599834cf955574e3b4a",
+      "describe": "e72669d-dirty",
       "dirty": true
     },
     "gtars_version": "0.11.0",
@@ -16,7 +16,7 @@
     }
   },
   "inputs": {
-    "sources_toml_sha256": "f303f6cdfe5394cf6113f26dd1d38718c0d2713a4ac762855014915711c40e15",
+    "sources_toml_sha256": "13aba9b4b3d4dfe38d23ba2556b3d189b4dc4d44b6aaea6c5629c9b180d26000",
     "files": [
       {
         "kind": "assembly_fasta",
@@ -762,6 +762,23 @@
         "file_class": "assembly_report",
         "bytes": 80454,
         "sha256": "64318ddff470b69b261a667d813210044f60d4ce654253a547db80ff73638d38",
+        "present": true,
+        "ingest_spec": null,
+        "ingest_spec_sha256": null
+      },
+      {
+        "kind": "seqset",
+        "owner": "refseq_human_refseqgene_superseded",
+        "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&rettype=fasta&retmode=text#refseq_human_refseqgene_superseded-f77c66f206c7c34c.fna.gz",
+        "cache_path": "eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi/refseq_human_refseqgene_superseded-f77c66f206c7c34c.fna.gz",
+        "mutable": false,
+        "provider_checksum": null,
+        "provider_checksum_algorithm": null,
+        "provider_checksum_blocks": null,
+        "checksum_url": null,
+        "file_class": "genomic",
+        "bytes": 101197269,
+        "sha256": "7756a0cf001c0fe0d0575f50c33f6aa7c96e186dc89c81fb62629fd0b55b8b64",
         "present": true,
         "ingest_spec": null,
         "ingest_spec_sha256": null
@@ -5922,10 +5939,10 @@
     ]
   },
   "outputs": {
-    "n_sequences": 1779052,
-    "n_collections": 235,
-    "sequences_root": "sha256:3ecf0d7221a60fa038aa12baac6b1da646b4917513b176a1d0661b1541ed921c",
-    "collections_root": "sha256:829d3700161d1f151efc53cddb7e41d97fabc0e032eec5a6d0b93eeebac41f5c",
+    "n_sequences": 1781533,
+    "n_collections": 236,
+    "sequences_root": "sha256:78d864510a1fd4941797f9762b13b2d6deb9a98f2fa9ac6549301ee77c6cac65",
+    "collections_root": "sha256:e4ad95972ce01eae9a91b7c61958f6b3645e1908b47db2e45c88bed8d7cb9754",
     "collections": [
       {
         "digest": "-bnIcfluHD7QZH6jlI-pAQEn0vvj0y26",
@@ -6590,6 +6607,13 @@
         "n_sequences": 160987,
         "from": [
           "ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20200522/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_rna.fna.gz"
+        ]
+      },
+      {
+        "digest": "MD6Ozcf38_BHxS91ZZPRPDImssycpDC8",
+        "n_sequences": 2501,
+        "from": [
+          "eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi/refseq_human_refseqgene_superseded-f77c66f206c7c34c.fna.gz"
         ]
       },
       {

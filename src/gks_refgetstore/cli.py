@@ -10,6 +10,8 @@ Subcommands:
   sync     apply sources.toml changes to an existing store incrementally
   fetch    pre-populate the download cache from the manifest (no ingest)
   lock     (re)generate a build.lock.json for a build that already ran
+  refseqgene-history
+           update the checked-in list of superseded NG_ versions to efetch
 
 All subcommands share one library: the source model -- manifest schema, source
 resolution, cache-path mapping (``sources``) -- the build engine
@@ -43,6 +45,7 @@ from pathlib import Path
 from . import (
     build_lock,
     build_store,
+    efetch,
     fetch_sources,
     fs_checks,
     repair,
@@ -271,6 +274,25 @@ def _add_lock(sub: argparse._SubParsersAction) -> None:
     p.set_defaults(func=build_lock.run_lock)
 
 
+def _add_refseqgene_history(sub: argparse._SubParsersAction) -> None:
+    p = sub.add_parser(
+        "refseqgene-history",
+        help="update the list of superseded RefSeqGene versions to fetch",
+        description=efetch.run_refseqgene_history.__doc__,
+    )
+    p.add_argument("--out", type=Path,
+                   default=Path("accession_lists/refseqgene_superseded.txt"),
+                   help="accession list to update in place (entries are only added)")
+    p.add_argument("--gene-refseqgene-url", default=efetch.GENE_REFSEQGENE_URL)
+    p.add_argument("--seed", type=Path, nargs="*", default=None,
+                   help="accession lists whose NG_ versions (and earlier) to include")
+    p.add_argument("--seqrepo-aliases", type=Path, default=None,
+                   help="a SeqRepo aliases.sqlite3: include its NCBI NG_ accessions")
+    p.add_argument("--dry-run", action="store_true",
+                   help="print the list instead of writing it")
+    p.set_defaults(func=efetch.run_refseqgene_history)
+
+
 def build_parser() -> argparse.ArgumentParser:
     ap = argparse.ArgumentParser(
         prog="gks-refgetstore", description=__doc__,
@@ -285,6 +307,7 @@ def build_parser() -> argparse.ArgumentParser:
     _add_fetch(sub)
     _add_lock(sub)
     _add_sync(sub)
+    _add_refseqgene_history(sub)
     return ap
 
 

@@ -30,6 +30,8 @@ from pathlib import Path
 from typing import Callable, Iterator
 from urllib.parse import urljoin, urlsplit
 
+from .efetch import EFETCH_DBS, efetch_url, is_efetch_url, read_accession_list
+
 logger = logging.getLogger("sources")
 
 NA_VALUES = {"na", "", "<NA>"}
@@ -111,16 +113,37 @@ class SeqsetConfig:
     rolling_namespace: str | None = None
     format: str = "fasta"
     exclude: dict | None = None
+    efetch_accessions: str | None = None
+    efetch_db: str | None = None
     resolved_sources: list["ResolvedSource"] | None = field(default=None, init=False)
     exclusion: "RecordExclusion | None" = field(default=None, init=False)
+    #: The ``efetch_accessions`` list, read by :func:`load_config` (relative to
+    #: the manifest, like ``fasta_path``).
+    efetch_ids: tuple[str, ...] | None = field(default=None, init=False)
 
     def __post_init__(self) -> None:
         modes = sum(value is not None for value in
-                    (self.url_template, self.urls, self.url_pattern))
+                    (self.url_template, self.urls, self.url_pattern,
+                     self.efetch_accessions))
         if modes != 1:
             raise ValueError(
                 f"seqset {self.name!r}: set exactly one of url_template, urls, "
-                "or url_pattern"
+                "url_pattern, or efetch_accessions"
+            )
+        if self.efetch_accessions is not None:
+            self.efetch_db = self.efetch_db or "nuccore"
+            if self.efetch_db not in EFETCH_DBS:
+                raise ValueError(
+                    f"seqset {self.name!r}: efetch_db must be one of {EFETCH_DBS}"
+                )
+            if self.format != "fasta" or self.file_classes is not None:
+                raise ValueError(
+                    f"seqset {self.name!r}: efetch sources are one FASTA with "
+                    "one file_class"
+                )
+        elif self.efetch_db is not None:
+            raise ValueError(
+                f"seqset {self.name!r}: efetch_db requires efetch_accessions"
             )
         if self.shard_range is not None and self.url_template is None:
             raise ValueError(
@@ -273,6 +296,14 @@ class SeqsetConfig:
             return
         if self.url_pattern is not None:
             raise RuntimeError(f"seqset {self.name!r}: pattern source has not been resolved")
+        if self.efetch_accessions is not None:
+            if self.efetch_ids is None:
+                raise RuntimeError(
+                    f"seqset {self.name!r}: efetch accession list has not been loaded"
+                )
+            assert self.efetch_db is not None
+            yield "", efetch_url(self.efetch_db, self.name, self.efetch_ids)
+            return
         if self.urls is not None:
             for i, url in enumerate(self.urls, 1):
                 yield str(i), url
@@ -296,6 +327,8 @@ class ResolvedSource:
     provider_checksum_blocks: int | None = None
     checksum_url: str | None = None
     file_class: str | None = None
+    #: Accessions to fetch, for an efetch source; ``url`` pins their digest.
+    efetch_ids: tuple[str, ...] | None = field(default=None, compare=False, repr=False)
 
 
 _MD5_RECORD = re.compile(r"^([0-9A-Fa-f]{32})[ \t]+([^\s]+)$")
@@ -461,6 +494,12 @@ def resolve_sources(
                     "seqset", seqset.name, urljoin(base, name), md5,
                     file_class=seqset.file_class,
                 ))
+        elif seqset.efetch_accessions is not None:
+            ((_, url),) = seqset.iter_shard_urls()
+            seq_sources.append(ResolvedSource(
+                "seqset", seqset.name, url, file_class=seqset.file_class,
+                efetch_ids=seqset.efetch_ids,
+            ))
         else:
             urls = list(seqset.iter_shard_urls())
             for index, (_, url) in enumerate(urls):
@@ -578,6 +617,11 @@ def load_config(
                 manifest_dir / assembly.fasta_path
             ).resolve()
     seqsets = [SeqsetConfig(**entry) for entry in data.get("seqset", [])]
+    for seqset in seqsets:
+        if seqset.efetch_accessions is not None:
+            seqset.efetch_ids = read_accession_list(
+                (manifest_dir / seqset.efetch_accessions).resolve()
+            )
     names = [entry.name for entry in seqsets]
     if len(names) != len(set(names)):
         duplicate = next(name for name in names if names.count(name) > 1)
@@ -625,7 +669,10 @@ def mirror_cache_path(cache_root: Path, url: str) -> Path:
     builder share one cache.
     """
     parts = urlsplit(url)
-    return cache_root / parts.netloc / parts.path.lstrip("/")
+    path = cache_root / parts.netloc / parts.path.lstrip("/")
+    # An efetch source's URL is one endpoint for every list; its fragment names
+    # the list (see efetch.efetch_url), and becomes the file under it.
+    return path / parts.fragment if is_efetch_url(url) else path
 
 
 def md5_file(path: Path) -> str:
