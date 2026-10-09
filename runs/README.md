@@ -34,6 +34,10 @@ Durable records currently retained:
 - [`2026-10-09-retire-r2-prefixes/`](2026-10-09-retire-r2-prefixes/) — the
   superseded `refgetstore/2026-06-24` and `refgetstore/2026-07-22` prefixes
   deleted from R2.
+- [`2026-10-09-ng-efetch-backfill/`](2026-10-09-ng-efetch-backfill/) — the
+  current local store and lock: 2,501 superseded and retired RefSeqGene
+  versions fetched from E-utilities and added as one collection. Not yet
+  published; R2's `refgetstore/2026-10-07` lacks them.
 
 Removed: `2026-07-02-seqrepo-parity/`. Its build and parity analysis were fully
 superseded by `2026-08-26-full-rebuild/`, which covers a larger source set and

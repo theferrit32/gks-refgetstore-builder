@@ -1,0 +1,34 @@
+# sync dry run against the store before the backfill (unchanged lines omitted)
+unchanged=333  added=1  removed=2  reingest=0  missing=1
+
+added:
+  eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi/refseq_human_refseqgene_superseded-f77c66f206c7c34c.fna.gz
+
+missing:
+  ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/RefSeqGene/refseqgene.9.genomic.fna.gz
+
+removed:
+  ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.16.protein.faa.gz
+  ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.16.rna.fna.gz
+
+collections to remove: 2
+  RqV6KCkB2tFlKSWe2tTL352VvbXfazsb
+  sgZ4rOTVlu7hJz26Yd85tRXcIS3RRflG
+
+refusing to sync: sources missing from the cache
+
+# Record-level comparison: cached feeds (2026-10-07 lock) vs upstream on 2026-10-09
+# digests are sha512t24u of the uppercased sequence
+RefSeqGene  shards cached 8 (MD5 changed: 8), upstream 9
+            records cached 6844, upstream 6844; added 0, removed 0
+            same accession.version with different bytes: 0
+            records in a different shard: 4089 of 6844
+            per shard cached   700 1018 968 1000 780 879 600 899
+            per shard upstream 667 977 1068 764 891 435 900 918 224
+mRNA_Prot   shards cached 32 (MD5 changed: 30), upstream 30 (human.16.rna, human.16.protein dropped)
+            records cached 471504, upstream 471431
+            accession.versions added 78 (54 new accessions), removed 151 (24 superseded by a newer version, 127 retired)
+            removed by prefix: XM_ 56, XP_ 56, NR_ 15, XR_ 11, NM_ 9, NP_ 4
+            same accession.version with different bytes: 0
+            records in a different shard: 213405 of 471353
+            cached shard 16 records removed upstream: 0 of 1495

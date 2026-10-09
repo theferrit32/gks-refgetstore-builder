@@ -1,0 +1,165 @@
+{
+  "schema": "gks-refgetstore-run/1",
+  "run_id": "2026-10-09-ng-efetch-backfill",
+  "kind": "build",
+  "title": "Add superseded and retired RefSeqGene versions fetched from E-utilities",
+  "status": "succeeded",
+  "timestamps": {
+    "initialized_utc": "2026-10-09T20:35:29.388002+00:00",
+    "finalized_utc": "2026-10-09T20:39:23.190947+00:00"
+  },
+  "baseline_run_id": "2026-10-08-case-sensitive-rebuild",
+  "evidence": {
+    "quality": "reconstructed",
+    "missing": [
+      "The fetch, sync dry run and selective build ran outside run_record exec, from the then-uncommitted code committed as 78c8ef3; their logs are attached as artifacts rather than recorded commands.",
+      "Per-command timestamps and exit codes for those three commands (all exited 0)."
+    ]
+  },
+  "git": {
+    "commit": "78c8ef39e0ad5bec049f89443399790cbb82949e",
+    "dirty": false,
+    "status_text": "",
+    "diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "tool_versions": {
+    "python": "3.14.7",
+    "git": "git version 2.50.1 (Apple Git-155)",
+    "uv": "uv 0.12.12 (Homebrew 2026-09-09 aarch64-apple-darwin)",
+    "gtars": "0.11.0"
+  },
+  "commands": [
+    {
+      "label": "verify",
+      "argv": [
+        "uv",
+        "run",
+        "gks-refgetstore",
+        "verify"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-09T20:35:29.488814+00:00",
+      "finished_utc": "2026-10-09T20:37:34.879298+00:00",
+      "exit_code": 0,
+      "log": "logs/verify.log",
+      "log_bytes": 277,
+      "log_sha256": "8a912c3ccadc7d62506db576a3c242d3d151cfa44e1847e1bbe67cf7162bb1f3"
+    },
+    {
+      "label": "tests",
+      "argv": [
+        "uv",
+        "run",
+        "pytest",
+        "-q"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-09T20:37:34.996079+00:00",
+      "finished_utc": "2026-10-09T20:38:07.328366+00:00",
+      "exit_code": 0,
+      "log": "logs/tests.log",
+      "log_bytes": 341,
+      "log_sha256": "5fbd9452c029d6356c9cd7ee4c01a382eae5e44b0e8d327f03075a95b943f9ed"
+    },
+    {
+      "label": "verify-corpus",
+      "argv": [
+        "uv",
+        "run",
+        "python",
+        "runs/2026-10-09-ng-efetch-backfill/artifacts/verify_corpus.py",
+        "downloads/eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi/refseq_human_refseqgene_superseded-f77c66f206c7c34c.fna.gz",
+        "/Users/kferrite/dev/data/seqrepo/2024-12-20/aliases.sqlite3",
+        "store"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-09T20:38:27.945250+00:00",
+      "finished_utc": "2026-10-09T20:38:44.624911+00:00",
+      "exit_code": 0,
+      "log": "logs/verify-corpus.log",
+      "log_bytes": 241,
+      "log_sha256": "f15b3b860b52c63d5f85d8d70de960f021a794544713ce592552fa6940b11684"
+    }
+  ],
+  "artifacts": [
+    {
+      "role": "verification-script",
+      "path": "artifacts/verify_corpus.py",
+      "bytes": 2325,
+      "sha256": "3cc18ce6779078e17c49c125331ca47398ea6352026f340b3907dbfefa6943b0"
+    },
+    {
+      "role": "fetch-log",
+      "path": "artifacts/fetch.log",
+      "bytes": 1804,
+      "sha256": "66fd51ba88c1995b482d8c00d0a78acc02e2f73aea9fbbf0d2a06f7d1888a438"
+    },
+    {
+      "role": "build-log",
+      "path": "artifacts/build.log",
+      "bytes": 2943,
+      "sha256": "a683a4fc93152b32a94b47da3c50d9ede7b0937d1e434e445d95349f6a8ca13f"
+    },
+    {
+      "role": "sync-dry-run-log",
+      "path": "artifacts/sync-dry-run.log",
+      "bytes": 565,
+      "sha256": "6e400cadc23cef5fe0f58ead609286a47b791de914775599d1e165773d54be2c"
+    },
+    {
+      "role": "store-stats-before",
+      "path": "artifacts/store-before-stats.txt",
+      "bytes": 181,
+      "sha256": "3488984e84f8f5ea87b2dbe080699ce741bbe05fd97e3621bf7297cabc61a4f0"
+    },
+    {
+      "role": "store-index-sha256-before",
+      "path": "artifacts/store-before.sha256",
+      "bytes": 261,
+      "sha256": "f093d8de5c6752a66b185a38eef0799130ab635f0b03193e1d9bf90d73777506"
+    },
+    {
+      "role": "build-lock",
+      "path": "artifacts/build.lock.json",
+      "bytes": 354782,
+      "sha256": "4207fdd39bc0ff0693dad73377b338748aa5d28316bd34a273b709bd78d86f8c"
+    },
+    {
+      "role": "feed-comparison",
+      "path": "artifacts/feed-comparison.txt",
+      "bytes": 1683,
+      "sha256": "c2fda2834d7d2435b02e3e139a9c369861c86ff75b574f97660904069563cd02"
+    }
+  ],
+  "result_summary": {
+    "seqset": "refseq_human_refseqgene_superseded",
+    "accessions_requested": 2501,
+    "accessions_retrieved": 2501,
+    "source_sha256": "7756a0cf001c0fe0d0575f50c33f6aa7c96e186dc89c81fb62629fd0b55b8b64",
+    "collection": "MD6Ozcf38_BHxS91ZZPRPDImssycpDC8",
+    "n_sequences_before": 1779052,
+    "n_sequences_after": 1781533,
+    "n_collections_before": 235,
+    "n_collections_after": 236,
+    "refseq_aliases_added": 2494,
+    "refseq_aliases_already_present": 7
+  },
+  "validations": [
+    {
+      "name": "verify",
+      "result": "pass",
+      "detail": "336 locked files ok; 1,781,533 sequences and 236 collections reachable"
+    },
+    {
+      "name": "tests",
+      "result": "pass",
+      "detail": "271 passed"
+    },
+    {
+      "name": "verify-corpus",
+      "result": "pass",
+      "detail": "0 round-trip failures; 2,146 shared with seqrepo, 0 digest mismatches; 355 not in seqrepo; every accession resolves in the store"
+    }
+  ],
+  "publication": null
+}

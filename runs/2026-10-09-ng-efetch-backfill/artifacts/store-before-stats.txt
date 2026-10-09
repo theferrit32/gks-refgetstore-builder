@@ -1,0 +1,1 @@
+{'n_collections_in_memory': '0', 'n_sequences': '1779052', 'logical_sequence_bytes': '16844765092', 'n_sequences_in_memory': '0', 'storage_mode': 'Encoded', 'n_collections': '235'}
