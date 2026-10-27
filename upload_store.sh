@@ -18,6 +18,7 @@ BUCKET="${RGS_BUCKET:-}"                 # required, no default
 DATE="$(date -u +%Y-%m-%d)"
 PREFIX="${RGS_PREFIX:-refgetstore/${DATE}}"
 STORE_DIR="${RGS_STORE_DIR:-${HERE}/store}"
+CONFIG="${RGS_CONFIG:-${HERE}/sources.toml}"
 MODE="sync"                              # sync (mirror) by default; --copy for additive
 MAKE_MANIFEST=1
 RUN_CHECK=1
@@ -38,6 +39,8 @@ Options:
   --prefix PREFIX     Object key prefix (default: refgetstore/<UTC-date>;
                       RGS_PREFIX). Set explicitly to control the full path.
   --store-dir DIR     Store directory to upload (default: ./store; RGS_STORE_DIR).
+  --config FILE       Manifest the store was built from, whose sources manifest.json
+                      lists (default: ./sources.toml; RGS_CONFIG).
   --copy              Use 'rclone copy' (additive) instead of the default
                       'rclone sync' (mirror, deletes extra remote objects).
   --no-manifest       Skip writing manifest.json into the store dir.
@@ -59,6 +62,7 @@ while [ $# -gt 0 ]; do
         --remote)     REMOTE="$2"; shift 2 ;;
         --prefix)     PREFIX="$2"; shift 2 ;;
         --store-dir)  STORE_DIR="$2"; shift 2 ;;
+        --config)     CONFIG="$2"; shift 2 ;;
         --copy)       MODE="copy"; shift ;;
         --no-manifest) MAKE_MANIFEST=0; shift ;;
         --no-check)   RUN_CHECK=0; shift ;;
@@ -80,6 +84,7 @@ command -v rclone >/dev/null 2>&1 || die "rclone not found on PATH"
 [ -f "$STORE_DIR/rgstore.json" ] || \
     die "$STORE_DIR does not look like a RefgetStore (no rgstore.json)"
 [ -n "$(ls -A "$STORE_DIR")" ] || die "store dir is empty: $STORE_DIR"
+[ "$MAKE_MANIFEST" = 0 ] || [ -f "$CONFIG" ] || die "config not found: $CONFIG"
 rclone listremotes 2>/dev/null | grep -qx "${REMOTE}:" || \
     die "rclone remote '${REMOTE}:' not configured (see: rclone listremotes)"
 
@@ -93,7 +98,7 @@ echo "Mode      : rclone ${MODE}$([ "$DRY_RUN" = 1 ] && echo ' (dry-run)')"
 if [ "$MAKE_MANIFEST" = 1 ]; then
     echo "Generating manifest.json ..."
     STORE_DIR="$STORE_DIR" PREFIX="$PREFIX" REMOTE="$REMOTE" BUCKET="$BUCKET" \
-    REPO_DIR="$HERE" UPLOAD_DATE="$DATE" \
+    REPO_DIR="$HERE" UPLOAD_DATE="$DATE" CONFIG="$CONFIG" \
     uv run --project "$HERE" python - <<'PY'
 import json, os, subprocess, tomllib
 from pathlib import Path
@@ -115,8 +120,8 @@ try:
 except Exception:
     gtars_version = None
 
-# source pins from sources.toml
-cfg_path = repo / "sources.toml"
+# source pins from the manifest the store was built from
+cfg_path = Path(os.environ["CONFIG"])
 assemblies, seqsets = [], []
 if cfg_path.exists():
     cfg = tomllib.loads(cfg_path.read_text())
@@ -148,6 +153,7 @@ manifest = {
         "dirty": git("status", "--porcelain", default="") != "",
     },
     "gtars_version": gtars_version,
+    "config": cfg_path.name,
     "object_count": count,
     "total_bytes": total,
     "assemblies": assemblies,
