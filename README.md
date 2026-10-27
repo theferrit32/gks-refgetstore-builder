@@ -39,7 +39,7 @@ header names. The only runtime dependency is `gtars`.
   macOS (APFS) and Windows (NTFS) are case-insensitive, and a store written to
   one cannot be published. See
   [Case-sensitive store directory](#case-sensitive-store-directory).
-- Disk: the default manifest includes 23 NCBI assembly releases, complete
+- Disk: the default manifest includes 25 NCBI assembly releases, complete
   published GRCh37/GRCh38 RefSeq release history, and all four canonical FASTA
   classes for Ensembl releases 75–116.
   Its cache and store therefore need substantially more capacity than a
@@ -655,6 +655,10 @@ current. Entries are only ever added, so an accession that NCBI retires from
 `gene_RefSeqGene` keeps its history. The current versions themselves come from
 the RefSeqGene FTP seqset.
 
+The NCBI36 list, `accession_lists/ncbi36_refseq.txt`, is the `RefSeq-Accn`
+column of the NCBI36 assembly report, which the NCBI36 report-only assembly
+entry applies.
+
 ## What gets written
 
 Per assembly run, the loader adds:
@@ -698,6 +702,12 @@ membership of mutable current RefSeq feeds from official checksum manifests. It 
 - **NCBI assemblies:** the original GRCh38 and GRCh37 releases, their listed
   patch releases, and their matching assembly reports. GRCh37.p11 and p12 are
   report-only because NCBI does not publish genomic FASTAs for them.
+- **NCBI36 (hg18):** its assembly report, applied alias-only, and its 123
+  RefSeq sequences (24 chromosomes and 99 scaffolds), fetched per accession
+  from E-utilities because NCBI publishes no NCBI36 genomic FASTA.
+- **T2T-CHM13v2.0:** the RefSeq assembly (`GCF_009914755.1`) and its report.
+  Its 24 nuclear chromosomes are loaded; its mitochondrion, GenBank-only
+  `CP068254.1`, is not in the RefSeq FASTA and is not in the store.
 - **NCBI RefSeq:** current mRNA, protein, and RefSeqGene shards, plus every RNA
   and protein FASTA discoverable in the official GRCh37/GRCh38 assembly and
   taxid-9606 annotation-release histories.
@@ -740,9 +750,9 @@ DNA sequences are not affected.
 The published store is
 `theferrit32-public:theferrit32-public/refgetstore/2026-10-07`, served at
 <https://static.ferriter.dev/refgetstore/2026-10-07/>: 1,779,052 sequences and
-235 collections, built from the current `sources.toml` with the gtars revision
-above (see [gtars revision](#gtars-revision) for which gtars can read it). Its
-build is [`runs/2026-10-08-case-sensitive-rebuild/`](runs/2026-10-08-case-sensitive-rebuild/)
+235 collections, built with the gtars revision above (see
+[gtars revision](#gtars-revision) for which gtars can read it). Its build is
+[`runs/2026-10-08-case-sensitive-rebuild/`](runs/2026-10-08-case-sensitive-rebuild/)
 and its upload [`runs/2026-10-08-r2-resync/`](runs/2026-10-08-r2-resync/),
 whose `published-manifest.json` is the manifest uploaded with it.
 
@@ -750,8 +760,11 @@ The earlier published prefixes, `refgetstore/2026-06-24` and
 `refgetstore/2026-07-22`, were deleted from the bucket; their records remain in
 [`runs/`](runs/).
 
-The local `store` is a build target and is not published automatically. The
-prior isolated release-116 experiment is documented at
+The local `store` is a build target and is not published automatically. It
+and `build.lock.json` hold 1,781,660 sequences and 238 collections: the
+published set plus the RefSeqGene history, NCBI36 and T2T-CHM13v2.0 sources,
+none of which the published store has. The prior isolated release-116
+experiment is documented at
 [`runs/2026-07-23-ensembl-r116-genomic-experiment/`](runs/2026-07-23-ensembl-r116-genomic-experiment/).
 Do not infer publication status from a local store directory.
 

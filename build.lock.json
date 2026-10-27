@@ -1,10 +1,10 @@
 {
   "schema": "gks-refgetstore-build-lock/4",
   "build": {
-    "timestamp_utc": "2026-10-09T20:31:26.332532+00:00",
+    "timestamp_utc": "2026-10-27T21:11:30.852543+00:00",
     "git": {
-      "commit": "e72669d1ddb4a3a50417f599834cf955574e3b4a",
-      "describe": "e72669d-dirty",
+      "commit": "b3939b1578c19f7ff6e69441a32c9b2ee4c61f0e",
+      "describe": "b3939b1-dirty",
       "dirty": true
     },
     "gtars_version": "0.11.0",
@@ -16,7 +16,7 @@
     }
   },
   "inputs": {
-    "sources_toml_sha256": "13aba9b4b3d4dfe38d23ba2556b3d189b4dc4d44b6aaea6c5629c9b180d26000",
+    "sources_toml_sha256": "453f7946edb7c5ba4c1f8ff08505c9c14c7125ba373786669b0c288f482b09bf",
     "files": [
       {
         "kind": "assembly_fasta",
@@ -371,6 +371,40 @@
         "file_class": "genomic",
         "bytes": 972898531,
         "sha256": "11912a45a545bf01a10b2a7f10eb7a42924436b4d19b476b1899834fb7ba74a3",
+        "present": true,
+        "ingest_spec": null,
+        "ingest_spec_sha256": null
+      },
+      {
+        "kind": "assembly_fasta",
+        "owner": "T2T-CHM13v2.0",
+        "url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/009/914/755/GCF_009914755.1_T2T-CHM13v2.0/GCF_009914755.1_T2T-CHM13v2.0_genomic.fna.gz",
+        "cache_path": "ftp.ncbi.nlm.nih.gov/genomes/all/GCF/009/914/755/GCF_009914755.1_T2T-CHM13v2.0/GCF_009914755.1_T2T-CHM13v2.0_genomic.fna.gz",
+        "mutable": false,
+        "provider_checksum": "9e6bf6b586bc8954208d1cc1d5f2fc99",
+        "provider_checksum_algorithm": "md5",
+        "provider_checksum_blocks": null,
+        "checksum_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/009/914/755/GCF_009914755.1_T2T-CHM13v2.0/md5checksums.txt",
+        "file_class": "genomic",
+        "bytes": 932691275,
+        "sha256": "4bd19ff56f5e3d60c800386d43ad0ed94e3e67429f07b89e5015a5742ecbf362",
+        "present": true,
+        "ingest_spec": null,
+        "ingest_spec_sha256": null
+      },
+      {
+        "kind": "assembly_report",
+        "owner": "NCBI36",
+        "url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.12_NCBI36/GCF_000001405.12_NCBI36_assembly_report.txt",
+        "cache_path": "ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.12_NCBI36/GCF_000001405.12_NCBI36_assembly_report.txt",
+        "mutable": false,
+        "provider_checksum": "4b158498e095a3f5ca5dc7dd43d59dae",
+        "provider_checksum_algorithm": "md5",
+        "provider_checksum_blocks": null,
+        "checksum_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.12_NCBI36/md5checksums.txt",
+        "file_class": "assembly_report",
+        "bytes": 12311,
+        "sha256": "d8c72a557b9670b1e5bd5d14c098a57f955c5be566ec3c39867c86aab717f4bb",
         "present": true,
         "ingest_spec": null,
         "ingest_spec_sha256": null
@@ -762,6 +796,40 @@
         "file_class": "assembly_report",
         "bytes": 80454,
         "sha256": "64318ddff470b69b261a667d813210044f60d4ce654253a547db80ff73638d38",
+        "present": true,
+        "ingest_spec": null,
+        "ingest_spec_sha256": null
+      },
+      {
+        "kind": "assembly_report",
+        "owner": "T2T-CHM13v2.0",
+        "url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/009/914/755/GCF_009914755.1_T2T-CHM13v2.0/GCF_009914755.1_T2T-CHM13v2.0_assembly_report.txt",
+        "cache_path": "ftp.ncbi.nlm.nih.gov/genomes/all/GCF/009/914/755/GCF_009914755.1_T2T-CHM13v2.0/GCF_009914755.1_T2T-CHM13v2.0_assembly_report.txt",
+        "mutable": false,
+        "provider_checksum": "d1d3bad3beb51c4afd44175b07b2a240",
+        "provider_checksum_algorithm": "md5",
+        "provider_checksum_blocks": null,
+        "checksum_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/009/914/755/GCF_009914755.1_T2T-CHM13v2.0/md5checksums.txt",
+        "file_class": "assembly_report",
+        "bytes": 3702,
+        "sha256": "734ed8bd2d4f268ed60e2a310caf9c78c3d9f1f4c28441c90f168ea304ed6910",
+        "present": true,
+        "ingest_spec": null,
+        "ingest_spec_sha256": null
+      },
+      {
+        "kind": "seqset",
+        "owner": "ncbi36_refseq",
+        "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&rettype=fasta&retmode=text#ncbi36_refseq-e124ecdc299a4ceb.fna.gz",
+        "cache_path": "eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi/ncbi36_refseq-e124ecdc299a4ceb.fna.gz",
+        "mutable": false,
+        "provider_checksum": null,
+        "provider_checksum_algorithm": null,
+        "provider_checksum_blocks": null,
+        "checksum_url": null,
+        "file_class": "genomic",
+        "bytes": 832545989,
+        "sha256": "d2612de0c59f9a5d525934dbedeae203842e16cafde8d3b62076d4834becff52",
         "present": true,
         "ingest_spec": null,
         "ingest_spec_sha256": null
@@ -5939,10 +6007,10 @@
     ]
   },
   "outputs": {
-    "n_sequences": 1781533,
-    "n_collections": 236,
-    "sequences_root": "sha256:78d864510a1fd4941797f9762b13b2d6deb9a98f2fa9ac6549301ee77c6cac65",
-    "collections_root": "sha256:e4ad95972ce01eae9a91b7c61958f6b3645e1908b47db2e45c88bed8d7cb9754",
+    "n_sequences": 1781660,
+    "n_collections": 238,
+    "sequences_root": "sha256:f192865259fc8c40022a5a98ec7e40ba3cab9e85e3ef9f246743c12c8dd649ae",
+    "collections_root": "sha256:9a2477f134ab73e4baef3c462d688e6c515fb4558480aeeb1a97fb01a0a36c7d",
     "collections": [
       {
         "digest": "-bnIcfluHD7QZH6jlI-pAQEn0vvj0y26",
@@ -6403,6 +6471,13 @@
         "n_sequences": 113832,
         "from": [
           "ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20200522/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_protein.faa.gz"
+        ]
+      },
+      {
+        "digest": "GFxy8xYVWbzxOKJcWiq97r3nGdTQ33yE",
+        "n_sequences": 123,
+        "from": [
+          "eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi/ncbi36_refseq-e124ecdc299a4ceb.fna.gz"
         ]
       },
       {
@@ -7119,6 +7194,13 @@
         "n_sequences": 525,
         "from": [
           "ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.33_GRCh38.p7/GCF_000001405.33_GRCh38.p7_genomic.fna.gz"
+        ]
+      },
+      {
+        "digest": "eM0RH5r4wQtxMzLTl1NUkkehbww-cWvM",
+        "n_sequences": 24,
+        "from": [
+          "ftp.ncbi.nlm.nih.gov/genomes/all/GCF/009/914/755/GCF_009914755.1_T2T-CHM13v2.0/GCF_009914755.1_T2T-CHM13v2.0_genomic.fna.gz"
         ]
       },
       {

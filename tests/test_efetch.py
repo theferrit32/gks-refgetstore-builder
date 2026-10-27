@@ -351,12 +351,16 @@ def test_history_command_only_adds(tmp_path: Path, monkeypatch: pytest.MonkeyPat
     assert "refusing to drop" in capsys.readouterr().err
 
 
-def test_checked_in_list_is_valid_and_configured() -> None:
+@pytest.mark.parametrize("name, path, prefixes", [
+    ("refseq_human_refseqgene_superseded", "accession_lists/refseqgene_superseded.txt", ("NG_",)),
+    ("ncbi36_refseq", "accession_lists/ncbi36_refseq.txt", ("NC_", "NG_", "NT_")),
+])
+def test_checked_in_list_is_valid_and_configured(name: str, path: str, prefixes: tuple[str, ...]) -> None:
     root = Path(__file__).parents[1]
-    ids = efetch.read_accession_list(root / "accession_lists/refseqgene_superseded.txt")
-    assert all(a.startswith("NG_") for a in ids)
+    ids = efetch.read_accession_list(root / path)
+    assert all(a.startswith(prefixes) for a in ids)
     digest = hashlib.sha256("".join(f"{a}\n" for a in ids).encode()).hexdigest()
     assert efetch.accession_list_sha256(ids) == digest
     _, seqsets = load_config(root / "sources.toml")
-    (seqset,) = [s for s in seqsets if s.efetch_accessions is not None]
+    (seqset,) = [s for s in seqsets if s.name == name]
     assert seqset.efetch_ids == ids and seqset.namespace == "refseq"
