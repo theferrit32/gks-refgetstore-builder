@@ -1,0 +1,6 @@
+sequence index: 13615 digests; collection index: 33 digests
+.seq files: 13615; indexed but missing: 0; on disk but unindexed: 0
+collections the full lock attributes to the manifest's 29 sources: 33
+expected collections present with matching counts: 33/33
+sequence files byte-identical to the full store: 13615/13615
+PASS

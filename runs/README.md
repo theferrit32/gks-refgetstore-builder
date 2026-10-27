@@ -41,6 +41,9 @@ Durable records currently retained:
   and lock: NCBI36, as a report-only assembly plus its 123 RefSeq sequences
   fetched from E-utilities, and T2T-CHM13v2.0's 24 nuclear chromosomes. Not yet
   published.
+- [`2026-10-27-genomic-r2-upload/`](2026-10-27-genomic-r2-upload/) — the
+  genomic-only store from `sources.genomic.toml` (13,615 sequences, 4.9 GB),
+  published at `refgetstore/genomic-2026-10-27`.
 
 Removed: `2026-07-02-seqrepo-parity/`. Its build and parity analysis were fully
 superseded by `2026-08-26-full-rebuild/`, which covers a larger source set and

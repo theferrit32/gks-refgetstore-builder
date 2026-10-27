@@ -1,0 +1,82 @@
+[
+ {
+  "expression": "NG_033840.1:g.60236G>A",
+  "format": "hgvs",
+  "seqrepo_vrs_id": "ga4gh:VA.9Q5_6O5poDL0XHblBacT4Djnj2se6cDf"
+ },
+ {
+  "expression": "NG_008885.1:g.95101A>G",
+  "format": "hgvs",
+  "seqrepo_vrs_id": "ga4gh:VA.5_2j_s-E5rWKJ0x7r-CT1DE4T17AHlVn"
+ },
+ {
+  "expression": "NG_017064.1:g.31674C>G",
+  "format": "hgvs",
+  "seqrepo_vrs_id": "ga4gh:VA.aS34n4chCQAHG9-wAs-kb5LKVpDHyMT2"
+ },
+ {
+  "expression": "LRG_882:g.53908A>T",
+  "format": "hgvs",
+  "seqrepo_vrs_id": "ga4gh:VA.CMJpR1rTuUAQwl4f1wIbxxJ1w8ENgvGc"
+ },
+ {
+  "expression": "LRG_1118:g.540885G>T",
+  "format": "hgvs",
+  "seqrepo_vrs_id": "ga4gh:VA.JJlfK9MKOyF1FW6NEN4g6omcCttx2AyS"
+ },
+ {
+  "expression": "LRG_161:g.10377G>A",
+  "format": "hgvs",
+  "seqrepo_vrs_id": "ga4gh:VA.W_q6JQP4-hM0YaVbRunq4BJy3yfImr-d"
+ },
+ {
+  "expression": "CM000679.1:g.77365534_77392001dup",
+  "format": "hgvs",
+  "seqrepo_vrs_id": "ga4gh:VA.Vgatp_ck1C3uP_Lth62ecQdwdDHnqaMh"
+ },
+ {
+  "expression": "CM000671.1:g.8582229_8610513dup",
+  "format": "hgvs",
+  "seqrepo_vrs_id": "ga4gh:VA.ORU4zrSLGVRI9pCjQlTiZmQ8E_aNyuSB"
+ },
+ {
+  "expression": "NW_009646206.1:g.177490G>A",
+  "format": "hgvs",
+  "seqrepo_vrs_id": "ga4gh:VA.W5oGpKzahPSm90RoagutnNvFctC_euUs"
+ },
+ {
+  "expression": "NT_187633.1:g.267335C>T",
+  "format": "hgvs",
+  "seqrepo_vrs_id": "ga4gh:VA.H1ezVl-_brhT6TkPYn980yEzEncEseoh"
+ },
+ {
+  "expression": "NC_012920.1:7500:T:A",
+  "format": "spdi",
+  "seqrepo_vrs_id": "ga4gh:VA.jRhECnxb0XQGyGhF6djQLyNL8XxXfOBo"
+ },
+ {
+  "expression": "NC_012920.1:m.14905G>A",
+  "format": "hgvs",
+  "seqrepo_vrs_id": "ga4gh:VA.rEwL6NMW_PlPYH3S1cAeBJjlCmfg6o-Y"
+ },
+ {
+  "expression": "NC_000022.11:g.20994002C>A",
+  "format": "hgvs",
+  "seqrepo_vrs_id": "ga4gh:VA.B6FxD6sUyI0PlXFUPurSEgr4HNPE0HZN"
+ },
+ {
+  "expression": "NC_000022.11:41758501:C:G",
+  "format": "spdi",
+  "seqrepo_vrs_id": "ga4gh:VA.0jYuZ4Nmh7lXGUFsl3MQOha3-y_1UQvr"
+ },
+ {
+  "expression": "NC_000021.7:g.13636378_28138533dup",
+  "format": "hgvs",
+  "seqrepo_vrs_id": "ga4gh:VA.MwnFCkyAPKB1guZVWN3d_zV5D0oygUGL"
+ },
+ {
+  "expression": "NC_060946.1:24438325:C:T",
+  "format": "spdi",
+  "seqrepo_vrs_id": "ga4gh:VA.DxMZHGR-5WjpOgzn5N40P4IJ3wJlYB-r"
+ }
+]

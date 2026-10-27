@@ -1,0 +1,186 @@
+{
+  "schema": "gks-refgetstore-run/1",
+  "run_id": "2026-10-27-genomic-r2-upload",
+  "kind": "publication",
+  "title": "Upload the genomic-only store to refgetstore/genomic-2026-10-27",
+  "status": "succeeded",
+  "timestamps": {
+    "initialized_utc": "2026-10-27T23:01:49.357198+00:00",
+    "finalized_utc": "2026-10-27T23:07:34.534097+00:00"
+  },
+  "baseline_run_id": "2026-10-27-ncbi36-t2t",
+  "evidence": {
+    "quality": "captured",
+    "missing": [
+      "The store was built before this record was initialized, outside run_record, with `gks-refgetstore build --config sources.genomic.toml --lock <copy of build.lock.json> --locked-sources --lock-check-mode subset --no-lock` at commit 5e0c4a6 with sources.genomic.toml untracked. That file was committed as 3c58cd3 with only its header comment changed; its entries are identical. The build log is not attached; it exited 0 in 237 s.",
+      "The upload dry run (13,682 copies, 0 deletions) ran outside run_record; its 1.7 MB per-object log exceeds the artifact limit and is summarized in README.md."
+    ]
+  },
+  "git": {
+    "commit": "b70c3b4897a4d2f0157e615e8aa16ba0d0d05d51",
+    "dirty": false,
+    "status_text": "",
+    "diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "tool_versions": {
+    "python": "3.14.7",
+    "git": "git version 2.50.1 (Apple Git-155)",
+    "uv": "uv 0.12.12 (Homebrew 2026-09-09 aarch64-apple-darwin)",
+    "gtars": "0.11.0"
+  },
+  "commands": [
+    {
+      "label": "upload",
+      "argv": [
+        "env",
+        "RCLONE_CHECKSUM=true",
+        "./upload_store.sh",
+        "--remote",
+        "theferrit32-public",
+        "--bucket",
+        "theferrit32-public",
+        "--prefix",
+        "refgetstore/genomic-2026-10-27",
+        "--store-dir",
+        "/Volumes/RefgetStores/genomic-2026-10-27",
+        "--config",
+        "sources.genomic.toml",
+        "--transfers",
+        "64",
+        "--checkers",
+        "64"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-27T23:01:58.122294+00:00",
+      "finished_utc": "2026-10-27T23:03:54.597815+00:00",
+      "exit_code": 0,
+      "log": "logs/upload.log",
+      "log_bytes": 10065,
+      "log_sha256": "7a079ca7fff76e578523077440b6e17e57b48ae850035be6f1796d2fce7f3c0e"
+    },
+    {
+      "label": "public-read-check",
+      "argv": [
+        "env",
+        "GA4GH_VRS_REFGET_CACHE_DIR=/private/tmp/claude-502/-Users-kferrite-dev-gks-refgetstore-builder/8d27e090-1d7b-4f32-a363-c5fc7ee370ea/scratchpad/remote-cache.Ps9q",
+        "uv",
+        "run",
+        "--project",
+        "/Users/kferrite/dev/vrs-python/.claude/worktrees/dataproxy-backend-refactor",
+        "python",
+        "runs/2026-10-27-genomic-r2-upload/artifacts/check_new_sources.py",
+        "/Users/kferrite/dev/vrs-python/seqrepo-refgetstore-evals",
+        "refget+https://static.ferriter.dev/refgetstore/genomic-2026-10-27",
+        "postgresql://anonymous@localhost:15432/uta/uta_20241220",
+        "runs/2026-10-27-genomic-r2-upload/artifacts/remote_samples.json"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-27T23:04:30.778373+00:00",
+      "finished_utc": "2026-10-27T23:04:39.689259+00:00",
+      "exit_code": 0,
+      "log": "logs/public-read-check.log",
+      "log_bytes": 1757,
+      "log_sha256": "1bed9832e92adcc417ef226c4d3dfd5d87d5bfac0c058af8fcce16b2431631ba"
+    },
+    {
+      "label": "public-read-check-index-loaded",
+      "argv": [
+        "env",
+        "GA4GH_VRS_REFGET_CACHE_DIR=/private/tmp/claude-502/-Users-kferrite-dev-gks-refgetstore-builder/8d27e090-1d7b-4f32-a363-c5fc7ee370ea/scratchpad/remote-cache.7DPL",
+        "uv",
+        "run",
+        "--project",
+        "/Users/kferrite/dev/vrs-python/.claude/worktrees/dataproxy-backend-refactor",
+        "python",
+        "runs/2026-10-27-genomic-r2-upload/artifacts/check_remote_sources.py",
+        "/Users/kferrite/dev/vrs-python/seqrepo-refgetstore-evals",
+        "refget+https://static.ferriter.dev/refgetstore/genomic-2026-10-27",
+        "postgresql://anonymous@localhost:15432/uta/uta_20241220",
+        "runs/2026-10-27-genomic-r2-upload/artifacts/remote_samples.json"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-27T23:05:40.775726+00:00",
+      "finished_utc": "2026-10-27T23:06:11.517422+00:00",
+      "exit_code": 0,
+      "log": "logs/public-read-check-index-loaded.log",
+      "log_bytes": 2043,
+      "log_sha256": "aac9317f0113ccdb396643b40e7adb57014989f465ed4fc0731229468e4ed69f"
+    }
+  ],
+  "artifacts": [
+    {
+      "role": "verification-script",
+      "path": "artifacts/check_new_sources.py",
+      "bytes": 904,
+      "sha256": "9fca14fd993d53ca09874b110e8d8ebc4841e299cb94561a9d173caac3f74a87"
+    },
+    {
+      "role": "verification-samples",
+      "path": "artifacts/remote_samples.json",
+      "bytes": 2164,
+      "sha256": "39c1f7ee785e1301771d80eae6b2dbc4d580c4fda7a2fe0bf7c6ca9c19cc4693"
+    },
+    {
+      "role": "subset-check-script",
+      "path": "artifacts/check_subset_store.py",
+      "bytes": 4014,
+      "sha256": "c0eb76648321703bfb331e2f23ee9ae73f6892a118a898eb69025a776fd148ba"
+    },
+    {
+      "role": "verification-script-remote",
+      "path": "artifacts/check_remote_sources.py",
+      "bytes": 994,
+      "sha256": "e5dde516adbc89f49dfd47b1a91f5f1a666eac7b44877fc4d74da5c1249d968d"
+    },
+    {
+      "role": "published-manifest",
+      "path": "artifacts/published-manifest.json",
+      "bytes": 9312,
+      "sha256": "206dcdec0bbcfe19da51a74971ff455a26c1934c58e55526d2da6b5324e11377"
+    },
+    {
+      "role": "subset-check-output",
+      "path": "artifacts/subset-check.txt",
+      "bytes": 321,
+      "sha256": "ab240b33b0424543f0844e6d2080b29329aed009a0ff81a2aa7499e3563a4de3"
+    }
+  ],
+  "result_summary": {
+    "store_dir": "/Volumes/RefgetStores/genomic-2026-10-27",
+    "config": "sources.genomic.toml",
+    "n_sequences": 13615,
+    "n_collections": 33,
+    "objects_uploaded": 13682,
+    "store_bytes": 4886047853,
+    "rgstore_sequences_digest": "9075f1c9c3749ef63b8773ee23eb537ebe87377e3fbf50787aeb80fffacea3c6",
+    "rgstore_collections_digest": "5ed16be649ae7cbe6c4e28ad596af4e454ac8ca0379608fba96031f157f5ff7e",
+    "rgstore_aliases_digest": "48df5d24a1c532b11c611e98e8c1a724bff90f598c7fbab2cfcf4bc41f8e2454",
+    "upload_seconds": 116
+  },
+  "validations": [
+    {
+      "name": "subset-check",
+      "result": "pass",
+      "detail": "all 33 collections the full lock attributes to the manifest's 29 sources present with the lock's sequence counts and no others; 13,615 indexed sequences each with its .seq file and none extra; every sequence and collection file byte-identical to the full store's"
+    },
+    {
+      "name": "rclone-check",
+      "result": "pass",
+      "detail": "0 differences, 13,682 matching files (13,681 store files plus manifest.json)"
+    },
+    {
+      "name": "public-read-check",
+      "result": "fail",
+      "detail": "0/16 resolved through refget+https: gtars open_remote defers the sequence index and get_sequence_metadata_by_alias returns None until it is loaded; the store's contents were not at fault"
+    },
+    {
+      "name": "public-read-check-index-loaded",
+      "result": "pass",
+      "detail": "16/16 (NG_, LRG, CM, NW_, NT_, chrM, GRCh38 chr22, NCBI36 chr21, T2T chr22) translate through the public URL with the full store's VRS IDs once the sequence index is loaded"
+    }
+  ],
+  "publication": {
+    "destination": "theferrit32-public:theferrit32-public/refgetstore/genomic-2026-10-27",
+    "public_url": "https://static.ferriter.dev/refgetstore/genomic-2026-10-27/"
+  }
+}
