@@ -1,0 +1,259 @@
+{
+  "schema": "gks-refgetstore-run/1",
+  "run_id": "2026-10-27-ncbi36-t2t",
+  "kind": "build",
+  "title": "Add NCBI36 and T2T-CHM13v2.0",
+  "status": "succeeded",
+  "timestamps": {
+    "initialized_utc": "2026-10-27T20:41:30.370161+00:00",
+    "finalized_utc": "2026-10-27T21:36:33.650483+00:00"
+  },
+  "baseline_run_id": "2026-10-09-ng-efetch-backfill",
+  "evidence": {
+    "quality": "captured",
+    "missing": [
+      "The record was initialized from a dirty tree (b3939b1 plus the manifest changes); the commands ran against the sources.toml committed as 9fa66d1 (SHA-256 453f7946...), which the lock records as sources_toml_sha256."
+    ]
+  },
+  "git": {
+    "commit": "b3939b1578c19f7ff6e69441a32c9b2ee4c61f0e",
+    "dirty": true,
+    "status_text": "M sources.toml\n?? accession_lists/ncbi36_refseq.txt",
+    "diff_sha256": "a91484675bc49cb65bab7e55514a7ff18e834af2eb848471c074527e4836407e"
+  },
+  "tool_versions": {
+    "python": "3.14.7",
+    "git": "git version 2.50.1 (Apple Git-155)",
+    "uv": "uv 0.12.12 (Homebrew 2026-09-09 aarch64-apple-darwin)",
+    "gtars": "0.11.0"
+  },
+  "commands": [
+    {
+      "label": "fetch",
+      "argv": [
+        "uv",
+        "run",
+        "gks-refgetstore",
+        "fetch",
+        "--only",
+        "NCBI36",
+        "ncbi36_refseq",
+        "T2T-CHM13v2.0"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-27T20:41:35.842787+00:00",
+      "finished_utc": "2026-10-27T21:08:32.318283+00:00",
+      "exit_code": 0,
+      "log": "logs/fetch.log",
+      "log_bytes": 899,
+      "log_sha256": "54d4888b095c1978246270613947ea2eaf308f0f34e11c228d2b13f7ffdcb1af"
+    },
+    {
+      "label": "build-ncbi36-seqset",
+      "argv": [
+        "uv",
+        "run",
+        "gks-refgetstore",
+        "build",
+        "--seqset",
+        "ncbi36_refseq",
+        "--force-lock"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-27T21:09:04.133616+00:00",
+      "finished_utc": "2026-10-27T21:09:50.189680+00:00",
+      "exit_code": 0,
+      "log": "logs/build-ncbi36-seqset.log",
+      "log_bytes": 2827,
+      "log_sha256": "6e42dafec8695ac5a5da4959d448407f44954eb70ef94b58fb245d1059293b7f"
+    },
+    {
+      "label": "build-ncbi36-report",
+      "argv": [
+        "uv",
+        "run",
+        "gks-refgetstore",
+        "build",
+        "--assembly",
+        "NCBI36",
+        "--force-lock"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-27T21:10:05.743678+00:00",
+      "finished_utc": "2026-10-27T21:10:34.427882+00:00",
+      "exit_code": 0,
+      "log": "logs/build-ncbi36-report.log",
+      "log_bytes": 2444,
+      "log_sha256": "eb2db9e11ca9ea6d693fab2d8c485efea27da6ec737f6a8143e6c053dcd5ffab"
+    },
+    {
+      "label": "build-t2t",
+      "argv": [
+        "uv",
+        "run",
+        "gks-refgetstore",
+        "build",
+        "--assembly",
+        "T2T-CHM13v2.0",
+        "--force-lock"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-27T21:10:40.980031+00:00",
+      "finished_utc": "2026-10-27T21:11:35.134107+00:00",
+      "exit_code": 0,
+      "log": "logs/build-t2t.log",
+      "log_bytes": 3288,
+      "log_sha256": "2181119da0acb78b121504ccb14acc04bc71cf1be82be902c7f905900bf8717c"
+    },
+    {
+      "label": "verify",
+      "argv": [
+        "uv",
+        "run",
+        "gks-refgetstore",
+        "verify"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-27T21:11:49.263251+00:00",
+      "finished_utc": "2026-10-27T21:13:54.627184+00:00",
+      "exit_code": 0,
+      "log": "logs/verify.log",
+      "log_bytes": 277,
+      "log_sha256": "1cfd81072b9de8f89069f52959300c6d7f7b9c90c4bb265fcef7050898012507"
+    },
+    {
+      "label": "tests",
+      "argv": [
+        "uv",
+        "run",
+        "pytest",
+        "-q"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-27T21:13:54.751678+00:00",
+      "finished_utc": "2026-10-27T21:14:28.451530+00:00",
+      "exit_code": 1,
+      "log": "logs/tests.log",
+      "log_bytes": 1325,
+      "log_sha256": "7ae6e3ada2e45bd5da2c3ba19cfb7713b438c02ae13c2e6bcb436771c04dc59d"
+    },
+    {
+      "label": "tests-after-fix",
+      "argv": [
+        "uv",
+        "run",
+        "pytest",
+        "-q"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-27T21:14:58.638978+00:00",
+      "finished_utc": "2026-10-27T21:15:31.224712+00:00",
+      "exit_code": 0,
+      "log": "logs/tests-after-fix.log",
+      "log_bytes": 341,
+      "log_sha256": "f4378d5304dfd6ac30c55ee8a23890fd69b770902dcd45fbbe6d2e35ee0e4db7"
+    },
+    {
+      "label": "vrs-python-check",
+      "argv": [
+        "sandbox-exec",
+        "-f",
+        "runs/2026-10-27-ncbi36-t2t/artifacts/live-readonly.sb",
+        "uv",
+        "run",
+        "--project",
+        "/Users/kferrite/dev/vrs-python/.claude/worktrees/dataproxy-backend-refactor",
+        "python",
+        "runs/2026-10-27-ncbi36-t2t/artifacts/check_new_sources.py",
+        "/Users/kferrite/dev/vrs-python/seqrepo-refgetstore-evals",
+        "refget+file:///Volumes/RefgetStores/store",
+        "postgresql://anonymous@localhost:15432/uta/uta_20241220",
+        "runs/2026-10-27-ncbi36-t2t/artifacts/seqrepo_only_samples.json"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-27T21:34:34.404887+00:00",
+      "finished_utc": "2026-10-27T21:35:09.230784+00:00",
+      "exit_code": 0,
+      "log": "logs/vrs-python-check.log",
+      "log_bytes": 2761,
+      "log_sha256": "5d998c63defdd6696173eef936c3af2381cba3f66806da07968aeb7428d44322"
+    }
+  ],
+  "artifacts": [
+    {
+      "role": "verification-script",
+      "path": "artifacts/check_new_sources.py",
+      "bytes": 904,
+      "sha256": "9fca14fd993d53ca09874b110e8d8ebc4841e299cb94561a9d173caac3f74a87"
+    },
+    {
+      "role": "verification-samples",
+      "path": "artifacts/seqrepo_only_samples.json",
+      "bytes": 3306,
+      "sha256": "157cdd2d3cbb66c79305b7d0a32f267165d0ab670ff61f8c4f598228334d2618"
+    },
+    {
+      "role": "sandbox-profile",
+      "path": "artifacts/live-readonly.sb",
+      "bytes": 87,
+      "sha256": "c4e1a49ddc6bc82e584ef804fa31f569fc6f03a15edd87bb053fc858a2faf24c"
+    },
+    {
+      "role": "build-lock",
+      "path": "artifacts/build.lock.json",
+      "bytes": 358809,
+      "sha256": "7e27b609013a55cef7e2805bbdf5b7a9fbc0aff2d5f0cb90e44c1d5e7a37b694"
+    }
+  ],
+  "result_summary": {
+    "ncbi36_refseq": {
+      "accessions_requested": 123,
+      "accessions_retrieved": 123,
+      "source_bytes": 832545989,
+      "source_sha256": "d2612de0c59f9a5d525934dbedeae203842e16cafde8d3b62076d4834becff52",
+      "collection": "GFxy8xYVWbzxOKJcWiq97r3nGdTQ33yE",
+      "sequences_new": 103,
+      "sequences_already_present": 20
+    },
+    "NCBI36": {
+      "report_rows": 123,
+      "resolved": 123,
+      "sequence_aliases_added": 149
+    },
+    "T2T-CHM13v2.0": {
+      "collection": "eM0RH5r4wQtxMzLTl1NUkkehbww-cWvM",
+      "collection_sequences": 24,
+      "report_rows": 25,
+      "resolved": 24,
+      "skipped_genbank_only": [
+        "MT (CP068254.1)"
+      ],
+      "sequence_aliases_added": 120,
+      "collection_aliases_added": 2
+    },
+    "n_sequences_before": 1781533,
+    "n_sequences_after": 1781660,
+    "n_collections_before": 236,
+    "n_collections_after": 238,
+    "lock_input_files_before": 336,
+    "lock_input_files_after": 340
+  },
+  "validations": [
+    {
+      "name": "verify",
+      "result": "pass",
+      "detail": "340 locked files ok; 1,781,660 sequences and 238 collections reachable, every payload on disk"
+    },
+    {
+      "name": "tests",
+      "result": "pass",
+      "detail": "272 passed after the efetch list test was parameterized over both checked-in lists (it had assumed one efetch seqset)"
+    },
+    {
+      "name": "vrs-python-check",
+      "result": "pass",
+      "detail": "one expression per accession that the 2026-10-27 ClinVar genomic eval resolved only on SeqRepo (22 NCBI36 chromosomes, NC_060946.1): 23/23 now translate on the store with SeqRepo's VRS ID"
+    }
+  ],
+  "publication": null
+}

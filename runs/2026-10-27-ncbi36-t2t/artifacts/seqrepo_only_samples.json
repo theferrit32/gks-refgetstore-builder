@@ -1,0 +1,117 @@
+[
+ {
+  "expression": "NC_000001.9:g.114244498del",
+  "format": "hgvs",
+  "seqrepo_vrs_id": "ga4gh:VA.AroudZh2eum2klH1i9pDgrRe7KvBlziG"
+ },
+ {
+  "expression": "NC_000002.10:g.112364620_112455677del",
+  "format": "hgvs",
+  "seqrepo_vrs_id": "ga4gh:VA.rTFptOE43lLk2VIW6E3rv-XLm5LgRykm"
+ },
+ {
+  "expression": "NC_000003.10:g.101462705G>A",
+  "format": "hgvs",
+  "seqrepo_vrs_id": "ga4gh:VA.b2X0nKe4FhYQpfyUQO72duOC64cbVo2d"
+ },
+ {
+  "expression": "NC_000004.10:g.111994000_115504000del3510001",
+  "format": "hgvs",
+  "seqrepo_vrs_id": "ga4gh:VA.Pq_mmLQdUuKylQK2JffW9i18R0JM0m1N"
+ },
+ {
+  "expression": "NC_000005.8:g.112091493G>A",
+  "format": "hgvs",
+  "seqrepo_vrs_id": "ga4gh:VA.6-ZWX9hHChSO_6Th097VzLW_saum1p1U"
+ },
+ {
+  "expression": "NC_000006.10:g.1543591_1675085del131495",
+  "format": "hgvs",
+  "seqrepo_vrs_id": "ga4gh:VA.fKhjLK3Gl-SSiEZof2ge7mmW8qKsMoN1"
+ },
+ {
+  "expression": "NC_000007.12:g.100098527_100291144del",
+  "format": "hgvs",
+  "seqrepo_vrs_id": "ga4gh:VA.6n-MEzaUOm5DN56uZ5sgqannm73cRPJ3"
+ },
+ {
+  "expression": "NC_000008.9:g.11369157G>A",
+  "format": "hgvs",
+  "seqrepo_vrs_id": "ga4gh:VA.-aC0NJRo_3ffncqhfJUdipmxRASDUABl"
+ },
+ {
+  "expression": "NC_000009.10:g.135209194A>G",
+  "format": "hgvs",
+  "seqrepo_vrs_id": "ga4gh:VA.InBnKYI9WEcl-0SSnvfDEO3cYznnEcRv"
+ },
+ {
+  "expression": "NC_000010.9:g.102968888_103417760dup",
+  "format": "hgvs",
+  "seqrepo_vrs_id": "ga4gh:VA.5qzNxnIqxt0FiOi3BTziTkyF67p8v5Mo"
+ },
+ {
+  "expression": "NC_000011.8:g.30874642_31654833del780192",
+  "format": "hgvs",
+  "seqrepo_vrs_id": "ga4gh:VA.H_p8fXAMpEf-dgUMZxZbX6lDYIdEJTsx"
+ },
+ {
+  "expression": "NC_000012.10:g.118707254T>C",
+  "format": "hgvs",
+  "seqrepo_vrs_id": "ga4gh:VA.qIk7-ZAhn0-o8xCk-837REpWNYCqCPsK"
+ },
+ {
+  "expression": "NC_000013.9:g.113976035_114077122dup",
+  "format": "hgvs",
+  "seqrepo_vrs_id": "ga4gh:VA.hPsdDBrCmwEhiKKBXeFXqJRIYXeRKWNR"
+ },
+ {
+  "expression": "NC_000014.7:g.19993136G>A",
+  "format": "hgvs",
+  "seqrepo_vrs_id": "ga4gh:VA.5fM3sPzdnU1hIAqDmeFnQfB6mqQXeKoZ"
+ },
+ {
+  "expression": "NC_000015.8:g.19359417_20778963dup",
+  "format": "hgvs",
+  "seqrepo_vrs_id": "ga4gh:VA.QuOt3zmF2byep9hKPW0cLLvV5jvJ5-8B"
+ },
+ {
+  "expression": "NC_000016.8:g.29554843_30085308del",
+  "format": "hgvs",
+  "seqrepo_vrs_id": "ga4gh:VA.MuuHy0u2oFd6kSqqN7cpvMV_VyAueDTy"
+ },
+ {
+  "expression": "NC_000017.9:g.14039002_15411904dup",
+  "format": "hgvs",
+  "seqrepo_vrs_id": "ga4gh:VA.0wXJE2UxR5WusOsuxSyqwQL73nlgzzoW"
+ },
+ {
+  "expression": "NC_000019.8:g.13380344_13465506del85162",
+  "format": "hgvs",
+  "seqrepo_vrs_id": "ga4gh:VA.zX6Irqe5mR_HxVj-VHd4vQcfnB1y9YGa"
+ },
+ {
+  "expression": "NC_000020.9:g.14653888_14859003del",
+  "format": "hgvs",
+  "seqrepo_vrs_id": "ga4gh:VA.e35b1ye8HbhzHNBZZnRC_yShBHem6rGw"
+ },
+ {
+  "expression": "NC_000021.7:g.13636378_28138533dup",
+  "format": "hgvs",
+  "seqrepo_vrs_id": "ga4gh:VA.MwnFCkyAPKB1guZVWN3d_zV5D0oygUGL"
+ },
+ {
+  "expression": "NC_000022.9:g.17257787_18686993dup",
+  "format": "hgvs",
+  "seqrepo_vrs_id": "ga4gh:VA.MhCSSBIkM3Ri3wz2KwBZYbNRejSLfSx_"
+ },
+ {
+  "expression": "NC_000023.9:g.1131507_1713118dup",
+  "format": "hgvs",
+  "seqrepo_vrs_id": "ga4gh:VA.V4S6O5J4Rav-2gKlblFVcLn0LPZqpWFV"
+ },
+ {
+  "expression": "NC_060946.1:24438325:C:T",
+  "format": "spdi",
+  "seqrepo_vrs_id": "ga4gh:VA.DxMZHGR-5WjpOgzn5N40P4IJ3wJlYB-r"
+ }
+]

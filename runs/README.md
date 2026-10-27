@@ -34,10 +34,13 @@ Durable records currently retained:
 - [`2026-10-09-retire-r2-prefixes/`](2026-10-09-retire-r2-prefixes/) — the
   superseded `refgetstore/2026-06-24` and `refgetstore/2026-07-22` prefixes
   deleted from R2.
-- [`2026-10-09-ng-efetch-backfill/`](2026-10-09-ng-efetch-backfill/) — the
-  current local store and lock: 2,501 superseded and retired RefSeqGene
-  versions fetched from E-utilities and added as one collection. Not yet
-  published; R2's `refgetstore/2026-10-07` lacks them.
+- [`2026-10-09-ng-efetch-backfill/`](2026-10-09-ng-efetch-backfill/) — 2,501
+  superseded and retired RefSeqGene versions fetched from E-utilities and added
+  as one collection. Not yet published; R2's `refgetstore/2026-10-07` lacks them.
+- [`2026-10-27-ncbi36-t2t/`](2026-10-27-ncbi36-t2t/) — the current local store
+  and lock: NCBI36, as a report-only assembly plus its 123 RefSeq sequences
+  fetched from E-utilities, and T2T-CHM13v2.0's 24 nuclear chromosomes. Not yet
+  published.
 
 Removed: `2026-07-02-seqrepo-parity/`. Its build and parity analysis were fully
 superseded by `2026-08-26-full-rebuild/`, which covers a larger source set and
