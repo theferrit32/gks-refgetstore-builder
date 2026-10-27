@@ -1,0 +1,335 @@
+# Genomic subset of sources.toml: every assembly, NCBI36 by efetch, RefSeqGene
+# with its history, and LRG (whose bundle also carries its few transcripts and
+# proteins); no RefSeq transcript, protein or Ensembl sources. Entries are
+# copied verbatim from sources.toml and must stay identical to them.
+#
+# Build it from the full build's lock so it is exactly a subset of the full
+# store, sharing its download cache; --no-lock leaves that lock untouched:
+#
+#     gks-refgetstore build --config sources.genomic.toml \
+#         --store-dir <dir> --lock build.lock.json \
+#         --locked-sources --lock-check-mode subset --no-lock
+
+# Sequences to ingest into the custom vrs-python refgetstore archive.
+#
+# Source policy: every URL must be a documented, version-specific distribution
+# from its data provider. The manifest includes selected historical releases
+# where they preserve useful accession versions. Do not add undocumented FTP
+# artifacts merely because they contain otherwise unavailable sequences.
+# Versions absent from an official bulk release should be fetched per accession
+# from an authoritative service such as NCBI E-utilities or INSDC.
+#
+# Two entry kinds:
+#
+#   [[assembly]]  An assembled genome FASTA + matching NCBI assembly_report.txt.
+#                 Produces one collection and derives per-sequence aliases
+#                 (UCSC chr names, GenBank accns, RefSeq accns) from the
+#                 report. The cross-assembly `refseq` and `insdc` namespaces
+#                 are populated regardless of the entry's own `namespace`.
+#
+#   [[seqset]]    A flat FASTA (or sharded set of FASTAs) where the accession
+#                 is the FASTA header's first token. Used for NCBI RefSeq
+#                 transcript/protein shards. Each shard becomes its own
+#                 collection; aliases map header-name -> digest under the
+#                 configured namespace.
+#
+# Assembly fields
+#   namespace    Per-assembly alias namespace (e.g. "GRCh38.p14").
+#   fasta_url    URL of the genomic FASTA (.fna.gz supported directly by gtars).
+#                Required when load_fasta is true.
+#   report_url   URL of the NCBI assembly_report.txt.
+#   load_fasta   If true, ingest the FASTA. If false, use the report to add
+#                aliases for sequences already present in the store. This
+#                supports report-only releases and deliberate alias-only
+#                namespaces; fasta_url is not needed or fetched in this mode.
+#   fasta_path   Optional local path override, relative to repo root.
+#
+# Seqset fields
+#   name         Human-readable id for logs + summary.
+#   namespace    Alias namespace for every ingested sequence (e.g. "refseq").
+#   url_template URL with "{shard}" placeholder, or a plain URL if unsharded.
+#   shard_range  [min, max] inclusive integer range substituted into
+#                url_template. Omit for a single-file seqset.
+#   urls         Explicit URL list (mutually exclusive with the other modes).
+#   efetch_accessions  Path (relative to this file) of a sorted accession.version
+#                list fetched from NCBI E-utilities efetch into one FASTA. For
+#                versions no bulk release carries. The source URL is the efetch
+#                request plus the list's digest, so editing the list is a new
+#                source to the lock and to sync.
+#   efetch_db    efetch database for efetch_accessions: "nuccore" (default) or
+#                "protein".
+#   url_pattern  HTTPS URL with a glob in its basename. Requires the companion
+#                checksum_manifest_url in the same directory.
+#   checksum_manifest_url  NCBI *.files.installed file used for discovery + MD5.
+#   md5_manifest_urls      Per-URL NCBI md5checksums.txt manifests.
+#   checksum_manifest_urls Per-URL Ensembl BSD-sum CHECKSUMS manifests.
+#   format                 Source encoding: "fasta" (default), "gbff", or
+#                          "lrg_zip". Non-FASTA formats are converted to a
+#                          cached derived FASTA beside the downloaded artifact.
+#   file_class             One representation label for all resolved files.
+#   file_classes           Per-URL representation labels for attribution.
+#   release                Ordered provider release number.
+#   rolling_namespace      Namespace replaced completely after that release.
+#   exclude                Table dropping records from named file classes before
+#                          ingest: {file_classes = [...], record_prefixes = [...]}.
+#                          Matching is by record name only, never by inspecting
+#                          sequence content. The filtered FASTA is cached beside
+#                          the artifact as <name>.filtered.fa.gz, with a
+#                          <name>.excluded.tsv listing every dropped record. A
+#                          rule that matches nothing is an error, so a stale
+#                          declaration fails loudly instead of silently
+#                          retaining what it was meant to remove.
+
+# ---------------------------------------------------------------------------
+# NCBI human reference assembly releases
+# ---------------------------------------------------------------------------
+# Releases are grouped in chronological order so a newly published patch can be
+# appended to its assembly's timeline. Each available genomic FASTA is loaded
+# to retain sequences, including retired FIX scaffolds, and its report adds the
+# aliases used by that release. GRCh37.p11 and GRCh37.p12 are report-only:
+# their configured NCBI genomic-FASTA URLs are unavailable, but their reports
+# are still published. NCBI36 is report-only too, with its sequences fetched
+# per accession.
+
+# GRCh38: original release followed by patch releases.
+[[assembly]]
+namespace = "GRCh38"
+fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.26_GRCh38/GCF_000001405.26_GRCh38_genomic.fna.gz"
+report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.26_GRCh38/GCF_000001405.26_GRCh38_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.26_GRCh38/md5checksums.txt"
+load_fasta = true
+
+[[assembly]]
+namespace = "GRCh38.p1"
+fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.27_GRCh38.p1/GCF_000001405.27_GRCh38.p1_genomic.fna.gz"
+report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.27_GRCh38.p1/GCF_000001405.27_GRCh38.p1_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.27_GRCh38.p1/md5checksums.txt"
+load_fasta = true
+
+[[assembly]]
+namespace = "GRCh38.p2"
+fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.28_GRCh38.p2/GCF_000001405.28_GRCh38.p2_genomic.fna.gz"
+report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.28_GRCh38.p2/GCF_000001405.28_GRCh38.p2_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.28_GRCh38.p2/md5checksums.txt"
+load_fasta = true
+
+[[assembly]]
+namespace = "GRCh38.p3"
+fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.29_GRCh38.p3/GCF_000001405.29_GRCh38.p3_genomic.fna.gz"
+report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.29_GRCh38.p3/GCF_000001405.29_GRCh38.p3_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.29_GRCh38.p3/md5checksums.txt"
+load_fasta = true
+
+[[assembly]]
+namespace = "GRCh38.p4"
+fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.30_GRCh38.p4/GCF_000001405.30_GRCh38.p4_genomic.fna.gz"
+report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.30_GRCh38.p4/GCF_000001405.30_GRCh38.p4_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.30_GRCh38.p4/md5checksums.txt"
+load_fasta = true
+
+[[assembly]]
+namespace = "GRCh38.p5"
+fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.31_GRCh38.p5/GCF_000001405.31_GRCh38.p5_genomic.fna.gz"
+report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.31_GRCh38.p5/GCF_000001405.31_GRCh38.p5_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.31_GRCh38.p5/md5checksums.txt"
+load_fasta = true
+
+[[assembly]]
+namespace = "GRCh38.p6"
+fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.32_GRCh38.p6/GCF_000001405.32_GRCh38.p6_genomic.fna.gz"
+report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.32_GRCh38.p6/GCF_000001405.32_GRCh38.p6_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.32_GRCh38.p6/md5checksums.txt"
+load_fasta = true
+
+[[assembly]]
+namespace = "GRCh38.p7"
+fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.33_GRCh38.p7/GCF_000001405.33_GRCh38.p7_genomic.fna.gz"
+report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.33_GRCh38.p7/GCF_000001405.33_GRCh38.p7_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.33_GRCh38.p7/md5checksums.txt"
+load_fasta = true
+
+[[assembly]]
+namespace = "GRCh38.p8"
+fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.34_GRCh38.p8/GCF_000001405.34_GRCh38.p8_genomic.fna.gz"
+report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.34_GRCh38.p8/GCF_000001405.34_GRCh38.p8_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.34_GRCh38.p8/md5checksums.txt"
+load_fasta = true
+
+[[assembly]]
+namespace = "GRCh38.p9"
+fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.35_GRCh38.p9/GCF_000001405.35_GRCh38.p9_genomic.fna.gz"
+report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.35_GRCh38.p9/GCF_000001405.35_GRCh38.p9_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.35_GRCh38.p9/md5checksums.txt"
+load_fasta = true
+
+[[assembly]]
+namespace = "GRCh38.p10"
+fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.36_GRCh38.p10/GCF_000001405.36_GRCh38.p10_genomic.fna.gz"
+report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.36_GRCh38.p10/GCF_000001405.36_GRCh38.p10_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.36_GRCh38.p10/md5checksums.txt"
+load_fasta = true
+
+[[assembly]]
+namespace = "GRCh38.p11"
+fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.37_GRCh38.p11/GCF_000001405.37_GRCh38.p11_genomic.fna.gz"
+report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.37_GRCh38.p11/GCF_000001405.37_GRCh38.p11_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.37_GRCh38.p11/md5checksums.txt"
+load_fasta = true
+
+[[assembly]]
+namespace = "GRCh38.p12"
+fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.38_GRCh38.p12/GCF_000001405.38_GRCh38.p12_genomic.fna.gz"
+report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.38_GRCh38.p12/GCF_000001405.38_GRCh38.p12_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.38_GRCh38.p12/md5checksums.txt"
+load_fasta = true
+
+# GRCh38.p13 genomic assembly release.
+[[assembly]]
+namespace = "GRCh38.p13"
+fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_genomic.fna.gz"
+report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.39_GRCh38.p13/md5checksums.txt"
+load_fasta = true
+
+# GRCh38.p14 is the current configured GRCh38 patch release. The GRCh38.p13
+# annotation archives in refseq_history_rna and refseq_history_protein above
+# contribute transcript/protein aliases, not a GRCh38.p13 genomic assembly
+# namespace.
+[[assembly]]
+namespace = "GRCh38.p14"
+fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_genomic.fna.gz"
+report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.40_GRCh38.p14/md5checksums.txt"
+load_fasta = true
+
+# GRCh37: original release followed by available patch releases.
+[[assembly]]
+namespace = "GRCh37"
+fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.13_GRCh37/GCF_000001405.13_GRCh37_genomic.fna.gz"
+report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.13_GRCh37/GCF_000001405.13_GRCh37_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.13_GRCh37/md5checksums.txt"
+load_fasta = true
+
+[[assembly]]
+namespace = "GRCh37.p2"
+fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.14_GRCh37.p2/GCF_000001405.14_GRCh37.p2_genomic.fna.gz"
+report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.14_GRCh37.p2/GCF_000001405.14_GRCh37.p2_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.14_GRCh37.p2/md5checksums.txt"
+load_fasta = true
+
+[[assembly]]
+namespace = "GRCh37.p5"
+fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.17_GRCh37.p5/GCF_000001405.17_GRCh37.p5_genomic.fna.gz"
+report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.17_GRCh37.p5/GCF_000001405.17_GRCh37.p5_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.17_GRCh37.p5/md5checksums.txt"
+load_fasta = true
+
+[[assembly]]
+namespace = "GRCh37.p9"
+fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.21_GRCh37.p9/GCF_000001405.21_GRCh37.p9_genomic.fna.gz"
+report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.21_GRCh37.p9/GCF_000001405.21_GRCh37.p9_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.21_GRCh37.p9/md5checksums.txt"
+load_fasta = true
+
+[[assembly]]
+namespace = "GRCh37.p10"
+fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.22_GRCh37.p10/GCF_000001405.22_GRCh37.p10_genomic.fna.gz"
+report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.22_GRCh37.p10/GCF_000001405.22_GRCh37.p10_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.22_GRCh37.p10/md5checksums.txt"
+load_fasta = true
+
+[[assembly]]
+namespace = "GRCh37.p11"
+report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.23_GRCh37.p11/GCF_000001405.23_GRCh37.p11_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.23_GRCh37.p11/md5checksums.txt"
+load_fasta = false
+
+[[assembly]]
+namespace = "GRCh37.p12"
+report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.24_GRCh37.p12/GCF_000001405.24_GRCh37.p12_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.24_GRCh37.p12/md5checksums.txt"
+load_fasta = false
+
+# GRCh37.p13 is the current GRCh37 patch release.
+[[assembly]]
+namespace = "GRCh37.p13"
+fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.25_GRCh37.p13/GCF_000001405.25_GRCh37.p13_genomic.fna.gz"
+report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.25_GRCh37.p13/GCF_000001405.25_GRCh37.p13_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.25_GRCh37.p13/md5checksums.txt"
+load_fasta = true
+
+# NCBI36 (hg18). NCBI publishes its assembly report but no genomic FASTA, so
+# the report is applied alias-only and its RefSeq sequences are fetched per
+# accession by the seqset below.
+[[assembly]]
+namespace = "NCBI36"
+report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.12_NCBI36/GCF_000001405.12_NCBI36_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.12_NCBI36/md5checksums.txt"
+load_fasta = false
+
+[[seqset]]
+name = "ncbi36_refseq"
+namespace = "refseq"
+efetch_accessions = "accession_lists/ncbi36_refseq.txt"
+file_class = "genomic"
+
+# T2T-CHM13v2.0: the telomere-to-telomere alternate human assembly, outside the
+# GRC reference timelines above.
+[[assembly]]
+namespace = "T2T-CHM13v2.0"
+fasta_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/009/914/755/GCF_009914755.1_T2T-CHM13v2.0/GCF_009914755.1_T2T-CHM13v2.0_genomic.fna.gz"
+report_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/009/914/755/GCF_009914755.1_T2T-CHM13v2.0/GCF_009914755.1_T2T-CHM13v2.0_assembly_report.txt"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/009/914/755/GCF_009914755.1_T2T-CHM13v2.0/md5checksums.txt"
+load_fasta = true
+
+# NCBI RefSeqGene genomic sequences (NG_ accessions). These are gene-region
+# reference sequences NOT present in the mRNA_Prot shards above; seqrepo's NCBI
+# namespace includes them, so they are required for backwards-compatibility.
+[[seqset]]
+name = "refseq_human_refseqgene"
+namespace = "refseq"
+url_pattern = "https://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/RefSeqGene/refseqgene.*.genomic.fna.gz"
+checksum_manifest_url = "https://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/RefSeqGene/refseqgene.files.installed"
+file_class = "genomic"
+
+# Superseded and retired RefSeqGene versions. The RefSeqGene FTP above holds only
+# each NG_ accession's current version, but clients still cite earlier ones
+# (ClinVar's NG_ HGVS, and seqrepo, which has them from older imports). NCBI
+# serves every version through E-utilities, so these are fetched one accession
+# at a time, listed in a checked-in file derived from gene_RefSeqGene: every
+# earlier version of each current accession, plus accessions since retired from
+# it. `gks-refgetstore refseqgene-history` updates the list; see efetch.py.
+[[seqset]]
+name = "refseq_human_refseqgene_superseded"
+namespace = "refseq"
+efetch_accessions = "accession_lists/refseqgene_superseded.txt"
+file_class = "genomic"
+
+# ---------------------------------------------------------------------------
+# EBI Locus Reference Genomic (LRG)
+# ---------------------------------------------------------------------------
+# LRG ids are the stable, frozen reference spellings used by HGVS and ClinVar
+# ("LRG_1:g.", "LRG_199t1:c."), so they are required for clients resolving those
+# expressions. This is net-new coverage rather than a seqrepo parity gap:
+# seqrepo has no LRG namespace at all.
+#
+# EBI publishes the public set as 1325 standalone LRG_N.fasta files and as one
+# aggregate zip of byte-identical members. The aggregate is used so the build
+# pins a single immutable artifact instead of 1325 URLs; build_store unpacks it
+# to a cached derived FASTA in natural-sorted member order without rewriting any
+# header. The set is frozen at release 810 (2021-03-31).
+#
+# EBI publishes no checksum manifest for this directory, so the lock's SHA-256
+# of the downloaded zip is the integrity anchor, as for the refseq_history_*
+# entries. Only the public set is ingested — not pending/, stalled/, or
+# suppressed/.
+#
+# Each member holds a genomic record plus its transcripts and proteins. The
+# genomic record is ingested as "LRG_1g" (EBI's record id) and additionally
+# aliased as "LRG_1", which is how ClinVar and HGVS spell it.
+[[seqset]]
+name = "lrg_public"
+namespace = "lrg"
+urls = ["https://ftp.ebi.ac.uk/pub/databases/lrgex/fasta/LRG_public_fasta_files.zip"]
+file_class = "lrg_bundle"
+format = "lrg_zip"
