@@ -44,6 +44,9 @@ Durable records currently retained:
 - [`2026-10-27-genomic-r2-upload/`](2026-10-27-genomic-r2-upload/) — the
   genomic-only store from `sources.genomic.toml` (13,615 sequences, 4.9 GB),
   published at `refgetstore/genomic-2026-10-27`.
+- [`2026-10-27-genomic-archive/`](2026-10-27-genomic-archive/) — that store as a
+  single archive, `refgetstore/genomic-2026-10-27.tar.gz`, for consumers that
+  download the whole store.
 
 Removed: `2026-07-02-seqrepo-parity/`. Its build and parity analysis were fully
 superseded by `2026-08-26-full-rebuild/`, which covers a larger source set and

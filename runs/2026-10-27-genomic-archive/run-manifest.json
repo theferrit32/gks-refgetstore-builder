@@ -1,0 +1,116 @@
+{
+  "schema": "gks-refgetstore-run/1",
+  "run_id": "2026-10-27-genomic-archive",
+  "kind": "publication",
+  "title": "Publish the genomic-only store as refgetstore/genomic-2026-10-27.tar.gz",
+  "status": "succeeded",
+  "timestamps": {
+    "initialized_utc": "2026-10-28T02:55:32.532007+00:00",
+    "finalized_utc": "2026-10-28T03:20:56.566524+00:00"
+  },
+  "baseline_run_id": "2026-10-27-genomic-r2-upload",
+  "evidence": {
+    "quality": "captured",
+    "missing": []
+  },
+  "git": {
+    "commit": "25986ed69a3f344daa27c2f461d23350aacca577",
+    "dirty": false,
+    "status_text": "",
+    "diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "tool_versions": {
+    "python": "3.14.7",
+    "git": "git version 2.50.1 (Apple Git-155)",
+    "uv": "uv 0.12.12 (Homebrew 2026-09-09 aarch64-apple-darwin)",
+    "gtars": "0.11.0"
+  },
+  "commands": [
+    {
+      "label": "create-archive",
+      "argv": [
+        "env",
+        "COPYFILE_DISABLE=1",
+        "bash",
+        "-c",
+        "set -euo pipefail; tar --no-mac-metadata --no-xattrs --no-acls --uid 0 --gid 0 --uname root --gname root -C /Volumes/RefgetStores -cf - genomic-2026-10-27 | pigz -6 > /Volumes/RefgetStores/archive.wK1v/genomic-2026-10-27.tar.gz; cd /Volumes/RefgetStores/archive.wK1v; shasum -a 256 genomic-2026-10-27.tar.gz | tee genomic-2026-10-27.tar.gz.sha256; ls -l genomic-2026-10-27.tar.gz"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-28T02:55:44.270773+00:00",
+      "finished_utc": "2026-10-28T02:56:44.441533+00:00",
+      "exit_code": 0,
+      "log": "logs/create-archive.log",
+      "log_bytes": 173,
+      "log_sha256": "ac5ca970cb51c4133cd25a4bbe845c3e7ab2f0f696fcf9b24c866932246b0222"
+    },
+    {
+      "label": "create-archive-mode-755",
+      "argv": [
+        "env",
+        "COPYFILE_DISABLE=1",
+        "bash",
+        "-c",
+        "set -euo pipefail; tar --no-mac-metadata --no-xattrs --no-acls --uid 0 --gid 0 --uname root --gname root -C /Volumes/RefgetStores -cf - genomic-2026-10-27 | pigz -6 > /Volumes/RefgetStores/archive.wK1v/genomic-2026-10-27.tar.gz; cd /Volumes/RefgetStores/archive.wK1v; shasum -a 256 genomic-2026-10-27.tar.gz | tee genomic-2026-10-27.tar.gz.sha256; ls -l genomic-2026-10-27.tar.gz; tar -tzvf genomic-2026-10-27.tar.gz | head -1"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-28T02:58:39.994109+00:00",
+      "finished_utc": "2026-10-28T02:59:54.244594+00:00",
+      "exit_code": 0,
+      "log": "logs/create-archive-mode-755.log",
+      "log_bytes": 241,
+      "log_sha256": "010e84fb78f9a94e182b45a666ff47129c4be0c8c078043468d0eca2759f6c0c"
+    },
+    {
+      "label": "upload",
+      "argv": [
+        "bash",
+        "-c",
+        "set -euo pipefail; for f in genomic-2026-10-27.tar.gz genomic-2026-10-27.tar.gz.sha256; do rclone copyto /Volumes/RefgetStores/archive.wK1v/$f theferrit32-public:theferrit32-public/refgetstore/$f --s3-no-check-bucket --stats-one-line --stats 30s; done; rclone check /Volumes/RefgetStores/archive.wK1v theferrit32-public:theferrit32-public/refgetstore/ --include 'genomic-2026-10-27.tar.gz*' --s3-no-check-bucket"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-28T03:01:05.316422+00:00",
+      "finished_utc": "2026-10-28T03:16:27.179640+00:00",
+      "exit_code": 0,
+      "log": "logs/upload.log",
+      "log_bytes": 187,
+      "log_sha256": "0adf00115b8fa374b7533ce70a0bae466393cb4ee9a61ff159f9a6f29d63168a"
+    }
+  ],
+  "artifacts": [
+    {
+      "role": "archive-sha256",
+      "path": "artifacts/genomic-2026-10-27.tar.gz.sha256",
+      "bytes": 92,
+      "sha256": "8c301465580f2c43c829534f05e176037d067c1c7843e4bcb68fd7881effd6ec"
+    }
+  ],
+  "result_summary": {
+    "archive": "genomic-2026-10-27.tar.gz",
+    "bytes": 3535731383,
+    "sha256": "9b8903a19d8ff64b204b3b0a4cb9f9cc80026c88516d45a9caae2deb183a65ab",
+    "files": 13682,
+    "source": "/Volumes/RefgetStores/genomic-2026-10-27",
+    "superseded_attempt": "create-archive produced an archive whose top-level directory was mode 0700 (the store directory was made with mktemp); create-archive-mode-755 rebuilt it after chmod 755, and only that archive was uploaded"
+  },
+  "validations": [
+    {
+      "name": "extract-and-diff",
+      "result": "pass",
+      "detail": "the uploaded archive extracts to a tree identical to the store directory (diff -rq), 13,682 files, no AppleDouble entries, root:root ownership"
+    },
+    {
+      "name": "rclone-check",
+      "result": "pass",
+      "detail": "0 differences, 2 matching files (archive and .sha256)"
+    },
+    {
+      "name": "public-url",
+      "result": "pass",
+      "detail": "HTTP 200 with the full content length; the .sha256 serves the archive's digest; clinvar-ingest vrsify downloaded, verified and extracted it and produced output identical to a run on the local store"
+    }
+  ],
+  "publication": {
+    "destination": "theferrit32-public:theferrit32-public/refgetstore/genomic-2026-10-27.tar.gz",
+    "public_url": "https://static.ferriter.dev/refgetstore/genomic-2026-10-27.tar.gz"
+  }
+}
