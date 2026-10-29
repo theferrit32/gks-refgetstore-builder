@@ -47,6 +47,9 @@ Durable records currently retained:
 - [`2026-10-27-genomic-archive/`](2026-10-27-genomic-archive/) — that store as a
   single archive, `refgetstore/genomic-2026-10-27.tar.gz`, for consumers that
   download the whole store.
+- [`2026-10-29-genomic-gcs-mirror/`](2026-10-29-genomic-gcs-mirror/) — the same
+  store mirrored to `gs://clingen-public/refgetstore/genomic-2026-10-27`, public
+  and in the Cloud Batch region (reconstructed record).
 - [`2026-10-29-genomic-seqrepo/`](2026-10-29-genomic-seqrepo/) — a biocommons
   SeqRepo instance (`genomic-2026-10-27`, 3.5 GB) holding exactly the genomic
   store's 13,615 sequences and 45,471 aliases, built with `gks-refgetstore

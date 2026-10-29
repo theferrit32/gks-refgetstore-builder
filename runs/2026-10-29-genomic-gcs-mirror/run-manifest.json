@@ -1,0 +1,92 @@
+{
+  "schema": "gks-refgetstore-run/1",
+  "run_id": "2026-10-29-genomic-gcs-mirror",
+  "kind": "publication",
+  "title": "Mirror the genomic-only store to gs://clingen-public/refgetstore/genomic-2026-10-27",
+  "status": "succeeded",
+  "timestamps": {
+    "initialized_utc": "2026-10-29T18:13:26.831963+00:00",
+    "finalized_utc": "2026-10-29T18:14:33.143465+00:00"
+  },
+  "baseline_run_id": "2026-10-27-genomic-r2-upload",
+  "evidence": {
+    "quality": "reconstructed",
+    "missing": [
+      "the upload command was not run under run_record exec; its argv is reconstructed in README.md and its rclone log is artifacts/upload.log"
+    ]
+  },
+  "git": {
+    "commit": "74999b48112f7873cdc57476d48804dd7c4ebd37",
+    "dirty": true,
+    "status_text": "?? Sheffield-refgetstore-paper/",
+    "diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "tool_versions": {
+    "python": "3.14.7",
+    "git": "git version 2.50.1 (Apple Git-155)",
+    "uv": "uv 0.12.12 (Homebrew 2026-09-09 aarch64-apple-darwin)",
+    "gtars": "0.11.0"
+  },
+  "commands": [
+    {
+      "label": "readback",
+      "argv": [
+        "/Users/kferrite/dev/clinvar-ingest/.claude/worktrees/320-vrsify/.venv/bin/python",
+        "-I",
+        "runs/2026-10-29-genomic-gcs-mirror/artifacts/gcs_readback.py",
+        "https://storage.googleapis.com/clingen-public/refgetstore/genomic-2026-10-27",
+        "/private/tmp/claude-502/-Users-kferrite-dev-gks-refgetstore-builder/8d27e090-1d7b-4f32-a363-c5fc7ee370ea/scratchpad/gcs-readback.Xhfp",
+        "runs/2026-10-27-genomic-r2-upload/artifacts/remote_samples.json"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-29T18:13:27.471019+00:00",
+      "finished_utc": "2026-10-29T18:13:59.550583+00:00",
+      "exit_code": 0,
+      "log": "logs/readback.log",
+      "log_bytes": 2403,
+      "log_sha256": "df325f5f822b58e526dc5bafb882895b05754cae4d7f9c6444d0e065b0297bc2"
+    }
+  ],
+  "artifacts": [
+    {
+      "role": "upload-log",
+      "path": "artifacts/upload.log",
+      "bytes": 1344,
+      "sha256": "6a70630aff0125dff02ac1fa8be720d194a3231884892801a59fa243347822ec"
+    },
+    {
+      "role": "script",
+      "path": "artifacts/gcs_readback.py",
+      "bytes": 998,
+      "sha256": "2479629702eeff986c726658bc0446ca8cc9c94859fb57f7b056544b2e6690a3"
+    }
+  ],
+  "result_summary": {
+    "destination": "gs://clingen-public/refgetstore/genomic-2026-10-27",
+    "public_url": "https://storage.googleapis.com/clingen-public/refgetstore/genomic-2026-10-27",
+    "source": "/Volumes/RefgetStores/genomic-2026-10-27",
+    "files": 13682,
+    "bytes_transferred": "4.550 GiB",
+    "upload_seconds_approx": 253,
+    "upload_seconds_basis": "first 30 s stats line at 11:36:54 EDT, 100% at 11:40:37 EDT",
+    "manifest_json": "the R2 copy's manifest.json, uploaded unchanged (--no-manifest), so its destination field names R2"
+  },
+  "validations": [
+    {
+      "name": "rclone-check",
+      "result": "pass",
+      "detail": "0 differences, 13,682 matching files (artifacts/upload.log)"
+    },
+    {
+      "name": "public-read",
+      "result": "pass",
+      "detail": "rgstore.json serves over unauthenticated HTTPS with the local file's MD5"
+    },
+    {
+      "name": "vrs-samples",
+      "result": "pass",
+      "detail": "through clinvar-ingest vrsify's worker against the public URL, 16/16 sample expressions translate to the expected VRS IDs (readback)"
+    }
+  ],
+  "publication": null
+}
