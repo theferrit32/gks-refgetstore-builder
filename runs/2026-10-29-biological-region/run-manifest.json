@@ -1,0 +1,296 @@
+{
+  "schema": "gks-refgetstore-run/1",
+  "run_id": "2026-10-29-biological-region",
+  "kind": "build",
+  "title": "Add RefSeq genomic biological regions to the lock and the genomic store",
+  "status": "succeeded",
+  "timestamps": {
+    "initialized_utc": "2026-10-29T18:45:04.980510+00:00",
+    "finalized_utc": "2026-10-29T19:07:21.835947+00:00"
+  },
+  "baseline_run_id": "2026-10-27-ncbi36-t2t",
+  "evidence": {
+    "quality": "captured",
+    "missing": []
+  },
+  "git": {
+    "commit": "ed9c0ca81918afa6b58b80919f74eb6a55eef421",
+    "dirty": true,
+    "status_text": "M sources.genomic.toml\n M sources.toml\n M src/gks_refgetstore/build_lock.py\n?? Sheffield-refgetstore-paper/",
+    "diff_sha256": "76727267457533d860983715db2aea51411b0c181bc3da7f03e669b55aebdae0"
+  },
+  "tool_versions": {
+    "python": "3.14.7",
+    "git": "git version 2.50.1 (Apple Git-155)",
+    "uv": "uv 0.12.12 (Homebrew 2026-09-09 aarch64-apple-darwin)",
+    "gtars": "0.11.0"
+  },
+  "commands": [
+    {
+      "label": "fetch",
+      "argv": [
+        "uv",
+        "run",
+        "--extra",
+        "seqrepo",
+        "gks-refgetstore",
+        "fetch",
+        "--only",
+        "refseq_human_biological_region"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-29T18:45:05.111531+00:00",
+      "finished_utc": "2026-10-29T18:45:08.486429+00:00",
+      "exit_code": 0,
+      "log": "logs/fetch.log",
+      "log_bytes": 357,
+      "log_sha256": "b6eaa2f066d39a0f80c34ca8c98d849c395fa41b2c3f061d9ffb30b52c4cf65b"
+    },
+    {
+      "label": "clone-genomic",
+      "argv": [
+        "cp",
+        "-c",
+        "-R",
+        "/Volumes/RefgetStores/genomic-2026-10-27",
+        "/Volumes/RefgetStores/genomic-2026-10-29"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-29T18:45:21.900199+00:00",
+      "finished_utc": "2026-10-29T18:45:24.959723+00:00",
+      "exit_code": 0,
+      "log": "logs/clone-genomic.log",
+      "log_bytes": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "clone-full",
+      "argv": [
+        "cp",
+        "-c",
+        "-R",
+        "/Volumes/RefgetStores/store",
+        "/Volumes/RefgetStores/full-2026-10-29"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-29T18:45:25.189082+00:00",
+      "finished_utc": "2026-10-29T18:53:27.205718+00:00",
+      "exit_code": 0,
+      "log": "logs/clone-full.log",
+      "log_bytes": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "verify-full-before",
+      "argv": [
+        "uv",
+        "run",
+        "--extra",
+        "seqrepo",
+        "gks-refgetstore",
+        "verify",
+        "--store",
+        "--store-dir",
+        "/Volumes/RefgetStores/full-2026-10-29"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-29T18:55:29.857724+00:00",
+      "finished_utc": "2026-10-29T18:56:19.844843+00:00",
+      "exit_code": 0,
+      "log": "logs/verify-full-before.log",
+      "log_bytes": 210,
+      "log_sha256": "c6565e7240cade5ab2a59343db368de56860811ab5920795a9d8d40409bc7ffc"
+    },
+    {
+      "label": "build-full",
+      "argv": [
+        "env",
+        "PYTHONUNBUFFERED=1",
+        "uv",
+        "run",
+        "--extra",
+        "seqrepo",
+        "gks-refgetstore",
+        "build",
+        "--store-dir",
+        "/Volumes/RefgetStores/full-2026-10-29",
+        "--seqset",
+        "refseq_human_biological_region",
+        "--force-lock"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-29T18:56:25.531179+00:00",
+      "finished_utc": "2026-10-29T18:58:07.056131+00:00",
+      "exit_code": 0,
+      "log": "logs/build-full.log",
+      "log_bytes": 2889,
+      "log_sha256": "815d0dd35a6bf4a728fd492f1d9deb9b4cfa9672d66086d56de7cba05ca61c46"
+    },
+    {
+      "label": "verify-full",
+      "argv": [
+        "uv",
+        "run",
+        "--extra",
+        "seqrepo",
+        "gks-refgetstore",
+        "verify",
+        "--store-dir",
+        "/Volumes/RefgetStores/full-2026-10-29",
+        "--cache",
+        "--store"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-29T18:58:23.351064+00:00",
+      "finished_utc": "2026-10-29T19:00:33.110623+00:00",
+      "exit_code": 0,
+      "log": "logs/verify-full.log",
+      "log_bytes": 277,
+      "log_sha256": "bee2cbe85c453fe84477f25ae83de794a08c91b77b7c3b91e1ef1ff96c31ff1c"
+    },
+    {
+      "label": "build-genomic",
+      "argv": [
+        "env",
+        "PYTHONUNBUFFERED=1",
+        "uv",
+        "run",
+        "--extra",
+        "seqrepo",
+        "gks-refgetstore",
+        "build",
+        "--config",
+        "sources.genomic.toml",
+        "--store-dir",
+        "/Volumes/RefgetStores/genomic-2026-10-29",
+        "--lock",
+        "build.lock.json",
+        "--locked-sources",
+        "--lock-check-mode",
+        "subset",
+        "--no-lock",
+        "--seqset",
+        "refseq_human_biological_region"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-29T19:00:41.642022+00:00",
+      "finished_utc": "2026-10-29T19:01:12.671062+00:00",
+      "exit_code": 0,
+      "log": "logs/build-genomic.log",
+      "log_bytes": 2074,
+      "log_sha256": "f454488ca0abb466234571969a23236bc45d830f389c9effa2d7ce16b05668e2"
+    },
+    {
+      "label": "subset-check",
+      "argv": [
+        "uv",
+        "run",
+        "--extra",
+        "seqrepo",
+        "python",
+        "runs/2026-10-27-genomic-r2-upload/artifacts/check_subset_store.py",
+        "/Volumes/RefgetStores/genomic-2026-10-29",
+        "/Volumes/RefgetStores/full-2026-10-29",
+        "build.lock.json",
+        "sources.genomic.toml"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-29T19:01:24.663204+00:00",
+      "finished_utc": "2026-10-29T19:02:36.097155+00:00",
+      "exit_code": 0,
+      "log": "logs/subset-check.log",
+      "log_bytes": 325,
+      "log_sha256": "8cad0472592c2905ed0f35f300df718b600525521ae01fbfe9d9ec19bcf2de32"
+    },
+    {
+      "label": "deep-verify-genomic",
+      "argv": [
+        "uv",
+        "run",
+        "--extra",
+        "seqrepo",
+        "python",
+        "runs/2026-10-29-biological-region/artifacts/deep_verify_store.py",
+        "/Volumes/RefgetStores/genomic-2026-10-29"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-29T19:02:42.515839+00:00",
+      "finished_utc": "2026-10-29T19:04:12.382037+00:00",
+      "exit_code": 0,
+      "log": "logs/deep-verify-genomic.log",
+      "log_bytes": 164,
+      "log_sha256": "31b10e04888a0806578e5cecd40f749538ce2ff33b5398cba8a917ff70c50289"
+    },
+    {
+      "label": "tests",
+      "argv": [
+        "uv",
+        "run",
+        "--extra",
+        "seqrepo",
+        "pytest",
+        "-q"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-29T19:05:54.731715+00:00",
+      "finished_utc": "2026-10-29T19:06:40.829078+00:00",
+      "exit_code": 0,
+      "log": "logs/tests.log",
+      "log_bytes": 928,
+      "log_sha256": "688a4dcfb49516940dde94e16b802fc828b82c814b1899578a1e7010e515513a"
+    }
+  ],
+  "artifacts": [
+    {
+      "role": "subset-check-script",
+      "path": "artifacts/check_subset_store.py",
+      "bytes": 4014,
+      "sha256": "c0eb76648321703bfb331e2f23ee9ae73f6892a118a898eb69025a776fd148ba"
+    },
+    {
+      "role": "deep-verify-script",
+      "path": "artifacts/deep_verify_store.py",
+      "bytes": 625,
+      "sha256": "dc4575d2210bb6ed8437134ca25c73e2c5451fba2a7d56b3fa14a78239a32d62"
+    }
+  ],
+  "result_summary": {
+    "seqset": "refseq_human_biological_region",
+    "source_sha256": "53529e456b177deecb7e59eedbab15042773040759b7807381f48daed95bb728",
+    "collection": "G4BWjptZHKGp0F_1ST4DI_T6DIByO72U",
+    "records": 128261,
+    "new_sequences": 128260,
+    "new_residues": 88477522,
+    "genomic_store": "/Volumes/RefgetStores/genomic-2026-10-29",
+    "genomic_sequences": 141875,
+    "genomic_collections": 34,
+    "genomic_sequence_aliases": 173732,
+    "genomic_bytes": 4962291943,
+    "full_store": "/Volumes/RefgetStores/full-2026-10-29",
+    "full_sequences": 1909920,
+    "full_collections": 239
+  },
+  "validations": [
+    {
+      "name": "verify-full",
+      "result": "pass",
+      "detail": "verify --cache --store on full-2026-10-29 against the new lock: 341 locked files ok, 1,909,920 sequences and 239 collections reachable, every payload on disk"
+    },
+    {
+      "name": "subset-check",
+      "result": "pass",
+      "detail": "genomic-2026-10-29 holds exactly the 34 collections the lock attributes to sources.genomic.toml's 30 sources, and its 141,875 payloads are byte-identical to full-2026-10-29's"
+    },
+    {
+      "name": "deep-verify-genomic",
+      "result": "pass",
+      "detail": "all 141,875 sequences in genomic-2026-10-29 re-digest from the bytes the store serves"
+    },
+    {
+      "name": "published-store-unchanged",
+      "result": "pass",
+      "detail": "genomic-2026-10-27's rgstore.json and sequences.rgsi hash as before"
+    }
+  ],
+  "publication": null
+}

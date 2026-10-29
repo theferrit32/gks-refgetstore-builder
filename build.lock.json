@@ -1,10 +1,10 @@
 {
   "schema": "gks-refgetstore-build-lock/4",
   "build": {
-    "timestamp_utc": "2026-10-27T21:11:30.852543+00:00",
+    "timestamp_utc": "2026-10-29T18:58:02.388814+00:00",
     "git": {
-      "commit": "b3939b1578c19f7ff6e69441a32c9b2ee4c61f0e",
-      "describe": "b3939b1-dirty",
+      "commit": "1a197d9ab35f0a786b0792bec9845bd023497125",
+      "describe": "1a197d9-dirty",
       "dirty": true
     },
     "gtars_version": "0.11.0",
@@ -16,7 +16,7 @@
     }
   },
   "inputs": {
-    "sources_toml_sha256": "453f7946edb7c5ba4c1f8ff08505c9c14c7125ba373786669b0c288f482b09bf",
+    "sources_toml_sha256": "a7b8c1fdcdfa62c742d70de5f5a4dd7d346f7deaaa10f9c6e827a788e97c0b85",
     "files": [
       {
         "kind": "assembly_fasta",
@@ -5462,6 +5462,23 @@
       },
       {
         "kind": "seqset",
+        "owner": "refseq_human_biological_region",
+        "url": "https://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/biological_region/human.biological_region.fna.gz",
+        "cache_path": "ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/biological_region/human.biological_region.fna.gz",
+        "mutable": true,
+        "provider_checksum": null,
+        "provider_checksum_algorithm": null,
+        "provider_checksum_blocks": null,
+        "checksum_url": null,
+        "file_class": "genomic",
+        "bytes": 29083824,
+        "sha256": "53529e456b177deecb7e59eedbab15042773040759b7807381f48daed95bb728",
+        "present": true,
+        "ingest_spec": null,
+        "ingest_spec_sha256": null
+      },
+      {
+        "kind": "seqset",
         "owner": "refseq_human_protein",
         "url": "https://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.1.protein.faa.gz",
         "cache_path": "ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.1.protein.faa.gz",
@@ -6007,10 +6024,10 @@
     ]
   },
   "outputs": {
-    "n_sequences": 1781660,
-    "n_collections": 238,
-    "sequences_root": "sha256:f192865259fc8c40022a5a98ec7e40ba3cab9e85e3ef9f246743c12c8dd649ae",
-    "collections_root": "sha256:9a2477f134ab73e4baef3c462d688e6c515fb4558480aeeb1a97fb01a0a36c7d",
+    "n_sequences": 1909920,
+    "n_collections": 239,
+    "sequences_root": "sha256:ca55d090abb5f567a8793a319ddc2345dda9d856f26f948c796b9d66c5ed7493",
+    "collections_root": "sha256:7b67c3a7d0792a1addf13d18c7af4989d0430ea85049a2d9e5effc3c5613e2fe",
     "collections": [
       {
         "digest": "-bnIcfluHD7QZH6jlI-pAQEn0vvj0y26",
@@ -6471,6 +6488,13 @@
         "n_sequences": 113832,
         "from": [
           "ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/109.20200522/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_protein.faa.gz"
+        ]
+      },
+      {
+        "digest": "G4BWjptZHKGp0F_1ST4DI_T6DIByO72U",
+        "n_sequences": 128261,
+        "from": [
+          "ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/biological_region/human.biological_region.fna.gz"
         ]
       },
       {

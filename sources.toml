@@ -307,6 +307,17 @@ namespace = "refseq"
 efetch_accessions = "accession_lists/refseqgene_superseded.txt"
 file_class = "genomic"
 
+# NCBI RefSeq Functional Elements: genomic biological regions (NG_ accessions
+# that are not RefSeqGene), such as recombination regions, enhancers and
+# pseudogene regions. ClinVar cites them in genomic HGVS. NCBI publishes the
+# current set as one file with no checksum manifest, so the lock's SHA-256 of
+# the downloaded file is the integrity anchor, as for LRG below.
+[[seqset]]
+name = "refseq_human_biological_region"
+namespace = "refseq"
+urls = ["https://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/biological_region/human.biological_region.fna.gz"]
+file_class = "genomic"
+
 # ---------------------------------------------------------------------------
 # EBI Locus Reference Genomic (LRG)
 # ---------------------------------------------------------------------------

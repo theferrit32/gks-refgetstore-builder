@@ -1,6 +1,7 @@
 # Genomic subset of sources.toml: every assembly, NCBI36 by efetch, RefSeqGene
-# with its history, and LRG (whose bundle also carries its few transcripts and
-# proteins); no RefSeq transcript, protein or Ensembl sources. Entries are
+# with its history, RefSeq genomic biological regions, and LRG (whose bundle
+# also carries its few transcripts and proteins); no RefSeq transcript, protein
+# or Ensembl sources. Entries are
 # copied verbatim from sources.toml and must stay identical to them.
 #
 # Build it from the full build's lock so it is exactly a subset of the full
@@ -303,6 +304,17 @@ file_class = "genomic"
 name = "refseq_human_refseqgene_superseded"
 namespace = "refseq"
 efetch_accessions = "accession_lists/refseqgene_superseded.txt"
+file_class = "genomic"
+
+# NCBI RefSeq Functional Elements: genomic biological regions (NG_ accessions
+# that are not RefSeqGene), such as recombination regions, enhancers and
+# pseudogene regions. ClinVar cites them in genomic HGVS. NCBI publishes the
+# current set as one file with no checksum manifest, so the lock's SHA-256 of
+# the downloaded file is the integrity anchor, as for LRG below.
+[[seqset]]
+name = "refseq_human_biological_region"
+namespace = "refseq"
+urls = ["https://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/biological_region/human.biological_region.fna.gz"]
 file_class = "genomic"
 
 # ---------------------------------------------------------------------------

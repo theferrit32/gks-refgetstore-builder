@@ -79,6 +79,7 @@ def is_mutable(url: str) -> bool:
     return (
         "/mRNA_Prot/" in url            # current RefSeq transcript/protein shards
         or "/RefSeqGene/" in url         # current RefSeqGene
+        or "/biological_region/" in url  # current RefSeq genomic biological regions
         or "/release-113/" in url        # pinned-current Ensembl release
     )
 

@@ -58,6 +58,11 @@ Durable records currently retained:
   that instance as a single archive, published at
   `gs://clingen-public/seqrepo/genomic-2026-10-27.tar.gz` with its `.sha256` and
   the build's provenance JSON.
+- [`2026-10-29-biological-region/`](2026-10-29-biological-region/) — the current
+  lock: NCBI's RefSeq genomic biological regions (128,261 `NG_` records) added
+  as one seqset and built into `full-2026-10-29` and `genomic-2026-10-29`, clones
+  of the full and genomic stores. `store/` is one collection behind the lock.
+  Not yet published.
 
 Removed: `2026-07-02-seqrepo-parity/`. Its build and parity analysis were fully
 superseded by `2026-08-26-full-rebuild/`, which covers a larger source set and
