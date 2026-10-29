@@ -1,0 +1,272 @@
+{
+  "schema": "gks-refgetstore-run/1",
+  "run_id": "2026-10-29-genomic-seqrepo-update",
+  "kind": "build",
+  "title": "Add RefSeq genomic biological regions to the genomic SeqRepo",
+  "status": "succeeded",
+  "timestamps": {
+    "initialized_utc": "2026-10-29T19:04:48.175576+00:00",
+    "finalized_utc": "2026-10-29T20:01:27.356290+00:00"
+  },
+  "baseline_run_id": "2026-10-29-genomic-seqrepo",
+  "evidence": {
+    "quality": "captured",
+    "missing": []
+  },
+  "git": {
+    "commit": "1a197d9ab35f0a786b0792bec9845bd023497125",
+    "dirty": true,
+    "status_text": "M build.lock.json\n M sources.genomic.toml\n M sources.toml\n M src/gks_refgetstore/build_lock.py\n?? Sheffield-refgetstore-paper/\n?? runs/2026-10-29-biological-region/",
+    "diff_sha256": "dc57158d4aba7cad00ee18ca0381fe831c6b72feb11dac53c04f5dd7ff668ad9"
+  },
+  "tool_versions": {
+    "python": "3.14.7",
+    "git": "git version 2.50.1 (Apple Git-155)",
+    "uv": "uv 0.12.12 (Homebrew 2026-09-09 aarch64-apple-darwin)",
+    "gtars": "0.11.0"
+  },
+  "commands": [
+    {
+      "label": "clone",
+      "argv": [
+        "cp",
+        "-c",
+        "-R",
+        "/Volumes/RefgetStores/seqrepo/genomic-2026-10-27",
+        "/Volumes/RefgetStores/seqrepo/genomic-2026-10-29"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-29T19:04:48.401969+00:00",
+      "finished_utc": "2026-10-29T19:04:48.423042+00:00",
+      "exit_code": 0,
+      "log": "logs/clone.log",
+      "log_bytes": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "add-missing",
+      "argv": [
+        "env",
+        "PYTHONUNBUFFERED=1",
+        "uv",
+        "run",
+        "--extra",
+        "seqrepo",
+        "gks-refgetstore",
+        "seqrepo",
+        "--config",
+        "sources.genomic.toml",
+        "--lock",
+        "build.lock.json",
+        "--lock-check-mode",
+        "subset",
+        "--store-dir",
+        "/Volumes/RefgetStores/genomic-2026-10-29",
+        "--target-dir",
+        "/Volumes/RefgetStores/seqrepo",
+        "--instance-name",
+        "genomic-2026-10-29",
+        "--add-missing"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-29T19:04:48.576196+00:00",
+      "finished_utc": "2026-10-29T19:57:36.695466+00:00",
+      "exit_code": 143,
+      "log": "logs/add-missing.log",
+      "log_bytes": 536,
+      "log_sha256": "19cf8206efefbf0cd5913b668269394af8e84a0d1c86d54a3903e31d866770be"
+    },
+    {
+      "label": "add-missing-verify",
+      "argv": [
+        "env",
+        "PYTHONUNBUFFERED=1",
+        "uv",
+        "run",
+        "--extra",
+        "seqrepo",
+        "gks-refgetstore",
+        "seqrepo",
+        "--config",
+        "sources.genomic.toml",
+        "--lock",
+        "build.lock.json",
+        "--lock-check-mode",
+        "subset",
+        "--store-dir",
+        "/Volumes/RefgetStores/genomic-2026-10-29",
+        "--target-dir",
+        "/Volumes/RefgetStores/seqrepo",
+        "--instance-name",
+        "genomic-2026-10-29",
+        "--add-missing"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-29T19:58:11.728289+00:00",
+      "finished_utc": "2026-10-29T19:59:00.123219+00:00",
+      "exit_code": 0,
+      "log": "logs/add-missing-verify.log",
+      "log_bytes": 1552,
+      "log_sha256": "cbf9bb891673c79c22d18c751ab23c8970d3b402db006914df2b56ae6c4a524c"
+    },
+    {
+      "label": "accessions",
+      "argv": [
+        "env",
+        "SEQREPO_FD_CACHE_MAXSIZE=none",
+        "uv",
+        "run",
+        "--project",
+        "/Users/kferrite/dev/vrs-python/.claude/worktrees/dataproxy-backend-refactor",
+        "python",
+        "runs/2026-10-29-genomic-seqrepo-update/artifacts/check_accessions.py",
+        "NG_042865.1",
+        "NG_046166.1",
+        "NG_046616.1",
+        "NG_050744.1"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-29T19:59:07.123269+00:00",
+      "finished_utc": "2026-10-29T19:59:07.900107+00:00",
+      "exit_code": 0,
+      "log": "logs/accessions.log",
+      "log_bytes": 787,
+      "log_sha256": "f920cb87ba3f76dade56148baf30dc523a0414f3c8f611f490458d986212da26"
+    },
+    {
+      "label": "proxy-check",
+      "argv": [
+        "env",
+        "SEQREPO_FD_CACHE_MAXSIZE=none",
+        "uv",
+        "run",
+        "--project",
+        "/Users/kferrite/dev/vrs-python/.claude/worktrees/dataproxy-backend-refactor",
+        "python",
+        "tools/check_seqrepo_proxies.py",
+        "--seqrepo",
+        "/Volumes/RefgetStores/seqrepo/genomic-2026-10-29",
+        "--store",
+        "/Volumes/RefgetStores/genomic-2026-10-29",
+        "--out",
+        "runs/2026-10-29-genomic-seqrepo-update/artifacts/proxy-differences.tsv"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-29T19:59:07.972265+00:00",
+      "finished_utc": "2026-10-29T19:59:31.371465+00:00",
+      "exit_code": 0,
+      "log": "logs/proxy-check.log",
+      "log_bytes": 494,
+      "log_sha256": "9f6005dbd85296c704220311dddf601df95d7d50b10c5e6bba4fb43f4908e936"
+    },
+    {
+      "label": "samples-seqrepo",
+      "argv": [
+        "env",
+        "SEQREPO_FD_CACHE_MAXSIZE=none",
+        "uv",
+        "run",
+        "--project",
+        "/Users/kferrite/dev/vrs-python/.claude/worktrees/dataproxy-backend-refactor",
+        "python",
+        "runs/2026-10-27-genomic-r2-upload/artifacts/check_new_sources.py",
+        "/Users/kferrite/dev/vrs-python/seqrepo-refgetstore-evals",
+        "seqrepo+file:///Volumes/RefgetStores/seqrepo/genomic-2026-10-29",
+        "postgresql://anonymous@localhost:15432/uta/uta_20241220",
+        "runs/2026-10-27-genomic-r2-upload/artifacts/remote_samples.json"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-29T19:59:36.949129+00:00",
+      "finished_utc": "2026-10-29T20:00:15.358191+00:00",
+      "exit_code": 0,
+      "log": "logs/samples-seqrepo.log",
+      "log_bytes": 2042,
+      "log_sha256": "467ee5030664d356e54607d0d689600e2011e2900543eecf7b80bad8007ba0b5"
+    },
+    {
+      "label": "samples-refget",
+      "argv": [
+        "uv",
+        "run",
+        "--project",
+        "/Users/kferrite/dev/vrs-python/.claude/worktrees/dataproxy-backend-refactor",
+        "python",
+        "runs/2026-10-27-genomic-r2-upload/artifacts/check_new_sources.py",
+        "/Users/kferrite/dev/vrs-python/seqrepo-refgetstore-evals",
+        "refget+file:///Volumes/RefgetStores/genomic-2026-10-29",
+        "postgresql://anonymous@localhost:15432/uta/uta_20241220",
+        "runs/2026-10-27-genomic-r2-upload/artifacts/remote_samples.json"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-29T20:00:15.436038+00:00",
+      "finished_utc": "2026-10-29T20:00:34.193820+00:00",
+      "exit_code": 0,
+      "log": "logs/samples-refget.log",
+      "log_bytes": 1998,
+      "log_sha256": "af6bf7140b5087e92f4c42957f89ebb6d1d8ceedbf971d9201cf54ac643fabc4"
+    }
+  ],
+  "artifacts": [
+    {
+      "role": "provenance",
+      "path": "artifacts/genomic-2026-10-29.provenance.json",
+      "bytes": 19527,
+      "sha256": "1396098acf9f274fa61e9f04c62bad706d429526e8a1dbf57ff234442c5b109e"
+    },
+    {
+      "role": "proxy-differences",
+      "path": "artifacts/proxy-differences.tsv",
+      "bytes": 42,
+      "sha256": "7bb7b33ce4945a7e69de4b7511df54c6e4378fd654f7f79ad51b32aa3361efff"
+    },
+    {
+      "role": "accession-check-script",
+      "path": "artifacts/check_accessions.py",
+      "bytes": 1104,
+      "sha256": "f20b70f7a34cfba8cc81dbeb24f53d6bacf32684232077834ed44326c9d22ef6"
+    }
+  ],
+  "result_summary": {
+    "instance": "/Volumes/RefgetStores/seqrepo/genomic-2026-10-29",
+    "cloned_from": "/Volumes/RefgetStores/seqrepo/genomic-2026-10-27",
+    "source_store": "/Volumes/RefgetStores/genomic-2026-10-29",
+    "sequences_added": 128260,
+    "aliases_added": 128261,
+    "residues_added": 88477522,
+    "add_seconds": 163,
+    "sequences": 141875,
+    "residues": 13875659588,
+    "store_aliases": 173732,
+    "seqrepo_alias_rows": 741232,
+    "files": 74,
+    "bytes": 3751758315
+  },
+  "validations": [
+    {
+      "name": "built-in-verification",
+      "result": "pass",
+      "detail": "141,875 sequences read back and re-hashed, lengths and MD5s match the store; sequence and alias sets (173,732) equal in both directions; one digest alias per namespace per sequence"
+    },
+    {
+      "name": "proxy-check",
+      "result": "pass",
+      "detail": "319,331 identifiers (145,599 of them bare accessions) resolve to the same SQ. digest through both vrs-python data proxies; 141,875 lengths and 5,675 sequences' ends agree; 0 differences"
+    },
+    {
+      "name": "formerly-missing-accessions",
+      "result": "pass",
+      "detail": "NG_042865.1, NG_046166.1, NG_046616.1 and NG_050744.1 resolve in neither 2026-10-27 backend and to the same digest in both 2026-10-29 backends"
+    },
+    {
+      "name": "vrs-samples",
+      "result": "pass",
+      "detail": "the 16 remote_samples.json expressions translate to the expected VRS IDs on both 2026-10-29 backends (SeqRepo with SEQREPO_FD_CACHE_MAXSIZE=none)"
+    },
+    {
+      "name": "base-instance-unchanged",
+      "result": "pass",
+      "detail": "every file in seqrepo/genomic-2026-10-27 hashes as before"
+    }
+  ],
+  "publication": null
+}

@@ -63,6 +63,10 @@ Durable records currently retained:
   as one seqset and built into `full-2026-10-29` and `genomic-2026-10-29`, clones
   of the full and genomic stores. `store/` is one collection behind the lock.
   Not yet published.
+- [`2026-10-29-genomic-seqrepo-update/`](2026-10-29-genomic-seqrepo-update/) —
+  the genomic SeqRepo extended to match `genomic-2026-10-29`
+  (`seqrepo/genomic-2026-10-29`, 141,875 sequences) with `gks-refgetstore
+  seqrepo --add-missing` on a clone of `genomic-2026-10-27`. Not yet published.
 
 Removed: `2026-07-02-seqrepo-parity/`. Its build and parity analysis were fully
 superseded by `2026-08-26-full-rebuild/`, which covers a larger source set and
