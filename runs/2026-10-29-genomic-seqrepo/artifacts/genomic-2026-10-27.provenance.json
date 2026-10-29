@@ -1,0 +1,464 @@
+{
+  "schema": "gks-refgetstore-seqrepo/1",
+  "created_utc": "2026-10-29T17:23:07.926360+00:00",
+  "instance": "genomic-2026-10-27",
+  "config": {
+    "path": "sources.genomic.toml",
+    "sha256": "276f65ad45bb2138356e8e644c1009b5c29890c44339b7bf3d5a9eef49a199e9"
+  },
+  "lock": {
+    "path": "build.lock.json",
+    "sha256": "7e27b609013a55cef7e2805bbdf5b7a9fbc0aff2d5f0cb90e44c1d5e7a37b694",
+    "check_mode": "subset",
+    "collections_selected": 33
+  },
+  "store": {
+    "path": "/Volumes/RefgetStores/genomic-2026-10-27",
+    "sequences_digest": "9075f1c9c3749ef63b8773ee23eb537ebe87377e3fbf50787aeb80fffacea3c6",
+    "collections_digest": "5ed16be649ae7cbe6c4e28ad596af4e454ac8ca0379608fba96031f157f5ff7e",
+    "aliases_digest": "48df5d24a1c532b11c611e98e8c1a724bff90f598c7fbab2cfcf4bc41f8e2454",
+    "modified": "2026-10-27T22:45:45.693462+00:00"
+  },
+  "build": {
+    "git": {
+      "commit": "d8d8a8acef8cfd321b543d5568b2d14419e73918",
+      "describe": "d8d8a8a-dirty",
+      "dirty": true
+    },
+    "gtars_version": "0.11.0",
+    "gtars_source": {
+      "url": "https://github.com/theferrit32/gtars",
+      "vcs": "git",
+      "commit": "7831e09f596042e3983c7a123c3f6c019ca6c05f",
+      "subdirectory": "gtars-python"
+    },
+    "biocommons.seqrepo": "0.6.11",
+    "bioutils": "0.6.2",
+    "pysam": "0.24.1",
+    "bgzip": {
+      "path": "/opt/homebrew/bin/bgzip",
+      "version": "1.24"
+    }
+  },
+  "write": {
+    "sequences": 13615,
+    "residues": 13787182066,
+    "store_aliases_by_namespace": {
+      "GRCh37": 276,
+      "GRCh37.p10": 643,
+      "GRCh37.p11": 649,
+      "GRCh37.p12": 661,
+      "GRCh37.p13": 687,
+      "GRCh37.p2": 419,
+      "GRCh37.p5": 489,
+      "GRCh37.p9": 583,
+      "GRCh38": 1365,
+      "GRCh38.p1": 1397,
+      "GRCh38.p10": 1569,
+      "GRCh38.p11": 1611,
+      "GRCh38.p12": 1642,
+      "GRCh38.p13": 1872,
+      "GRCh38.p14": 2115,
+      "GRCh38.p2": 1427,
+      "GRCh38.p3": 1443,
+      "GRCh38.p4": 1475,
+      "GRCh38.p5": 1489,
+      "GRCh38.p6": 1497,
+      "GRCh38.p7": 1505,
+      "GRCh38.p8": 1541,
+      "GRCh38.p9": 1557,
+      "NCBI36": 149,
+      "T2T-CHM13v2.0": 72,
+      "insdc": 996,
+      "lrg": 5905,
+      "refseq": 10437
+    },
+    "seconds": 1841.0
+  },
+  "verification": {
+    "ok": true,
+    "problems": [],
+    "counts": {
+      "sequences": 13615,
+      "residues": 13787182066,
+      "sequence_check_seconds": 164.9,
+      "store_aliases": 45471,
+      "seqrepo_alias_rows": 99931,
+      "seqrepo_aliases_by_namespace": {
+        "GRCh37": 276,
+        "GRCh37.p10": 643,
+        "GRCh37.p11": 649,
+        "GRCh37.p12": 661,
+        "GRCh37.p13": 687,
+        "GRCh37.p2": 419,
+        "GRCh37.p5": 489,
+        "GRCh37.p9": 583,
+        "GRCh38": 1365,
+        "GRCh38.p1": 1397,
+        "GRCh38.p10": 1569,
+        "GRCh38.p11": 1611,
+        "GRCh38.p12": 1642,
+        "GRCh38.p13": 1872,
+        "GRCh38.p14": 2115,
+        "GRCh38.p2": 1427,
+        "GRCh38.p3": 1443,
+        "GRCh38.p4": 1475,
+        "GRCh38.p5": 1489,
+        "GRCh38.p6": 1497,
+        "GRCh38.p7": 1505,
+        "GRCh38.p8": 1541,
+        "GRCh38.p9": 1557,
+        "LRG": 5905,
+        "MD5": 13615,
+        "NCBI": 10437,
+        "NCBI36": 149,
+        "SEGUID": 13615,
+        "SHA1": 13615,
+        "T2T-CHM13v2.0": 72,
+        "VMC": 13615,
+        "insdc": 996
+      }
+    }
+  },
+  "assembly_names_vs_bioutils": {
+    "shared_namespaces": {
+      "GRCh37": {
+        "bioutils_aliases": 184,
+        "missing": 0,
+        "differing": 0
+      },
+      "GRCh37.p10": {
+        "bioutils_aliases": 368,
+        "missing": 0,
+        "differing": 0
+      },
+      "GRCh37.p11": {
+        "bioutils_aliases": 371,
+        "missing": 0,
+        "differing": 0
+      },
+      "GRCh37.p12": {
+        "bioutils_aliases": 377,
+        "missing": 0,
+        "differing": 0
+      },
+      "GRCh37.p13": {
+        "bioutils_aliases": 390,
+        "missing": 0,
+        "differing": 0
+      },
+      "GRCh37.p2": {
+        "bioutils_aliases": 256,
+        "missing": 0,
+        "differing": 0
+      },
+      "GRCh37.p5": {
+        "bioutils_aliases": 291,
+        "missing": 0,
+        "differing": 0
+      },
+      "GRCh37.p9": {
+        "bioutils_aliases": 338,
+        "missing": 0,
+        "differing": 0
+      },
+      "GRCh38": {
+        "bioutils_aliases": 910,
+        "missing": 0,
+        "differing": 0
+      },
+      "GRCh38.p1": {
+        "bioutils_aliases": 926,
+        "missing": 0,
+        "differing": 0
+      },
+      "GRCh38.p10": {
+        "bioutils_aliases": 1012,
+        "missing": 0,
+        "differing": 0
+      },
+      "GRCh38.p11": {
+        "bioutils_aliases": 1033,
+        "missing": 0,
+        "differing": 0
+      },
+      "GRCh38.p12": {
+        "bioutils_aliases": 1048,
+        "missing": 0,
+        "differing": 0
+      },
+      "GRCh38.p13": {
+        "bioutils_aliases": 1233,
+        "missing": 0,
+        "differing": 0
+      },
+      "GRCh38.p14": {
+        "bioutils_aliases": 1410,
+        "missing": 0,
+        "differing": 0
+      },
+      "GRCh38.p2": {
+        "bioutils_aliases": 941,
+        "missing": 0,
+        "differing": 0
+      },
+      "GRCh38.p3": {
+        "bioutils_aliases": 949,
+        "missing": 0,
+        "differing": 0
+      },
+      "GRCh38.p4": {
+        "bioutils_aliases": 965,
+        "missing": 0,
+        "differing": 0
+      },
+      "GRCh38.p5": {
+        "bioutils_aliases": 972,
+        "missing": 0,
+        "differing": 0
+      },
+      "GRCh38.p6": {
+        "bioutils_aliases": 976,
+        "missing": 0,
+        "differing": 0
+      },
+      "GRCh38.p7": {
+        "bioutils_aliases": 980,
+        "missing": 0,
+        "differing": 0
+      },
+      "GRCh38.p8": {
+        "bioutils_aliases": 998,
+        "missing": 0,
+        "differing": 0
+      },
+      "GRCh38.p9": {
+        "bioutils_aliases": 1006,
+        "missing": 0,
+        "differing": 0
+      },
+      "NCBI36": {
+        "bioutils_aliases": 149,
+        "missing": 0,
+        "differing": 0
+      },
+      "T2T-CHM13v2.0": {
+        "bioutils_aliases": 48,
+        "missing": 0,
+        "differing": 0
+      }
+    },
+    "not_in_store": {
+      "NCBI34": 3,
+      "NCBI35": 26
+    }
+  },
+  "files": [
+    {
+      "path": "aliases.sqlite3",
+      "bytes": 23826432,
+      "sha256": "5bbe1abceac1e0d12abe9f004807ac5c2d65f36d9d643e53cb9eeb04dbffdd13"
+    },
+    {
+      "path": "sequences/2026/1029/1649/1793292579.954541.fa.bgz",
+      "bytes": 264710398,
+      "sha256": "bb5736dc40ce346479acb5ec6221dc93cf3981b39877b3afcbe07906117994b5"
+    },
+    {
+      "path": "sequences/2026/1029/1649/1793292579.954541.fa.bgz.fai",
+      "bytes": 50219,
+      "sha256": "ad1b6928fd4eb23e5205cbe7a409945a2879c4e576f5bdc8b7129e24adead1c8"
+    },
+    {
+      "path": "sequences/2026/1029/1649/1793292579.954541.fa.bgz.gzi",
+      "bytes": 248152,
+      "sha256": "b951c05ddf62dfbb5aa65ad494f21264404d3b94331cdeed94e87cdbf50ed6dd"
+    },
+    {
+      "path": "sequences/2026/1029/1651/1793292715.671577.fa.bgz",
+      "bytes": 253064168,
+      "sha256": "48ceb1644ce6f7070a654e28cd184cec77dbd7740e97ff9da6a5b31ab169a66c"
+    },
+    {
+      "path": "sequences/2026/1029/1651/1793292715.671577.fa.bgz.fai",
+      "bytes": 64349,
+      "sha256": "5445976fe620a569c14e23842a9aa1d21284fd8335b256913daa1bf3d874c116"
+    },
+    {
+      "path": "sequences/2026/1029/1651/1793292715.671577.fa.bgz.gzi",
+      "bytes": 261672,
+      "sha256": "246cc8002bef9310ce6d3ff60bac0c8533ca9729370993be73e554cb5d85390a"
+    },
+    {
+      "path": "sequences/2026/1029/1654/1793292852.323051.fa.bgz",
+      "bytes": 256208810,
+      "sha256": "22f9e640c127c9a69f5316a5d71a7adde8521ed8b186d52e436f813679c3c97b"
+    },
+    {
+      "path": "sequences/2026/1029/1654/1793292852.323051.fa.bgz.fai",
+      "bytes": 43882,
+      "sha256": "f41af8678b9bd67dbe4b41bd416ba8adf133ad52152e2828a2a66440f40a4f63"
+    },
+    {
+      "path": "sequences/2026/1029/1654/1793292852.323051.fa.bgz.gzi",
+      "bytes": 259512,
+      "sha256": "0121f97ceecec3138426e8dc067ccb67a92bd4d23f276b1eec0a4d2c404abe56"
+    },
+    {
+      "path": "sequences/2026/1029/1656/1793292988.53817.fa.bgz",
+      "bytes": 290167396,
+      "sha256": "6a1bc498f720fb491af2d966cb396ee12b4f0d72d4da167f31266d4611f357c1"
+    },
+    {
+      "path": "sequences/2026/1029/1656/1793292988.53817.fa.bgz.fai",
+      "bytes": 63692,
+      "sha256": "1288217efbfda5516d396454e8e93797f2534e054214e4c8c927d53314e94482"
+    },
+    {
+      "path": "sequences/2026/1029/1656/1793292988.53817.fa.bgz.gzi",
+      "bytes": 280424,
+      "sha256": "877028175ee533163b476176438a979a7627a5639fb82c18c16d7ae1eb46a19d"
+    },
+    {
+      "path": "sequences/2026/1029/1658/1793293139.910103.fa.bgz",
+      "bytes": 269058782,
+      "sha256": "eb8b95069a7b935c8e687fa14e11a827d9969cb66ec200cfbccd69ab64388a0b"
+    },
+    {
+      "path": "sequences/2026/1029/1658/1793293139.910103.fa.bgz.fai",
+      "bytes": 37590,
+      "sha256": "2414e6bb765c701d25eeca437cde8b5c624422390879cb683b16080041121422"
+    },
+    {
+      "path": "sequences/2026/1029/1658/1793293139.910103.fa.bgz.gzi",
+      "bytes": 269896,
+      "sha256": "567168e339e973340aba48a9eee3e25c76f297d8384f366cbd83e7fdcc98718c"
+    },
+    {
+      "path": "sequences/2026/1029/1701/1793293282.650835.fa.bgz",
+      "bytes": 288602909,
+      "sha256": "b6157e1acb462c617ba4c09ba13f0c6d2f6d278cef915237cc6310af6d390235"
+    },
+    {
+      "path": "sequences/2026/1029/1701/1793293282.650835.fa.bgz.fai",
+      "bytes": 63252,
+      "sha256": "34a16c48b45f6d1d52833e61c3acc7a156e98531554c26de8e95fe3cf743273d"
+    },
+    {
+      "path": "sequences/2026/1029/1701/1793293282.650835.fa.bgz.gzi",
+      "bytes": 279320,
+      "sha256": "a168c3080ad54d215836e4614263ab6ad0dbc07b40e72ea1dfa3089fe2b5cdaa"
+    },
+    {
+      "path": "sequences/2026/1029/1703/1793293434.732439.fa.bgz",
+      "bytes": 281510769,
+      "sha256": "efa5d4dff441d79ccc189ce5af7c4f02ea40acebd7e2e9c70b18bcab44e44e19"
+    },
+    {
+      "path": "sequences/2026/1029/1703/1793293434.732439.fa.bgz.fai",
+      "bytes": 68513,
+      "sha256": "d8ff5d943c1e02c5cb40ca7fbc2c9e6b96c3b0133ab92cceeb2167f1563597f2"
+    },
+    {
+      "path": "sequences/2026/1029/1703/1793293434.732439.fa.bgz.gzi",
+      "bytes": 284936,
+      "sha256": "c2be6c4424d6b16d736b104a39cf306ec9b8b9d3fe7caad7ef8827d32c8156b5"
+    },
+    {
+      "path": "sequences/2026/1029/1706/1793293585.165308.fa.bgz",
+      "bytes": 275086279,
+      "sha256": "21d9f3639a78d5b63c418c55d827b9e97624ff7293260ce926e35bae98e2e9c3"
+    },
+    {
+      "path": "sequences/2026/1029/1706/1793293585.165308.fa.bgz.fai",
+      "bytes": 55669,
+      "sha256": "e7059e74bfd2faef958ac23556c459f596738caa64a3dc200365ead1d0adbdd7"
+    },
+    {
+      "path": "sequences/2026/1029/1706/1793293585.165308.fa.bgz.gzi",
+      "bytes": 269112,
+      "sha256": "0257f1fda3bd2a747409cba0e7dded691e14467597c0a894dec37f078f668029"
+    },
+    {
+      "path": "sequences/2026/1029/1708/1793293730.626417.fa.bgz",
+      "bytes": 263949345,
+      "sha256": "002ea8179c815dd5e09ba4960c07584770f42e7bb7af19b4bf53bf26e90da32d"
+    },
+    {
+      "path": "sequences/2026/1029/1708/1793293730.626417.fa.bgz.fai",
+      "bytes": 84127,
+      "sha256": "dc41f56f01f31d22129fb9db23fb8b169f9b882e073338ca4ff7b4a2c4c087cf"
+    },
+    {
+      "path": "sequences/2026/1029/1708/1793293730.626417.fa.bgz.gzi",
+      "bytes": 255800,
+      "sha256": "105e3f51cabb01abc058b4910a72bff082a5129049e3a375af6fc1ad9ccafc45"
+    },
+    {
+      "path": "sequences/2026/1029/1711/1793293869.171665.fa.bgz",
+      "bytes": 276948311,
+      "sha256": "b871c325b6d0a1fba2db5be63e63b7311804d41ad94c15bcdb7fd184e56c1083"
+    },
+    {
+      "path": "sequences/2026/1029/1711/1793293869.171665.fa.bgz.fai",
+      "bytes": 45545,
+      "sha256": "4aa05a5c402514a933d0330b8d7140177b05fe1711022fbe21ed9d323ed5e357"
+    },
+    {
+      "path": "sequences/2026/1029/1711/1793293869.171665.fa.bgz.gzi",
+      "bytes": 261432,
+      "sha256": "b82032cd986b8d917c2b58c4253622026327287f49a42f330ae229c892d1fe47"
+    },
+    {
+      "path": "sequences/2026/1029/1713/1793294013.315883.fa.bgz",
+      "bytes": 267760047,
+      "sha256": "2691f1fb6cc7a3f823dcad30ad13e5ec20b86b90bf9eb20cdddd5a8e74499204"
+    },
+    {
+      "path": "sequences/2026/1029/1713/1793294013.315883.fa.bgz.fai",
+      "bytes": 77226,
+      "sha256": "47e932e0931e37b7fb4c3598c88b4959532fea6618f0e2a9f08e5c28d1f19c51"
+    },
+    {
+      "path": "sequences/2026/1029/1713/1793294013.315883.fa.bgz.gzi",
+      "bytes": 252136,
+      "sha256": "f736be8f4ba83dd8fa73d5e6473bf531643d6427bc96707fc42cf4ced976f24b"
+    },
+    {
+      "path": "sequences/2026/1029/1715/1793294152.7665741.fa.bgz",
+      "bytes": 284965885,
+      "sha256": "5b26e6d890f6b99e25f06da5d49a6faa7146fbc546e2ad1a67afdb136fb9a763"
+    },
+    {
+      "path": "sequences/2026/1029/1715/1793294152.7665741.fa.bgz.fai",
+      "bytes": 60963,
+      "sha256": "07a5eddfb792c458dfca5f71d617a650589975f8eaf15e65d51a5a3e370cbbfd"
+    },
+    {
+      "path": "sequences/2026/1029/1715/1793294152.7665741.fa.bgz.gzi",
+      "bytes": 267528,
+      "sha256": "e5327bcadd803e286bc67d4e82b07763f76317dc57344a06b2f12b98e3e02940"
+    },
+    {
+      "path": "sequences/2026/1029/1718/1793294300.583468.fa.bgz",
+      "bytes": 225245484,
+      "sha256": "dc7f8df457e9f62c0f4de7651b326ef8ff47baa34f380d35363a589574ffac74"
+    },
+    {
+      "path": "sequences/2026/1029/1718/1793294300.583468.fa.bgz.fai",
+      "bytes": 56428,
+      "sha256": "78e691abf6c0d0855e870ddb94d4fb45e098854ec0e6f2c1d4c960795c719f1f"
+    },
+    {
+      "path": "sequences/2026/1029/1718/1793294300.583468.fa.bgz.gzi",
+      "bytes": 224984,
+      "sha256": "319d3da035d46fb0f5e42eb0102c9d07a257322b57f4bc58af9153a1feba04cb"
+    },
+    {
+      "path": "sequences/db.sqlite3",
+      "bytes": 2818048,
+      "sha256": "92fd5440190a4b3e954a4091bc709ad195c31e922c47f9f68e0a8799269fb745"
+    }
+  ],
+  "bytes": 3528109422
+}
