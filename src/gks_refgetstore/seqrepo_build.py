@@ -27,7 +27,11 @@ subset``, as for ``sources.genomic.toml`` against the full lock) selects only
 its own sources' collections.
 
 The instance is written into a temporary directory beside the target, verified,
-and then renamed into place. Verification checks, in both directions, that the
+and then renamed into place. ``--add-missing`` instead opens an existing
+instance writeable, in place, and passes to ``store()`` only the store
+sequences it lacks or holds without some of the store's aliases; seqrepo writes
+them to a new bgzip file and leaves the existing files as they are. Clone the
+instance first (``cp -c -R`` on APFS) to keep the original. Verification checks, in both directions, that the
 sequence sets are equal, that every sequence read back from SeqRepo hashes to
 its ``seq_id`` and has the store's length and MD5, and that the alias sets are
 equal. A provenance record is written beside the instance as
@@ -154,8 +158,10 @@ def check_store_scope(store, expected: dict[str, int]) -> list[str]:
 
 @dataclass
 class WriteStats:
-    sequences: int = 0
-    residues: int = 0
+    sequences: int = 0          # sequences new to the instance
+    completed: int = 0          # sequences already present that gained aliases
+    aliases_added: int = 0      # store aliases added (seqrepo's digest aliases excluded)
+    residues: int = 0           # residues passed to store()
     aliases_by_namespace: Counter = field(default_factory=Counter)
     seconds: float = 0.0
 
@@ -166,27 +172,51 @@ def store_aliases(store, digest: str) -> list[dict[str, str]]:
     return [{"namespace": ns, "alias": alias} for ns, alias in sorted(pairs)]
 
 
-def write_instance(lib: SeqRepoLib, store, instance_dir: Path) -> WriteStats:
-    """Store every sequence of ``store`` in a new SeqRepo at ``instance_dir``."""
+def digests_to_add(store, sr) -> list[str]:
+    """Store sequences the instance lacks, or holds without all their aliases."""
+    missing = {d for d in store_census.sequence_digests(store) if d not in sr.sequences}
+    sr_triples, _, _ = _seqrepo_alias_triples(sr)
+    lacking = {d for _, _, d in _store_alias_triples(store) - sr_triples}
+    return sorted(missing | lacking)
+
+
+def write_instance(lib: SeqRepoLib, store, instance_dir: Path, *,
+                   add_missing: bool = False) -> WriteStats:
+    """Store the sequences of ``store`` in a SeqRepo at ``instance_dir``.
+
+    By default the instance is new and every sequence is stored. With
+    ``add_missing``, the instance already exists and only the sequences it
+    lacks, or holds without some of the store's aliases, are passed to
+    ``store()``, which adds only what is not already there.
+    """
     stats = WriteStats()
     started = time.monotonic()
     next_report = PROGRESS_EVERY_RESIDUES
     sr = lib.SeqRepo(str(instance_dir), writeable=True)
-    digests = sorted(store_census.sequence_digests(store))
+    if add_missing:
+        digests = digests_to_add(store, sr)
+        logger.info("%d store sequence(s) to add or complete", len(digests))
+    else:
+        digests = sorted(store_census.sequence_digests(store))
     for digest in digests:
+        present = add_missing and digest in sr.sequences
         nsaliases = store_aliases(store, digest)
         lib.validate_aliases(nsaliases)
         seq = "".join(store_census.stream_sequence_chunks(store, digest))
-        n_added, _ = sr.store(seq, nsaliases)
+        n_added, n_aliases = sr.store(seq, nsaliases)
         # store() files the sequence under seqrepo's own digest of it. For the
         # instance to mirror the store, that must be the store's digest.
-        if n_added != 1 or digest not in sr.sequences:
+        if n_added != (0 if present else 1) or digest not in sr.sequences:
             raise RuntimeError(
                 f"seqrepo did not file sequence {digest} under that digest "
                 f"(added {n_added}); its normalization (uppercase, '*' removed) "
                 "changes this sequence"
             )
-        stats.sequences += 1
+        if present:
+            stats.completed += 1
+        else:
+            stats.sequences += 1
+        stats.aliases_added += n_aliases
         stats.residues += len(seq)
         stats.aliases_by_namespace.update(a["namespace"] for a in nsaliases)
         del seq
@@ -200,8 +230,9 @@ def write_instance(lib: SeqRepoLib, store, instance_dir: Path) -> WriteStats:
     sr.commit()
     del sr
     stats.seconds = time.monotonic() - started
-    logger.info("stored %d sequences, %d residues in %.0fs",
-                stats.sequences, stats.residues, stats.seconds)
+    logger.info("stored %d new sequence(s) and completed %d, %d residues, %d "
+                "alias(es) added, in %.0fs", stats.sequences, stats.completed,
+                stats.residues, stats.aliases_added, stats.seconds)
     return stats
 
 
@@ -405,7 +436,9 @@ def provenance_record(args, lib: SeqRepoLib, store_dir: Path, instance_dir: Path
             "bgzip": {"path": lib.bgzip, "version": lib.bgzip_version},
         },
         "write": None if stats is None else {
-            "sequences": stats.sequences, "residues": stats.residues,
+            "mode": "add-missing" if args.add_missing else "new",
+            "sequences": stats.sequences, "completed": stats.completed,
+            "aliases_added": stats.aliases_added, "residues": stats.residues,
             "store_aliases_by_namespace": dict(sorted(stats.aliases_by_namespace.items())),
             "seconds": round(stats.seconds, 1),
         },
@@ -434,7 +467,9 @@ def run_seqrepo(args) -> int:
     target_dir: Path = args.target_dir
     instance = args.instance_name or store_dir.resolve().name
     final_dir = target_dir / instance
-    if args.verify_only:
+    if args.verify_only and args.add_missing:
+        raise SystemExit("--verify-only and --add-missing are mutually exclusive")
+    if args.verify_only or args.add_missing:
         if not (final_dir / "aliases.sqlite3").is_file():
             raise SystemExit(f"no SeqRepo instance at {final_dir}")
     elif final_dir.exists():
@@ -467,21 +502,28 @@ def run_seqrepo(args) -> int:
     if free < need:
         raise SystemExit(f"only {free:.1f} GiB free in {target_dir}; need ~{need:.1f}")
 
-    work = Path(tempfile.mkdtemp(prefix=f".{instance}.", dir=target_dir))
-    # mkdtemp creates 0700; the published instance directory is world-readable.
-    work.chmod(0o755)
-    logger.info("writing %s via %s", final_dir, work)
-    stats = write_instance(lib, store, work)
+    if args.add_missing:
+        # Written in place: seqrepo adds new bgzip files and alias rows to the
+        # existing instance. Clone the instance first to keep the original.
+        work = final_dir
+        logger.info("adding to %s", final_dir)
+    else:
+        work = Path(tempfile.mkdtemp(prefix=f".{instance}.", dir=target_dir))
+        # mkdtemp creates 0700; the published instance directory is world-readable.
+        work.chmod(0o755)
+        logger.info("writing %s via %s", final_dir, work)
+    stats = write_instance(lib, store, work, add_missing=args.add_missing)
 
     verified = None
     if not args.no_verify:
         verified = verify_instance(lib, store, work)
         _log_verification(verified)
         if not verified.ok:
-            raise SystemExit(f"verification failed; the unverified instance is left "
-                             f"at {work}")
+            raise SystemExit(f"verification failed; the unverified instance is at "
+                             f"{work}")
     names = assembly_name_check(store)
-    os.rename(work, final_dir)
+    if work != final_dir:
+        os.rename(work, final_dir)
     record = provenance_record(args, lib, store_dir, final_dir, expected, stats,
                                verified, names)
     record_path = target_dir / f"{instance}.provenance.json"

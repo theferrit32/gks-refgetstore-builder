@@ -323,6 +323,10 @@ def _add_seqrepo(sub: argparse._SubParsersAction) -> None:
                       help="verify an existing instance against the store; no writes")
     mode.add_argument("--no-verify", action="store_true",
                       help="skip verification after writing")
+    p.add_argument("--add-missing", action="store_true",
+                   help="add to an existing instance, in place, only the store "
+                        "sequences it lacks or holds without all their aliases; "
+                        "clone the instance first to keep the original")
     p.set_defaults(func=seqrepo_build.run_seqrepo)
 
 

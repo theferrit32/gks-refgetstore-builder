@@ -452,6 +452,11 @@ the `seqrepo` extra (`biocommons.seqrepo` 0.6.11, `bioutils` 0.6.2) and htslib's
   sibling directory, every sequence is read back through seqrepo and re-hashed,
   its length and MD5 compared with the store's, and the alias sets compared in
   both directions. `--verify-only` repeats this for an existing instance.
+- **Adding to an instance.** `--add-missing` opens an existing instance in
+  place and stores only the sequences it lacks, or holds without some of the
+  store's aliases, then verifies the whole instance. Seqrepo writes them to a new
+  bgzip file and leaves the existing files unchanged, so an APFS clone
+  (`cp -c -R`) of a published instance can be extended cheaply.
 - **Provenance.** `<seqrepo root>/<instance>.provenance.json` records the
   manifest, lock and store digests, the seqrepo, bioutils, pysam, bgzip and
   gtars versions, counts, the verification result, and the SHA-256 of every
