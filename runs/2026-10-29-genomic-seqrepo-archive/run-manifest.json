@@ -1,0 +1,146 @@
+{
+  "schema": "gks-refgetstore-run/1",
+  "run_id": "2026-10-29-genomic-seqrepo-archive",
+  "kind": "publication",
+  "title": "Publish the genomic SeqRepo as a single archive",
+  "status": "succeeded",
+  "timestamps": {
+    "initialized_utc": "2026-10-29T18:04:09.932222+00:00",
+    "finalized_utc": "2026-10-29T18:09:30.306692+00:00"
+  },
+  "baseline_run_id": "2026-10-29-genomic-seqrepo",
+  "evidence": {
+    "quality": "captured",
+    "missing": []
+  },
+  "git": {
+    "commit": "d20952c9802353696257201682b98e3367df68d3",
+    "dirty": true,
+    "status_text": "?? Sheffield-refgetstore-paper/",
+    "diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "tool_versions": {
+    "python": "3.14.7",
+    "git": "git version 2.50.1 (Apple Git-155)",
+    "uv": "uv 0.12.12 (Homebrew 2026-09-09 aarch64-apple-darwin)",
+    "gtars": "0.11.0"
+  },
+  "commands": [
+    {
+      "label": "create-archive",
+      "argv": [
+        "env",
+        "COPYFILE_DISABLE=1",
+        "bash",
+        "-c",
+        "set -euo pipefail; tar --no-mac-metadata --no-xattrs --no-acls --uid 0 --gid 0 --uname root --gname root -C /Volumes/RefgetStores/seqrepo -cf - genomic-2026-10-27 | pigz -6 > /Volumes/RefgetStores/archive.UibP/genomic-2026-10-27.tar.gz; cd /Volumes/RefgetStores/archive.UibP; shasum -a 256 genomic-2026-10-27.tar.gz | tee genomic-2026-10-27.tar.gz.sha256; ls -l genomic-2026-10-27.tar.gz"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-29T18:04:10.094457+00:00",
+      "finished_utc": "2026-10-29T18:04:26.289650+00:00",
+      "exit_code": 0,
+      "log": "logs/create-archive.log",
+      "log_bytes": 173,
+      "log_sha256": "3b9ee814bf8e68150ca70079ecfa89f26b9e7323a7f63a06953fcd52b26aaef8"
+    },
+    {
+      "label": "verify-archive",
+      "argv": [
+        "bash",
+        "-c",
+        "set -euo pipefail; tar -tzf /Volumes/RefgetStores/archive.UibP/genomic-2026-10-27.tar.gz | cut -d/ -f1 | sort -u; tar -tvzf /Volumes/RefgetStores/archive.UibP/genomic-2026-10-27.tar.gz | grep -c '\\._' || true; tar -xzf /Volumes/RefgetStores/archive.UibP/genomic-2026-10-27.tar.gz -C /Volumes/RefgetStores/extract.iZ7z; diff -rq /Volumes/RefgetStores/seqrepo/genomic-2026-10-27 /Volumes/RefgetStores/extract.iZ7z/genomic-2026-10-27 && echo 'extracted tree identical'; stat -f '%Sp' /Volumes/RefgetStores/extract.iZ7z/genomic-2026-10-27"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-29T18:04:33.681117+00:00",
+      "finished_utc": "2026-10-29T18:04:53.721346+00:00",
+      "exit_code": 0,
+      "log": "logs/verify-archive.log",
+      "log_bytes": 57,
+      "log_sha256": "1b8210f710cfc6762709301686a5b8dd1603c87e33791ba34bf34248933a80e4"
+    },
+    {
+      "label": "upload",
+      "argv": [
+        "rclone",
+        "copy",
+        "/Volumes/RefgetStores/archive.UibP",
+        "clingengcs:clingen-public/seqrepo",
+        "--checksum",
+        "--stats",
+        "30s",
+        "--stats-log-level",
+        "NOTICE",
+        "--stats-one-line"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-29T18:05:13.077167+00:00",
+      "finished_utc": "2026-10-29T18:08:00.491190+00:00",
+      "exit_code": 0,
+      "log": "logs/upload.log",
+      "log_bytes": 497,
+      "log_sha256": "22a17e409f0321cb582e42e89f625684a9ab4a0f0a22326c2ac36cf77d848b07"
+    },
+    {
+      "label": "check-upload",
+      "argv": [
+        "rclone",
+        "check",
+        "/Volumes/RefgetStores/archive.UibP",
+        "clingengcs:clingen-public/seqrepo",
+        "--one-way"
+      ],
+      "working_directory": "/Users/kferrite/dev/gks-refgetstore-builder",
+      "started_utc": "2026-10-29T18:08:08.443166+00:00",
+      "finished_utc": "2026-10-29T18:08:14.126925+00:00",
+      "exit_code": 0,
+      "log": "logs/check-upload.log",
+      "log_bytes": 173,
+      "log_sha256": "ad800656c6e6bbf06d089f9924232ca264022aea15617ecb441bc92c32e3ccd1"
+    }
+  ],
+  "artifacts": [
+    {
+      "role": "archive-sha256",
+      "path": "artifacts/genomic-2026-10-27.tar.gz.sha256",
+      "bytes": 92,
+      "sha256": "7fe13c35da38123a13ec8307caa027d3f27b0e25934b0a62923af332f322e3aa"
+    },
+    {
+      "role": "seqrepo-provenance",
+      "path": "artifacts/genomic-2026-10-27.provenance.json",
+      "bytes": 13927,
+      "sha256": "a3d5428c64fed65c8d63c0cd4881ae73128ec3a8e9d212e0624374705d2e3d8e"
+    }
+  ],
+  "result_summary": {
+    "archive": "seqrepo/genomic-2026-10-27.tar.gz",
+    "bytes": 3501905945,
+    "sha256": "bdb0f01b76538e39b9f3a71ca52b4252c3630f5350c9b7b01dd4db66f35d9a93",
+    "files": 41,
+    "source": "/Volumes/RefgetStores/seqrepo/genomic-2026-10-27",
+    "destination": "gs://clingen-public/seqrepo/",
+    "public_url": "https://storage.googleapis.com/clingen-public/seqrepo/genomic-2026-10-27.tar.gz",
+    "published_beside": [
+      "genomic-2026-10-27.tar.gz.sha256",
+      "genomic-2026-10-27.provenance.json"
+    ]
+  },
+  "validations": [
+    {
+      "name": "extract-and-diff",
+      "result": "pass",
+      "detail": "the archive extracts to a tree identical to the instance directory (diff -rq): one top-level directory genomic-2026-10-27/, mode 0755, no AppleDouble entries"
+    },
+    {
+      "name": "rclone-check",
+      "result": "pass",
+      "detail": "0 differences across the archive, its .sha256 and the provenance JSON"
+    },
+    {
+      "name": "public-url",
+      "result": "pass",
+      "detail": "unauthenticated HTTPS serves all three objects at full content length; the served .sha256 holds the archive's digest"
+    }
+  ],
+  "publication": null
+}

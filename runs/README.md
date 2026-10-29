@@ -51,7 +51,10 @@ Durable records currently retained:
   SeqRepo instance (`genomic-2026-10-27`, 3.5 GB) holding exactly the genomic
   store's 13,615 sequences and 45,471 aliases, built with `gks-refgetstore
   seqrepo`. Both vrs-python data proxies resolve every alias to the same digest.
-  Not yet published.
+- [`2026-10-29-genomic-seqrepo-archive/`](2026-10-29-genomic-seqrepo-archive/) —
+  that instance as a single archive, published at
+  `gs://clingen-public/seqrepo/genomic-2026-10-27.tar.gz` with its `.sha256` and
+  the build's provenance JSON.
 
 Removed: `2026-07-02-seqrepo-parity/`. Its build and parity analysis were fully
 superseded by `2026-08-26-full-rebuild/`, which covers a larger source set and
