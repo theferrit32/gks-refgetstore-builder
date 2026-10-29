@@ -161,8 +161,17 @@ def redigest_sequence(store, digest: str) -> str:
     two disagreeing means the stored payload no longer represents the sequence
     its digest promises -- whether from bit rot or from a lossy encoder.
     """
+    return sha512t24u(stream_sequence_chunks(store, digest))
+
+
+def sha512t24u(chunks: Iterable[str | bytes]) -> str:
+    """GA4GH sha512t24u of the concatenated chunks, exactly as given.
+
+    No normalization: the bytes are hashed as they are, which is what a
+    refget digest is defined over.
+    """
     hasher = hashlib.sha512()
-    for chunk in stream_sequence_chunks(store, digest):
+    for chunk in chunks:
         hasher.update(chunk.encode("ascii") if isinstance(chunk, str) else chunk)
     return base64.urlsafe_b64encode(hasher.digest()[:24]).decode("ascii")
 

@@ -191,6 +191,7 @@ styles:
 | `sync` | apply `sources.toml` changes incrementally | missing sources |
 | `fetch` | pre-populate the download cache (no ingest) | download failure |
 | `lock` | regenerate a lock for a build that already ran | — |
+| `seqrepo` | build a biocommons SeqRepo holding exactly a store's sequences and aliases | store/lock disagreement, verification failure |
 
 Global: `-v/--verbose` for debug logging. Every subcommand shares
 `--config` (default `./sources.toml`) and `--cache-dir` (default `./downloads`).
@@ -413,6 +414,52 @@ missing *after* the removal leaves the store worse than it started.
 Reconstructs the file→collection mapping from a build log and re-hashes the
 cache, producing the same lock a full build would. Use it to backfill a lock
 for a build that already ran.
+
+### `seqrepo` — the same data as a biocommons SeqRepo
+
+    uv sync --extra seqrepo
+    gks-refgetstore seqrepo --config sources.genomic.toml --lock build.lock.json \
+        --lock-check-mode subset --store-dir <store> \
+        --target-dir <seqrepo root> --instance-name genomic-2026-10-27
+
+Writes a [biocommons SeqRepo](https://github.com/biocommons/biocommons.seqrepo)
+instance at `<seqrepo root>/<instance>` holding the store's sequences under the
+same identifiers, so the two backends can be compared on identical data. Needs
+the `seqrepo` extra (`biocommons.seqrepo` 0.6.11, `bioutils` 0.6.2) and htslib's
+`bgzip` on `PATH` (or `SEQREPO_BGZIP_PATH`).
+
+- **Store and lock.** The store is opened read-only and must hold exactly the
+  collections the lock attributes to the manifest's sources, selected the same
+  way `build --locked-sources` selects them. `--lock-check-mode subset` lets a
+  manifest select part of a larger lock (`sources.genomic.toml` against the full
+  `build.lock.json`); `strict`, the default, requires the manifest to own every
+  locked source.
+- **Writes.** Every sequence is stored with one call to the seqrepo library's
+  `SeqRepo.store(seq, aliases)`, carrying every alias the store holds for it,
+  then `commit()`. Seqrepo computes the `seq_id`, writes and indexes the bgzip
+  FASTA files, inserts the alias rows, and adds its digest aliases (`VMC`,
+  `MD5`, `SHA1`, `SEGUID`) to every sequence. A sequence whose seqrepo `seq_id`
+  differs from its store digest stops the build; seqrepo removes `*` before
+  digesting, so this applies to proteins that carry one.
+- **Namespaces.** Aliases are passed under the store's namespace names.
+  Seqrepo stores `refseq` as `NCBI` and `lrg` as `LRG` and answers lookups under
+  either spelling; `insdc` and the assembly namespaces (`GRCh38`, `GRCh38.p14`,
+  `NCBI36`, `T2T-CHM13v2.0`, …) are stored as they are. `seqrepo
+  add-assembly-names` is not run: the store's assembly namespaces already hold
+  every sequence and UCSC name bioutils lists for them, and that command would
+  also add `NCBI34`/`NCBI35` names that the store does not have.
+- **Verification.** Before the instance is renamed into place from a temporary
+  sibling directory, every sequence is read back through seqrepo and re-hashed,
+  its length and MD5 compared with the store's, and the alias sets compared in
+  both directions. `--verify-only` repeats this for an existing instance.
+- **Provenance.** `<seqrepo root>/<instance>.provenance.json` records the
+  manifest, lock and store digests, the seqrepo, bioutils, pysam, bgzip and
+  gtars versions, counts, the verification result, and the SHA-256 of every
+  file in the instance.
+
+`tools/check_seqrepo_proxies.py` resolves every store alias through vrs-python's
+SeqRepo and RefgetStore data proxies and requires both to return the same
+`SQ.` digest.
 
 ### Post-build store self-check (separate entry point)
 

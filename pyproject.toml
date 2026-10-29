@@ -11,6 +11,15 @@ dependencies = [
     "gtars>=0.11.0",
 ]
 
+[project.optional-dependencies]
+# `gks-refgetstore seqrepo` writes a biocommons SeqRepo through the seqrepo
+# library. bioutils computes seqrepo's sequence digests and supplies the
+# assembly data its names are checked against, so it is pinned with it.
+seqrepo = [
+    "biocommons.seqrepo==0.6.11",
+    "bioutils==0.6.2",
+]
+
 [tool.uv.sources]
 # gtars is built from source at a pinned commit until a release includes
 # databio/gtars#273 (sequences that change when stored in encoded mode). The

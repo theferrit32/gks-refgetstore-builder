@@ -1439,11 +1439,7 @@ def run_build(args) -> int:
     )
     # The concrete files this run will touch (used for both the pre-flight check
     # and the partial add-to merge).
-    assembly_owners = {entry.namespace for entry in sel_assemblies}
-    seqset_owners = {entry.name for entry in sel_seqsets}
-    run_sources = [source for source in all_sources
-                   if (source.kind.startswith("assembly_") and source.owner in assembly_owners)
-                   or (source.kind == "seqset" and source.owner in seqset_owners)]
+    run_sources = build_lock.sources_owned_by(all_sources, sel_assemblies, sel_seqsets)
 
     # Materialize and validate every input before opening or mutating the store.
     locked_by_url = ({record["url"]: record

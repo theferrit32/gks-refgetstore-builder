@@ -12,6 +12,8 @@ Subcommands:
   lock     (re)generate a build.lock.json for a build that already ran
   refseqgene-history
            update the checked-in list of superseded NG_ versions to efetch
+  seqrepo  build a biocommons SeqRepo holding exactly a store's sequences and
+           aliases (needs the ``seqrepo`` extra and htslib ``bgzip``)
 
 All subcommands share one library: the source model -- manifest schema, source
 resolution, cache-path mapping (``sources``) -- the build engine
@@ -49,6 +51,7 @@ from . import (
     fetch_sources,
     fs_checks,
     repair,
+    seqrepo_build,
     store_sync,
     verify,
 )
@@ -293,6 +296,36 @@ def _add_refseqgene_history(sub: argparse._SubParsersAction) -> None:
     p.set_defaults(func=efetch.run_refseqgene_history)
 
 
+def _add_seqrepo(sub: argparse._SubParsersAction) -> None:
+    p = sub.add_parser(
+        "seqrepo",
+        help="build a biocommons SeqRepo holding exactly a store's sequences and aliases",
+        description=seqrepo_build.__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    p.add_argument("--config", type=Path, default=DEFAULT_CONFIG,
+                   help="manifest the store was built from")
+    p.add_argument("--lock", type=Path, default=DEFAULT_LOCK,
+                   help="build lock the store was built from")
+    p.add_argument("--lock-check-mode", choices=["strict", "subset"], default="strict",
+                   help="strict (default): the manifest owns every locked source; "
+                        "subset: the manifest selects part of a larger lock, as "
+                        "for build --locked-sources --lock-check-mode subset")
+    p.add_argument("--store-dir", type=Path, default=DEFAULT_STORE,
+                   help="source RefgetStore; opened read-only")
+    p.add_argument("--target-dir", type=Path, required=True,
+                   help="SeqRepo root directory (seqrepo's --root-directory)")
+    p.add_argument("--instance-name", default=None,
+                   help="instance directory under --target-dir (seqrepo's "
+                        "--instance-name); default: the store directory's name")
+    mode = p.add_mutually_exclusive_group()
+    mode.add_argument("--verify-only", action="store_true",
+                      help="verify an existing instance against the store; no writes")
+    mode.add_argument("--no-verify", action="store_true",
+                      help="skip verification after writing")
+    p.set_defaults(func=seqrepo_build.run_seqrepo)
+
+
 def build_parser() -> argparse.ArgumentParser:
     ap = argparse.ArgumentParser(
         prog="gks-refgetstore", description=__doc__,
@@ -308,6 +341,7 @@ def build_parser() -> argparse.ArgumentParser:
     _add_lock(sub)
     _add_sync(sub)
     _add_refseqgene_history(sub)
+    _add_seqrepo(sub)
     return ap
 
 
