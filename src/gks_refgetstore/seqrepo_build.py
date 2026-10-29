@@ -289,8 +289,15 @@ def _seqrepo_alias_triples(sr) -> tuple[set[tuple[str, str, str]], Counter, int]
 def verify_instance(lib: SeqRepoLib, store, instance_dir: Path) -> VerifyResult:
     """Prove the instance holds exactly the store's sequences and aliases."""
     result = VerifyResult()
-    sr = lib.SeqRepo(str(instance_dir))
+    # fd_cache_size=None keeps each bgzip file open across reads; uncached,
+    # seqrepo reopens a file and reloads its indexes for every sequence.
+    sr = lib.SeqRepo(str(instance_dir), fd_cache_size=None)
     meta = store_census.sequence_metadata_by_digest(store)
+    # One query for every MD5 alias: a per-sequence lookup filtered on
+    # namespace scans all MD5 rows each time, quadratic in the sequence count.
+    md5s: dict[str, list[str]] = {}
+    for record in sr.aliases.find_aliases(namespace="MD5"):
+        md5s.setdefault(record["seq_id"], []).append(record["alias"])
 
     # Sequences: every seqrepo record read back, re-hashed, and matched to the
     # store's length and MD5.
@@ -309,7 +316,7 @@ def verify_instance(lib: SeqRepoLib, store, instance_dir: Path) -> VerifyResult:
         if not (len(seq) == record["len"] == int(m.length)):
             result.problems.append(f"sequence {seq_id} length {len(seq)}, store "
                                    f"{m.length}")
-        md5 = [a["alias"] for a in sr.aliases.find_aliases(seq_id=seq_id, namespace="MD5")]
+        md5 = md5s.get(seq_id, [])
         if md5 != [m.md5]:
             result.problems.append(f"sequence {seq_id} MD5 {md5}, store {m.md5}")
     only_seqrepo = seen - set(meta)
