@@ -1,0 +1,367 @@
+{
+  "started_at": "2026-10-30T02:15:02.480270+00:00",
+  "finished_at": "2026-10-30T02:28:38.745805+00:00",
+  "inputs": [
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000000.jsonl.gz",
+      "generation": 1793218873370254,
+      "md5": "UaRqJyZEbrSVTa0BaaJjAw==",
+      "size": 6546353
+    },
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000001.jsonl.gz",
+      "generation": 1793218874305662,
+      "md5": "Q/Zm+XAqUgVTO25Pxi3ttQ==",
+      "size": 6553753
+    },
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000002.jsonl.gz",
+      "generation": 1793218873997500,
+      "md5": "sQ/S5458wbOnFgVW291Egg==",
+      "size": 6557413
+    },
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000003.jsonl.gz",
+      "generation": 1793218874372708,
+      "md5": "pmS5I7z0TwCljJuhFvK/nw==",
+      "size": 6544168
+    },
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000004.jsonl.gz",
+      "generation": 1793218874127328,
+      "md5": "z1gzBx7oG+V/hp8mTcgA4w==",
+      "size": 6528434
+    },
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000005.jsonl.gz",
+      "generation": 1793218874536501,
+      "md5": "i4R6bKPsQi3aiuMcejIW0Q==",
+      "size": 6544734
+    },
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000006.jsonl.gz",
+      "generation": 1793218875463399,
+      "md5": "BcGgFbn9YrNE3iVn3A6G/A==",
+      "size": 6538097
+    },
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000007.jsonl.gz",
+      "generation": 1793218873352246,
+      "md5": "KhNdhK2WycnIMJFpYot+Aw==",
+      "size": 6554420
+    },
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000008.jsonl.gz",
+      "generation": 1793218874601750,
+      "md5": "R88F1vlUZSCh+PNjuqmk4Q==",
+      "size": 6525579
+    },
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000009.jsonl.gz",
+      "generation": 1793218874503782,
+      "md5": "LmtYG9+ZzxKF1HZ5YXIedg==",
+      "size": 6528555
+    },
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000010.jsonl.gz",
+      "generation": 1793218874515010,
+      "md5": "ENOr+qk0gBL+uj0IQWszOA==",
+      "size": 6524554
+    },
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000011.jsonl.gz",
+      "generation": 1793218873654854,
+      "md5": "EOp+2+jSwVhnX3DYhqIkmA==",
+      "size": 6535457
+    },
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000012.jsonl.gz",
+      "generation": 1793218875088725,
+      "md5": "Xio5yGa4/m9aQqeRf/79qw==",
+      "size": 6553337
+    },
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000013.jsonl.gz",
+      "generation": 1793218874018181,
+      "md5": "4bsCSVrhH5u23UZRoQIq2w==",
+      "size": 6543315
+    },
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000014.jsonl.gz",
+      "generation": 1793218874260075,
+      "md5": "xx26FAEI+8JjQhCSquS0Ww==",
+      "size": 6536408
+    },
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000015.jsonl.gz",
+      "generation": 1793218874415515,
+      "md5": "Pg+60oMXGFxiOz/pjcM/rw==",
+      "size": 6538005
+    },
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000016.jsonl.gz",
+      "generation": 1793218874027811,
+      "md5": "uro9AhfLMQjb7rUXAwRZLQ==",
+      "size": 6527883
+    }
+  ],
+  "output": "gs://clinvar-gkm/2026-10-24/dev/scratch/opv-hm-1w-r1-B/vi-vrs-python.jsonl.gz",
+  "refget_store": {
+    "source": "https://storage.googleapis.com/clingen-public/refgetstore/genomic-2026-10-29",
+    "remote": true,
+    "rgstore": {
+      "sequences_digest": "3d601764d40ab5969f7c71ae6dc5151ad87c6626e9cf06a460f706a57f547737",
+      "collections_digest": "7928d41c04e249a23f8c0a3ef609c0069feccf215164c3a801ae1a07ebbed720",
+      "aliases_digest": "c80338ce2ca62b4adc9a8222af8c8596535d2c8ac6a9f6bbb0fae88ef08bb2c5",
+      "modified": "2026-10-29T19:01:12.453207+00:00"
+    },
+    "setup_seconds": 0.1
+  },
+  "sequence_reads": "whole",
+  "libraries": {
+    "clinvar_ingest": {
+      "version": "0.0.0",
+      "url": "file:///app",
+      "commit": null
+    },
+    "ga4gh.vrs": {
+      "version": "0.1.dev869+g8ce6d702e",
+      "url": "https://github.com/theferrit32/vrs-python",
+      "commit": "8ce6d702e3b976441f9c0b93e486a653aab79a4c"
+    },
+    "gtars": {
+      "version": "0.11.0",
+      "url": "https://github.com/theferrit32/gtars",
+      "commit": "7831e09f596042e3983c7a123c3f6c019ca6c05f"
+    },
+    "hgvs": {
+      "version": "2.0.0a0"
+    },
+    "biocommons.seqrepo": {
+      "version": "0.6.11"
+    },
+    "pysam": {
+      "version": "0.24.1"
+    }
+  },
+  "workers": 1,
+  "record_timeout_seconds": 300,
+  "host": {
+    "hostname": "d28063e9d363",
+    "cpu_count": 8,
+    "batch": {
+      "BATCH_TASK_UID": "vrsify-2026-10-24-0213e887-4a74-420c00-group0-0",
+      "BATCH_JOB_UID": "vrsify-2026-10-24-0213e887-4a74-420c00",
+      "BATCH_JOB_ID": "vrsify-2026-10-24-20261030021410",
+      "BATCH_TASK_COUNT": "1",
+      "BATCH_TASK_INDEX": "0",
+      "BATCH_TASK_RETRY_ATTEMPT": "0"
+    }
+  },
+  "records": 4692217,
+  "counts": {
+    "Allele:Allele": 4598094,
+    "Allele:error": 2573,
+    "CopyNumberChange:CopyNumberChange": 33184,
+    "CopyNumberChange:error": 539,
+    "CopyNumberCount:CopyNumberCount": 49034,
+    "CopyNumberCount:error": 95,
+    "Haplotype:null": 672,
+    "Not Available:null": 1154,
+    "Unknown:null": 6872
+  },
+  "seconds": 810.0,
+  "slowest_records": [
+    {
+      "seconds": 23.96,
+      "source": "NC_000015.9:g.2831_2832dup"
+    },
+    {
+      "seconds": 23.93,
+      "source": "NC_000015.9:g.7211_7214del"
+    },
+    {
+      "seconds": 23.03,
+      "source": "NC_000015.9:g.2897_2953del"
+    },
+    {
+      "seconds": 22.76,
+      "source": "NC_000015.9:g.5185del"
+    },
+    {
+      "seconds": 22.15,
+      "source": "NC_000014.8:g.7045933_7045938dup"
+    },
+    {
+      "seconds": 18.74,
+      "source": "NC_000013.11:g.1054_1106del"
+    },
+    {
+      "seconds": 3.65,
+      "source": "NC_000010.10:g.39991000_39991002dup"
+    },
+    {
+      "seconds": 3.54,
+      "source": "NC_000010.10:g.39990985_39990990dup"
+    },
+    {
+      "seconds": 1.87,
+      "source": "NC_000007.14:100101765:AAA:A"
+    },
+    {
+      "seconds": 1.77,
+      "source": "NC_000001.11:100011489:AAAAGAAA:AAA"
+    },
+    {
+      "seconds": 1.67,
+      "source": "NC_000006.12:100448691:A:"
+    },
+    {
+      "seconds": 1.56,
+      "source": "NC_000005.10:102260321:AAAAAAAAAA:AAAAAAAAA"
+    },
+    {
+      "seconds": 1.26,
+      "source": "NC_000023.11:100402798:TTTTTTT:TTTTTT"
+    },
+    {
+      "seconds": 1.16,
+      "source": "NC_000002.11:g.179443041_179790231delinsAGCA"
+    },
+    {
+      "seconds": 0.96,
+      "source": "NC_000002.12:10080157:GGGGAGGCTCTCGGGG:GG"
+    },
+    {
+      "seconds": 0.84,
+      "source": "NC_000004.12:1000916:ACTGACT:ACT"
+    },
+    {
+      "seconds": 0.74,
+      "source": "NC_000001.9:g.114244498del"
+    },
+    {
+      "seconds": 0.73,
+      "source": "NC_000023.10:g.36649710_136649711delinsG"
+    },
+    {
+      "seconds": 0.65,
+      "source": "NC_000003.12:10028693:AAA:A"
+    },
+    {
+      "seconds": 0.61,
+      "source": "NC_000007.13:g.6035323_6035324insSVA"
+    }
+  ],
+  "worker_peak_rss_mib": [
+    2892
+  ],
+  "worker_resources": [
+    {
+      "lifetime_seconds": 810.0,
+      "busy_seconds": 793.2,
+      "cpu_seconds": 784.2,
+      "startup_cpu_seconds": 0.0,
+      "user_seconds": 775.4,
+      "system_seconds": 8.8,
+      "cpu_utilization_busy": 0.975,
+      "cpu_utilization_lifetime": 0.968,
+      "voluntary_context_switches": 96488,
+      "involuntary_context_switches": 2308,
+      "major_page_faults": 0,
+      "block_reads": 272,
+      "peak_rss_mib": 2892,
+      "cpu_seconds_per_window": [
+        0.92,
+        3.03,
+        5.41,
+        9.49,
+        9.82,
+        9.72,
+        9.63,
+        9.83,
+        9.83,
+        9.57,
+        8.94,
+        9.83,
+        9.83,
+        9.55,
+        9.08,
+        9.83,
+        9.66,
+        9.84,
+        9.77,
+        9.91,
+        9.48,
+        9.86,
+        9.82,
+        9.83,
+        9.89,
+        9.82,
+        9.82,
+        9.79,
+        9.93,
+        9.93,
+        9.95,
+        9.85,
+        9.82,
+        9.82,
+        9.89,
+        9.82,
+        9.52,
+        9.83,
+        9.88,
+        9.82,
+        9.82,
+        9.88,
+        10.0,
+        10.0,
+        9.89,
+        9.83,
+        9.83,
+        9.86,
+        10.0,
+        9.93,
+        9.85,
+        9.82,
+        9.82,
+        9.52,
+        9.82,
+        9.82,
+        9.77,
+        9.88,
+        9.82,
+        9.82,
+        9.63,
+        9.83,
+        9.82,
+        9.81,
+        9.81,
+        9.85,
+        9.65,
+        9.81,
+        9.73,
+        9.84,
+        9.81,
+        9.81,
+        9.91,
+        10.0,
+        10.0,
+        9.99,
+        10.0,
+        9.95,
+        9.82,
+        9.82,
+        9.7
+      ]
+    }
+  ],
+  "timeline_window_seconds": 10,
+  "parent_cpu_utilization": 0.085,
+  "refget_cache": {
+    "worker_bytes": [
+      2526296416
+    ],
+    "total_bytes": 2526296416
+  }
+}

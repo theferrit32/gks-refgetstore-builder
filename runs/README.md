@@ -74,6 +74,10 @@ Durable records currently retained:
   (29.1M) on Cloud Batch with four backends holding `genomic-2026-10-29`:
   identical outputs; RefgetStore range reads 1.04× and SeqRepo 1.40× the time
   of whole-sequence RefgetStore reads.
+- [`2026-10-29-vrsify-one-per-variant-eval/`](2026-10-29-vrsify-one-per-variant-eval/) —
+  the same backends over `variation_identity` (4.7M, one expression per
+  variation), 8 workers and 1: with one worker SeqRepo takes 1.64× the remote
+  RefgetStore's time, which downloads 2.53 GB and needs no setup.
 
 Removed: `2026-07-02-seqrepo-parity/`. Its build and parity analysis were fully
 superseded by `2026-08-26-full-rebuild/`, which covers a larger source set and

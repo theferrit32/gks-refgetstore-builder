@@ -1,0 +1,369 @@
+{
+  "started_at": "2026-10-30T02:15:44.779486+00:00",
+  "finished_at": "2026-10-30T02:29:31.490823+00:00",
+  "inputs": [
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000000.jsonl.gz",
+      "generation": 1793218873370254,
+      "md5": "UaRqJyZEbrSVTa0BaaJjAw==",
+      "size": 6546353
+    },
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000001.jsonl.gz",
+      "generation": 1793218874305662,
+      "md5": "Q/Zm+XAqUgVTO25Pxi3ttQ==",
+      "size": 6553753
+    },
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000002.jsonl.gz",
+      "generation": 1793218873997500,
+      "md5": "sQ/S5458wbOnFgVW291Egg==",
+      "size": 6557413
+    },
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000003.jsonl.gz",
+      "generation": 1793218874372708,
+      "md5": "pmS5I7z0TwCljJuhFvK/nw==",
+      "size": 6544168
+    },
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000004.jsonl.gz",
+      "generation": 1793218874127328,
+      "md5": "z1gzBx7oG+V/hp8mTcgA4w==",
+      "size": 6528434
+    },
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000005.jsonl.gz",
+      "generation": 1793218874536501,
+      "md5": "i4R6bKPsQi3aiuMcejIW0Q==",
+      "size": 6544734
+    },
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000006.jsonl.gz",
+      "generation": 1793218875463399,
+      "md5": "BcGgFbn9YrNE3iVn3A6G/A==",
+      "size": 6538097
+    },
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000007.jsonl.gz",
+      "generation": 1793218873352246,
+      "md5": "KhNdhK2WycnIMJFpYot+Aw==",
+      "size": 6554420
+    },
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000008.jsonl.gz",
+      "generation": 1793218874601750,
+      "md5": "R88F1vlUZSCh+PNjuqmk4Q==",
+      "size": 6525579
+    },
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000009.jsonl.gz",
+      "generation": 1793218874503782,
+      "md5": "LmtYG9+ZzxKF1HZ5YXIedg==",
+      "size": 6528555
+    },
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000010.jsonl.gz",
+      "generation": 1793218874515010,
+      "md5": "ENOr+qk0gBL+uj0IQWszOA==",
+      "size": 6524554
+    },
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000011.jsonl.gz",
+      "generation": 1793218873654854,
+      "md5": "EOp+2+jSwVhnX3DYhqIkmA==",
+      "size": 6535457
+    },
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000012.jsonl.gz",
+      "generation": 1793218875088725,
+      "md5": "Xio5yGa4/m9aQqeRf/79qw==",
+      "size": 6553337
+    },
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000013.jsonl.gz",
+      "generation": 1793218874018181,
+      "md5": "4bsCSVrhH5u23UZRoQIq2w==",
+      "size": 6543315
+    },
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000014.jsonl.gz",
+      "generation": 1793218874260075,
+      "md5": "xx26FAEI+8JjQhCSquS0Ww==",
+      "size": 6536408
+    },
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000015.jsonl.gz",
+      "generation": 1793218874415515,
+      "md5": "Pg+60oMXGFxiOz/pjcM/rw==",
+      "size": 6538005
+    },
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000016.jsonl.gz",
+      "generation": 1793218874027811,
+      "md5": "uro9AhfLMQjb7rUXAwRZLQ==",
+      "size": 6527883
+    }
+  ],
+  "output": "gs://clinvar-gkm/2026-10-24/dev/scratch/opv-hm-1w-r3-B/vi-vrs-python.jsonl.gz",
+  "refget_store": {
+    "source": "https://storage.googleapis.com/clingen-public/refgetstore/genomic-2026-10-29",
+    "remote": true,
+    "rgstore": {
+      "sequences_digest": "3d601764d40ab5969f7c71ae6dc5151ad87c6626e9cf06a460f706a57f547737",
+      "collections_digest": "7928d41c04e249a23f8c0a3ef609c0069feccf215164c3a801ae1a07ebbed720",
+      "aliases_digest": "c80338ce2ca62b4adc9a8222af8c8596535d2c8ac6a9f6bbb0fae88ef08bb2c5",
+      "modified": "2026-10-29T19:01:12.453207+00:00"
+    },
+    "setup_seconds": 0.0
+  },
+  "sequence_reads": "whole",
+  "libraries": {
+    "clinvar_ingest": {
+      "version": "0.0.0",
+      "url": "file:///app",
+      "commit": null
+    },
+    "ga4gh.vrs": {
+      "version": "0.1.dev869+g8ce6d702e",
+      "url": "https://github.com/theferrit32/vrs-python",
+      "commit": "8ce6d702e3b976441f9c0b93e486a653aab79a4c"
+    },
+    "gtars": {
+      "version": "0.11.0",
+      "url": "https://github.com/theferrit32/gtars",
+      "commit": "7831e09f596042e3983c7a123c3f6c019ca6c05f"
+    },
+    "hgvs": {
+      "version": "2.0.0a0"
+    },
+    "biocommons.seqrepo": {
+      "version": "0.6.11"
+    },
+    "pysam": {
+      "version": "0.24.1"
+    }
+  },
+  "workers": 1,
+  "record_timeout_seconds": 300,
+  "host": {
+    "hostname": "84ee980a6667",
+    "cpu_count": 8,
+    "batch": {
+      "BATCH_JOB_UID": "vrsify-2026-10-24-c407c8c1-4a24-4f8500",
+      "BATCH_JOB_ID": "vrsify-2026-10-24-20261030021451",
+      "BATCH_TASK_COUNT": "1",
+      "BATCH_TASK_INDEX": "0",
+      "BATCH_TASK_RETRY_ATTEMPT": "0",
+      "BATCH_TASK_UID": "vrsify-2026-10-24-c407c8c1-4a24-4f8500-group0-0"
+    }
+  },
+  "records": 4692217,
+  "counts": {
+    "Allele:Allele": 4598094,
+    "Allele:error": 2573,
+    "CopyNumberChange:CopyNumberChange": 33184,
+    "CopyNumberChange:error": 539,
+    "CopyNumberCount:CopyNumberCount": 49034,
+    "CopyNumberCount:error": 95,
+    "Haplotype:null": 672,
+    "Not Available:null": 1154,
+    "Unknown:null": 6872
+  },
+  "seconds": 820.5,
+  "slowest_records": [
+    {
+      "seconds": 24.41,
+      "source": "NC_000015.9:g.7211_7214del"
+    },
+    {
+      "seconds": 24.23,
+      "source": "NC_000015.9:g.2897_2953del"
+    },
+    {
+      "seconds": 24.02,
+      "source": "NC_000015.9:g.5185del"
+    },
+    {
+      "seconds": 23.69,
+      "source": "NC_000015.9:g.2831_2832dup"
+    },
+    {
+      "seconds": 22.73,
+      "source": "NC_000014.8:g.7045933_7045938dup"
+    },
+    {
+      "seconds": 19.23,
+      "source": "NC_000013.11:g.1054_1106del"
+    },
+    {
+      "seconds": 3.82,
+      "source": "NC_000010.10:g.39991000_39991002dup"
+    },
+    {
+      "seconds": 3.79,
+      "source": "NC_000010.10:g.39990985_39990990dup"
+    },
+    {
+      "seconds": 0.78,
+      "source": "NC_000001.9:g.114244498del"
+    },
+    {
+      "seconds": 0.76,
+      "source": "NC_000023.10:g.36649710_136649711delinsG"
+    },
+    {
+      "seconds": 0.72,
+      "source": "NC_000002.12:10080157:GGGGAGGCTCTCGGGG:GG"
+    },
+    {
+      "seconds": 0.69,
+      "source": "NC_000007.14:100101765:AAA:A"
+    },
+    {
+      "seconds": 0.68,
+      "source": "NC_000007.13:g.6035323_6035324insSVA"
+    },
+    {
+      "seconds": 0.67,
+      "source": "NC_000011.10:10029833:C:"
+    },
+    {
+      "seconds": 0.63,
+      "source": "NC_000005.10:102260321:AAAAAAAAAA:AAAAAAAAA"
+    },
+    {
+      "seconds": 0.6,
+      "source": "NC_000005.9:g.110436137G>A"
+    },
+    {
+      "seconds": 0.6,
+      "source": "NC_000002.11:g.179443041_179790231delinsAGCA"
+    },
+    {
+      "seconds": 0.56,
+      "source": "NC_000001.11:100011489:AAAAGAAA:AAA"
+    },
+    {
+      "seconds": 0.54,
+      "source": "NC_000001.10:g.146055392G>A"
+    },
+    {
+      "seconds": 0.53,
+      "source": "NC_000003.12:10028693:AAA:A"
+    }
+  ],
+  "worker_peak_rss_mib": [
+    2895
+  ],
+  "worker_resources": [
+    {
+      "lifetime_seconds": 820.5,
+      "busy_seconds": 804.3,
+      "cpu_seconds": 802.6,
+      "startup_cpu_seconds": 0.0,
+      "user_seconds": 793.8,
+      "system_seconds": 8.8,
+      "cpu_utilization_busy": 0.985,
+      "cpu_utilization_lifetime": 0.978,
+      "voluntary_context_switches": 118953,
+      "involuntary_context_switches": 2560,
+      "major_page_faults": 0,
+      "block_reads": 272,
+      "peak_rss_mib": 2895,
+      "cpu_seconds_per_window": [
+        1.81,
+        5.69,
+        9.33,
+        9.84,
+        9.84,
+        9.49,
+        9.86,
+        9.83,
+        9.67,
+        8.94,
+        9.86,
+        9.83,
+        9.84,
+        8.6,
+        9.86,
+        9.67,
+        9.83,
+        9.77,
+        9.88,
+        9.86,
+        9.58,
+        9.84,
+        9.83,
+        9.84,
+        9.89,
+        9.83,
+        9.83,
+        9.81,
+        9.93,
+        9.93,
+        9.95,
+        9.86,
+        9.83,
+        9.83,
+        9.88,
+        9.84,
+        9.59,
+        9.83,
+        9.89,
+        9.83,
+        9.83,
+        9.83,
+        9.97,
+        10.0,
+        9.97,
+        9.86,
+        9.83,
+        9.83,
+        9.93,
+        10.0,
+        9.82,
+        9.83,
+        9.82,
+        9.82,
+        9.71,
+        9.82,
+        9.82,
+        9.8,
+        9.89,
+        9.83,
+        9.82,
+        9.64,
+        9.82,
+        9.83,
+        9.83,
+        9.81,
+        9.85,
+        9.38,
+        9.83,
+        9.83,
+        9.86,
+        9.84,
+        9.84,
+        9.92,
+        10.0,
+        10.0,
+        9.98,
+        10.0,
+        9.96,
+        9.83,
+        9.82,
+        9.82,
+        0.35
+      ]
+    }
+  ],
+  "timeline_window_seconds": 10,
+  "parent_cpu_utilization": 0.086,
+  "refget_cache": {
+    "worker_bytes": [
+      2526296416
+    ],
+    "total_bytes": 2526296416
+  }
+}

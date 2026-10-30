@@ -1,0 +1,180 @@
+{
+  "schema": "gks-refgetstore-run/1",
+  "run_id": "2026-10-29-vrsify-one-per-variant-eval",
+  "kind": "evaluation",
+  "title": "vrsify over one expression per ClinVar variation: RefgetStore vs SeqRepo, 8 workers and 1, on Cloud Batch",
+  "status": "succeeded",
+  "timestamps": {
+    "initialized_utc": "2026-10-30T02:57:34.681859+00:00",
+    "finalized_utc": "2026-10-30T02:58:46.666706+00:00"
+  },
+  "baseline_run_id": "2026-10-29-vrsify-all-genomic-eval",
+  "evidence": {
+    "quality": "reconstructed",
+    "missing": [
+      "the Batch submissions ran outside run_record exec, from a session scratch directory; submit_arms.sh is copied to artifacts/ unchanged and README.md gives each command",
+      "the 18 output files are not attached and were not compared record by record; README.md gives their GCS locations"
+    ]
+  },
+  "git": {
+    "commit": "fc466b8c0e329e0ea62894655ed5a61b607d3acc",
+    "dirty": true,
+    "status_text": "?? Sheffield-refgetstore-paper/",
+    "diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "tool_versions": {
+    "python": "3.14.7",
+    "git": "git version 2.50.1 (Apple Git-155)",
+    "uv": "uv 0.12.12 (Homebrew 2026-09-09 aarch64-apple-darwin)",
+    "gtars": "0.11.0"
+  },
+  "commands": [],
+  "artifacts": [
+    {
+      "role": "script",
+      "path": "artifacts/submit_arms.sh",
+      "bytes": 4059,
+      "sha256": "511efad332dc6809db2abef4d478f24074af3fd2c49a85dc13dabbb46bf4e694"
+    },
+    {
+      "role": "job-list",
+      "path": "artifacts/batch-jobs.txt",
+      "bytes": 744,
+      "sha256": "d7d411cfaac4ea6c1913ab15974508a07765ea5b4c8c95ba4dd0d57d5f2b50dc"
+    },
+    {
+      "role": "provenance",
+      "path": "artifacts/provenance-8w-r1-A.json",
+      "bytes": 15725,
+      "sha256": "1bf543c535a7ad138aea682fad9592695c481914f0acb3b9bcdafae3ce7c424d"
+    },
+    {
+      "role": "provenance",
+      "path": "artifacts/provenance-8w-r1-B.json",
+      "bytes": 14044,
+      "sha256": "089d411d577083edbfcbf2cfc131b741765dfc0038d039ce210e16ab5cfd4750"
+    },
+    {
+      "role": "provenance",
+      "path": "artifacts/provenance-8w-r1-D.json",
+      "bytes": 14072,
+      "sha256": "b987b2a6dddf81ae35d66a09d6b1c7a3db2860710ea37d57a24aa8a6ac55b17a"
+    },
+    {
+      "role": "provenance",
+      "path": "artifacts/provenance-8w-r1-Cg.json",
+      "bytes": 16998,
+      "sha256": "858408a41538d0ecb67ab5117be606aebe29b54010761013a74f6bfbf92f1438"
+    },
+    {
+      "role": "provenance",
+      "path": "artifacts/provenance-8w-r2-A.json",
+      "bytes": 14471,
+      "sha256": "7ffe96306cac6f7b7843ef9e327aaec22f81ff73186297afee4dd105f4902b30"
+    },
+    {
+      "role": "provenance",
+      "path": "artifacts/provenance-8w-r2-B.json",
+      "bytes": 13930,
+      "sha256": "99615adad311df6c26eae1c8ff1cef87d051bfc59af414775bc49ab4924b5e10"
+    },
+    {
+      "role": "provenance",
+      "path": "artifacts/provenance-8w-r2-D.json",
+      "bytes": 14571,
+      "sha256": "37f8b60de5a28f3013d76b8fe81e096edb6e13f6720d87c691827a4c9d3f2342"
+    },
+    {
+      "role": "provenance",
+      "path": "artifacts/provenance-8w-r2-Cg.json",
+      "bytes": 17785,
+      "sha256": "3189fb854e99c36adbf750e2542267853384aa23f2c223efe560bb55502803d6"
+    },
+    {
+      "role": "provenance",
+      "path": "artifacts/provenance-8w-r3-A.json",
+      "bytes": 14630,
+      "sha256": "fdb56d882df2d9eba14b09516faeba23e30e3c148c095438a0842bc7f37a0277"
+    },
+    {
+      "role": "provenance",
+      "path": "artifacts/provenance-8w-r3-B.json",
+      "bytes": 13917,
+      "sha256": "b76128d7de75d99b39ac0f9fb6fae3f102642d2e34f062b488c4f7f556bd1bb1"
+    },
+    {
+      "role": "provenance",
+      "path": "artifacts/provenance-8w-r3-D.json",
+      "bytes": 16835,
+      "sha256": "feee50008b1f083ad60cc5cea9823a502b2a79455a72078d5ba7fb97262f9a87"
+    },
+    {
+      "role": "provenance",
+      "path": "artifacts/provenance-8w-r3-Cg.json",
+      "bytes": 17698,
+      "sha256": "db924ece41166cc2570bc09fe3e8178fee0cd638e0366f0f8129dc56709ac98c"
+    },
+    {
+      "role": "provenance",
+      "path": "artifacts/provenance-1w-r1-B.json",
+      "bytes": 9232,
+      "sha256": "c3a5866529afbe453558e73a07e7e3613cd837698aa21debeb0bde86ebfe99ca"
+    },
+    {
+      "role": "provenance",
+      "path": "artifacts/provenance-1w-r1-Cg.json",
+      "bytes": 11513,
+      "sha256": "008bf3e081f9aae1742734204cc989c1d051681e5ebb48388de4ca5c128cec1c"
+    },
+    {
+      "role": "provenance",
+      "path": "artifacts/provenance-1w-r2-B.json",
+      "bytes": 9246,
+      "sha256": "d7ee441dbc70a5b13ac4e4a4b98b6687e68057264650913a7f87623507a9bc11"
+    },
+    {
+      "role": "provenance",
+      "path": "artifacts/provenance-1w-r2-Cg.json",
+      "bytes": 10216,
+      "sha256": "0ffe6162cc6a88e583c30bf5e44f3e36c8baa7fbabdc226aa897c00f9fc094c0"
+    },
+    {
+      "role": "provenance",
+      "path": "artifacts/provenance-1w-r3-B.json",
+      "bytes": 9241,
+      "sha256": "6d0044ae3af387ceb902ee74ea8b13f5d65ade78d26739491f6284c476b70db8"
+    },
+    {
+      "role": "provenance",
+      "path": "artifacts/provenance-1w-r3-Cg.json",
+      "bytes": 13741,
+      "sha256": "8380568133c506621289b05050115f83a25a1f9b8ac9b0b94268bd0a812bf79e"
+    }
+  ],
+  "result_summary": {
+    "input": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-0*.jsonl.gz: variation_identity of ClinVar 2026-10-24, 4,692,217 records",
+    "machine": "Cloud Batch c4-highmem-8, us-east1",
+    "translate_seconds_mean": {
+      "8 workers": {
+        "A": 202.5,
+        "D": 221.2,
+        "B": 216.0,
+        "Cg": 337.6
+      },
+      "1 worker": {
+        "B": 818.6,
+        "Cg": 1340.7
+      }
+    },
+    "single_worker_cg_over_b": 1.64,
+    "single_worker_b_downloaded_gb": 2.53
+  },
+  "validations": [
+    {
+      "name": "counts-consistent",
+      "result": "pass",
+      "detail": "all 18 provenance files report 4,692,217 records and identical per-class counts"
+    }
+  ],
+  "publication": null
+}

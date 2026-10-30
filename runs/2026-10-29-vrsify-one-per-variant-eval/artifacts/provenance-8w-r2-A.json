@@ -1,0 +1,562 @@
+{
+  "started_at": "2026-10-30T02:15:10.236855+00:00",
+  "finished_at": "2026-10-30T02:20:54.780111+00:00",
+  "inputs": [
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000000.jsonl.gz",
+      "generation": 1793218873370254,
+      "md5": "UaRqJyZEbrSVTa0BaaJjAw==",
+      "size": 6546353
+    },
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000001.jsonl.gz",
+      "generation": 1793218874305662,
+      "md5": "Q/Zm+XAqUgVTO25Pxi3ttQ==",
+      "size": 6553753
+    },
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000002.jsonl.gz",
+      "generation": 1793218873997500,
+      "md5": "sQ/S5458wbOnFgVW291Egg==",
+      "size": 6557413
+    },
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000003.jsonl.gz",
+      "generation": 1793218874372708,
+      "md5": "pmS5I7z0TwCljJuhFvK/nw==",
+      "size": 6544168
+    },
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000004.jsonl.gz",
+      "generation": 1793218874127328,
+      "md5": "z1gzBx7oG+V/hp8mTcgA4w==",
+      "size": 6528434
+    },
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000005.jsonl.gz",
+      "generation": 1793218874536501,
+      "md5": "i4R6bKPsQi3aiuMcejIW0Q==",
+      "size": 6544734
+    },
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000006.jsonl.gz",
+      "generation": 1793218875463399,
+      "md5": "BcGgFbn9YrNE3iVn3A6G/A==",
+      "size": 6538097
+    },
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000007.jsonl.gz",
+      "generation": 1793218873352246,
+      "md5": "KhNdhK2WycnIMJFpYot+Aw==",
+      "size": 6554420
+    },
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000008.jsonl.gz",
+      "generation": 1793218874601750,
+      "md5": "R88F1vlUZSCh+PNjuqmk4Q==",
+      "size": 6525579
+    },
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000009.jsonl.gz",
+      "generation": 1793218874503782,
+      "md5": "LmtYG9+ZzxKF1HZ5YXIedg==",
+      "size": 6528555
+    },
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000010.jsonl.gz",
+      "generation": 1793218874515010,
+      "md5": "ENOr+qk0gBL+uj0IQWszOA==",
+      "size": 6524554
+    },
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000011.jsonl.gz",
+      "generation": 1793218873654854,
+      "md5": "EOp+2+jSwVhnX3DYhqIkmA==",
+      "size": 6535457
+    },
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000012.jsonl.gz",
+      "generation": 1793218875088725,
+      "md5": "Xio5yGa4/m9aQqeRf/79qw==",
+      "size": 6553337
+    },
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000013.jsonl.gz",
+      "generation": 1793218874018181,
+      "md5": "4bsCSVrhH5u23UZRoQIq2w==",
+      "size": 6543315
+    },
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000014.jsonl.gz",
+      "generation": 1793218874260075,
+      "md5": "xx26FAEI+8JjQhCSquS0Ww==",
+      "size": 6536408
+    },
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000015.jsonl.gz",
+      "generation": 1793218874415515,
+      "md5": "Pg+60oMXGFxiOz/pjcM/rw==",
+      "size": 6538005
+    },
+    {
+      "uri": "gs://clinvar-gkm/2026-10-24/dev/scratch/full/vi-000000000016.jsonl.gz",
+      "generation": 1793218874027811,
+      "md5": "uro9AhfLMQjb7rUXAwRZLQ==",
+      "size": 6527883
+    }
+  ],
+  "output": "gs://clinvar-gkm/2026-10-24/dev/scratch/opv-hm-r2-A/vi-vrs-python.jsonl.gz",
+  "refget_store": {
+    "source": "gs://clingen-public/refgetstore/genomic-2026-10-29.tar.gz",
+    "sha256": "da845a982251f368acd23f221ed8a5b4c173684da1797eb2bc21f0631991b6cd",
+    "rgstore": {
+      "sequences_digest": "3d601764d40ab5969f7c71ae6dc5151ad87c6626e9cf06a460f706a57f547737",
+      "collections_digest": "7928d41c04e249a23f8c0a3ef609c0069feccf215164c3a801ae1a07ebbed720",
+      "aliases_digest": "c80338ce2ca62b4adc9a8222af8c8596535d2c8ac6a9f6bbb0fae88ef08bb2c5",
+      "modified": "2026-10-29T19:01:12.453207+00:00"
+    },
+    "setup_seconds": 136.5
+  },
+  "sequence_reads": "whole",
+  "libraries": {
+    "clinvar_ingest": {
+      "version": "0.0.0",
+      "url": "file:///app",
+      "commit": null
+    },
+    "ga4gh.vrs": {
+      "version": "0.1.dev869+g8ce6d702e",
+      "url": "https://github.com/theferrit32/vrs-python",
+      "commit": "8ce6d702e3b976441f9c0b93e486a653aab79a4c"
+    },
+    "gtars": {
+      "version": "0.11.0",
+      "url": "https://github.com/theferrit32/gtars",
+      "commit": "7831e09f596042e3983c7a123c3f6c019ca6c05f"
+    },
+    "hgvs": {
+      "version": "2.0.0a0"
+    },
+    "biocommons.seqrepo": {
+      "version": "0.6.11"
+    },
+    "pysam": {
+      "version": "0.24.1"
+    }
+  },
+  "workers": 8,
+  "record_timeout_seconds": 300,
+  "host": {
+    "hostname": "5e792e361a48",
+    "cpu_count": 8,
+    "batch": {
+      "BATCH_TASK_UID": "vrsify-2026-10-24-23a57b6c-b810-4a8c00-group0-0",
+      "BATCH_JOB_UID": "vrsify-2026-10-24-23a57b6c-b810-4a8c00",
+      "BATCH_JOB_ID": "vrsify-2026-10-24-20261030021417",
+      "BATCH_TASK_COUNT": "1",
+      "BATCH_TASK_INDEX": "0",
+      "BATCH_TASK_RETRY_ATTEMPT": "0"
+    }
+  },
+  "records": 4692217,
+  "counts": {
+    "Allele:Allele": 4598094,
+    "Allele:error": 2573,
+    "CopyNumberChange:CopyNumberChange": 33184,
+    "CopyNumberChange:error": 539,
+    "CopyNumberCount:CopyNumberCount": 49034,
+    "CopyNumberCount:error": 95,
+    "Haplotype:null": 672,
+    "Not Available:null": 1154,
+    "Unknown:null": 6872
+  },
+  "seconds": 202.4,
+  "slowest_records": [
+    {
+      "seconds": 48.16,
+      "source": "NC_000015.9:g.5185del"
+    },
+    {
+      "seconds": 47.59,
+      "source": "NC_000015.9:g.2897_2953del"
+    },
+    {
+      "seconds": 45.49,
+      "source": "NC_000014.8:g.7045933_7045938dup"
+    },
+    {
+      "seconds": 38.17,
+      "source": "NC_000013.11:g.1054_1106del"
+    },
+    {
+      "seconds": 29.95,
+      "source": "NC_000015.9:g.7211_7214del"
+    },
+    {
+      "seconds": 28.78,
+      "source": "NC_000015.9:g.2831_2832dup"
+    },
+    {
+      "seconds": 8.07,
+      "source": "NC_000010.10:g.39990985_39990990dup"
+    },
+    {
+      "seconds": 8.05,
+      "source": "NC_000010.10:g.39991000_39991002dup"
+    },
+    {
+      "seconds": 1.25,
+      "source": "NC_000023.10:g.36649710_136649711delinsG"
+    },
+    {
+      "seconds": 0.1,
+      "source": "NC_000002.12:g.165757052_165757058delinsAAAGTAAGTCCAAACAGTTAAGTCCAATGTCCTTTAAAATTATTCATAAATGTTTTTCCATTCTAACTCCCTTGATGATCAACTCATTTCCTGAAGCACTAGATTTAATTATATTTATCTTGGCTGGAATTCAGTAGCTACAAGTGCATTAATTGGTGTTACTGCCTGGACACAGGAGTTTAACTGATTCCTCTTGTTACACTGGCGACAATGAATAAATATATTAAGTTACATATTAAAAGAAAATATTCTTATTCCAAAATTTCCAGCAATTAAGTTTCAGAAAGCACAAAAAGTAGAGTGCACACATCTGTAATCATATGTACCAGCCGATTAGAACACAATATATTTCATTGTTTAATATATCTGCTATATTTAATTTCCATAAACTTACTCTGAAAGACATTTCTATATTTTCACCTCCCCAGATTTCCATTTCTTCATCATAGCTTCCAATATACTCAAAATATTCTTTTGATATGGAAAAAAGTCCTCCTGCAAAAGTGGGTGTTCTGAAAAATAATCCATTGTCAAATTTTGTTATAAAAACTAAACAAGATAAAACAGCATATTTTAAGAACTGAAGTTAAAAAATTAAAGCCATATCACATTTTCAAAGCTTTTATTCAGATTAATAAAAACTAGAAATGCTATCTTCAAAGTCAAGATTTTTGGGGTCGGGGGGAGTACTTTGTGTCCTCTCCCATTGGAGTAAACTTAAATGTCTTCTCCTAACCATGCTTTACGATTTTTAAGTAATGATTGATGAGGAAGACATAAGAGCTCACTCACTGCTACCTCTTACTCAGCAACA"
+    },
+    {
+      "seconds": 0.09,
+      "source": "NC_000023.10:g.(?_31747728)_(33229429_?)del"
+    },
+    {
+      "seconds": 0.08,
+      "source": "NC_000003.11:g.37061785_37088541delinsTATTTTTC"
+    },
+    {
+      "seconds": 0.08,
+      "source": "NC_000007.13:g.6035323_6035324insSVA"
+    },
+    {
+      "seconds": 0.08,
+      "source": "NC_000001.11:100494806:TTTTTTT:TTTTTT"
+    },
+    {
+      "seconds": 0.08,
+      "source": "NC_000001.11:113091316:GGG:GG"
+    },
+    {
+      "seconds": 0.08,
+      "source": "NC_000001.11:150093517:CT:"
+    },
+    {
+      "seconds": 0.08,
+      "source": "NC_000002.12:144403907:CCCCCC:CCCCC"
+    },
+    {
+      "seconds": 0.08,
+      "source": "NC_000001.11:155238571:GGGG:GGG"
+    },
+    {
+      "seconds": 0.08,
+      "source": "NC_000001.11:164799817:CA:"
+    },
+    {
+      "seconds": 0.08,
+      "source": "NC_000001.11:182585411:C:"
+    }
+  ],
+  "worker_peak_rss_mib": [
+    2486,
+    2135,
+    2071,
+    2050,
+    1980,
+    1926,
+    1896,
+    1868
+  ],
+  "worker_resources": [
+    {
+      "lifetime_seconds": 183.5,
+      "busy_seconds": 174.1,
+      "cpu_seconds": 167.6,
+      "startup_cpu_seconds": 0.0,
+      "user_seconds": 165.5,
+      "system_seconds": 2.1,
+      "cpu_utilization_busy": 0.949,
+      "cpu_utilization_lifetime": 0.913,
+      "voluntary_context_switches": 5668,
+      "involuntary_context_switches": 67078,
+      "major_page_faults": 0,
+      "block_reads": 0,
+      "peak_rss_mib": 2050,
+      "cpu_seconds_per_window": [
+        7.94,
+        8.67,
+        8.69,
+        8.7,
+        8.79,
+        8.72,
+        9.81,
+        9.87,
+        9.87,
+        9.87,
+        9.87,
+        8.85,
+        9.07,
+        8.85,
+        8.77,
+        8.61,
+        8.51,
+        8.78,
+        3.02
+      ]
+    },
+    {
+      "lifetime_seconds": 202.2,
+      "busy_seconds": 193.0,
+      "cpu_seconds": 187.5,
+      "startup_cpu_seconds": 0.0,
+      "user_seconds": 185.5,
+      "system_seconds": 2.1,
+      "cpu_utilization_busy": 0.96,
+      "cpu_utilization_lifetime": 0.927,
+      "voluntary_context_switches": 5462,
+      "involuntary_context_switches": 60673,
+      "major_page_faults": 0,
+      "block_reads": 0,
+      "peak_rss_mib": 2135,
+      "cpu_seconds_per_window": [
+        8.02,
+        8.6,
+        8.75,
+        8.71,
+        8.89,
+        8.83,
+        8.84,
+        9.07,
+        8.89,
+        9.14,
+        9.89,
+        9.89,
+        9.89,
+        9.89,
+        9.1,
+        8.54,
+        8.54,
+        9.68,
+        9.97,
+        9.97,
+        2.18
+      ]
+    },
+    {
+      "lifetime_seconds": 183.5,
+      "busy_seconds": 172.0,
+      "cpu_seconds": 163.7,
+      "startup_cpu_seconds": 0.0,
+      "user_seconds": 161.5,
+      "system_seconds": 2.2,
+      "cpu_utilization_busy": 0.935,
+      "cpu_utilization_lifetime": 0.892,
+      "voluntary_context_switches": 6680,
+      "involuntary_context_switches": 92360,
+      "major_page_faults": 1,
+      "block_reads": 0,
+      "peak_rss_mib": 1926,
+      "cpu_seconds_per_window": [
+        7.85,
+        8.73,
+        8.85,
+        8.64,
+        8.77,
+        8.72,
+        9.03,
+        9.01,
+        8.85,
+        8.87,
+        8.96,
+        8.82,
+        8.93,
+        9.14,
+        8.74,
+        8.45,
+        8.48,
+        8.75,
+        3.16
+      ]
+    },
+    {
+      "lifetime_seconds": 183.5,
+      "busy_seconds": 171.8,
+      "cpu_seconds": 163.2,
+      "startup_cpu_seconds": 0.0,
+      "user_seconds": 161.0,
+      "system_seconds": 2.2,
+      "cpu_utilization_busy": 0.932,
+      "cpu_utilization_lifetime": 0.889,
+      "voluntary_context_switches": 6870,
+      "involuntary_context_switches": 93142,
+      "major_page_faults": 0,
+      "block_reads": 0,
+      "peak_rss_mib": 1896,
+      "cpu_seconds_per_window": [
+        7.92,
+        8.64,
+        8.72,
+        8.72,
+        8.79,
+        9.0,
+        8.95,
+        8.77,
+        8.87,
+        8.85,
+        8.98,
+        8.84,
+        8.82,
+        8.58,
+        8.77,
+        8.69,
+        8.57,
+        8.68,
+        3.02
+      ]
+    },
+    {
+      "lifetime_seconds": 183.5,
+      "busy_seconds": 174.1,
+      "cpu_seconds": 167.5,
+      "startup_cpu_seconds": 0.0,
+      "user_seconds": 165.4,
+      "system_seconds": 2.2,
+      "cpu_utilization_busy": 0.949,
+      "cpu_utilization_lifetime": 0.913,
+      "voluntary_context_switches": 5683,
+      "involuntary_context_switches": 68714,
+      "major_page_faults": 0,
+      "block_reads": 0,
+      "peak_rss_mib": 2071,
+      "cpu_seconds_per_window": [
+        7.96,
+        8.75,
+        8.55,
+        8.53,
+        9.88,
+        9.88,
+        9.88,
+        9.88,
+        9.42,
+        8.85,
+        8.81,
+        8.81,
+        8.85,
+        9.0,
+        9.0,
+        8.53,
+        8.58,
+        8.91,
+        3.08
+      ]
+    },
+    {
+      "lifetime_seconds": 183.5,
+      "busy_seconds": 173.8,
+      "cpu_seconds": 167.5,
+      "startup_cpu_seconds": 0.0,
+      "user_seconds": 165.0,
+      "system_seconds": 2.5,
+      "cpu_utilization_busy": 0.95,
+      "cpu_utilization_lifetime": 0.913,
+      "voluntary_context_switches": 5957,
+      "involuntary_context_switches": 65734,
+      "major_page_faults": 0,
+      "block_reads": 0,
+      "peak_rss_mib": 2486,
+      "cpu_seconds_per_window": [
+        7.65,
+        8.62,
+        8.67,
+        8.64,
+        9.53,
+        8.77,
+        9.26,
+        8.95,
+        8.94,
+        8.73,
+        9.03,
+        9.86,
+        9.86,
+        9.86,
+        9.45,
+        8.6,
+        8.72,
+        8.78,
+        3.12
+      ]
+    },
+    {
+      "lifetime_seconds": 183.5,
+      "busy_seconds": 172.1,
+      "cpu_seconds": 164.2,
+      "startup_cpu_seconds": 0.0,
+      "user_seconds": 162.0,
+      "system_seconds": 2.2,
+      "cpu_utilization_busy": 0.937,
+      "cpu_utilization_lifetime": 0.895,
+      "voluntary_context_switches": 6877,
+      "involuntary_context_switches": 87190,
+      "major_page_faults": 0,
+      "block_reads": 0,
+      "peak_rss_mib": 1980,
+      "cpu_seconds_per_window": [
+        7.73,
+        8.72,
+        8.76,
+        8.65,
+        9.02,
+        8.7,
+        9.66,
+        8.79,
+        8.86,
+        8.73,
+        9.0,
+        8.93,
+        8.78,
+        9.03,
+        8.68,
+        8.7,
+        8.55,
+        8.9,
+        3.11
+      ]
+    },
+    {
+      "lifetime_seconds": 201.5,
+      "busy_seconds": 190.3,
+      "cpu_seconds": 182.1,
+      "startup_cpu_seconds": 0.0,
+      "user_seconds": 180.0,
+      "system_seconds": 2.2,
+      "cpu_utilization_busy": 0.942,
+      "cpu_utilization_lifetime": 0.904,
+      "voluntary_context_switches": 6530,
+      "involuntary_context_switches": 88016,
+      "major_page_faults": 0,
+      "block_reads": 0,
+      "peak_rss_mib": 1868,
+      "cpu_seconds_per_window": [
+        8.0,
+        8.61,
+        8.67,
+        8.51,
+        8.76,
+        8.72,
+        8.91,
+        9.03,
+        8.8,
+        8.83,
+        8.92,
+        8.66,
+        9.02,
+        8.94,
+        8.85,
+        8.54,
+        8.57,
+        9.58,
+        9.96,
+        9.96,
+        1.47
+      ]
+    }
+  ],
+  "timeline_window_seconds": 10,
+  "parent_cpu_utilization": 0.536
+}
