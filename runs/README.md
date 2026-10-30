@@ -69,6 +69,11 @@ Durable records currently retained:
 - [`2026-10-29-genomic-2026-10-29-publish/`](2026-10-29-genomic-2026-10-29-publish/) —
   `genomic-2026-10-29` published per file to R2 and `clingen-public`, its store
   archive to both, and the SeqRepo archive to `gs://clingen-public/seqrepo/`.
+- [`2026-10-29-vrsify-all-genomic-eval/`](2026-10-29-vrsify-all-genomic-eval/) —
+  clinvar-ingest vrsify over every genomic expression of ClinVar 2026-10-24
+  (29.1M) on Cloud Batch with four backends holding `genomic-2026-10-29`:
+  identical outputs; RefgetStore range reads 1.04× and SeqRepo 1.40× the time
+  of whole-sequence RefgetStore reads.
 
 Removed: `2026-07-02-seqrepo-parity/`. Its build and parity analysis were fully
 superseded by `2026-08-26-full-rebuild/`, which covers a larger source set and

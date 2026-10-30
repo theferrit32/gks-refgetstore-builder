@@ -1,0 +1,196 @@
+{
+  "schema": "gks-refgetstore-run/1",
+  "run_id": "2026-10-29-vrsify-all-genomic-eval",
+  "kind": "evaluation",
+  "title": "vrsify over every genomic ClinVar expression: RefgetStore vs SeqRepo on Cloud Batch",
+  "status": "succeeded",
+  "timestamps": {
+    "initialized_utc": "2026-10-30T01:47:07.511427+00:00",
+    "finalized_utc": "2026-10-30T01:50:10.797033+00:00"
+  },
+  "baseline_run_id": "2026-10-29-genomic-2026-10-29-publish",
+  "evidence": {
+    "quality": "reconstructed",
+    "missing": [
+      "the Batch submissions, BigQuery script and analysis ran outside run_record exec, from a session scratch directory; their scripts are copied to artifacts/ unchanged and README.md gives each command",
+      "the 12 output files (about 2.88 GB each) and the analysis DuckDB database are not attached; README.md gives their GCS and local locations"
+    ]
+  },
+  "git": {
+    "commit": "3d8a28a179e8e69fa6ebae25091fa98c3b581c05",
+    "dirty": true,
+    "status_text": "?? Sheffield-refgetstore-paper/",
+    "diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "tool_versions": {
+    "python": "3.14.7",
+    "git": "git version 2.50.1 (Apple Git-155)",
+    "uv": "uv 0.12.12 (Homebrew 2026-09-09 aarch64-apple-darwin)",
+    "gtars": "0.11.0"
+  },
+  "commands": [],
+  "artifacts": [
+    {
+      "role": "script",
+      "path": "artifacts/submit_arms.sh",
+      "bytes": 4059,
+      "sha256": "511efad332dc6809db2abef4d478f24074af3fd2c49a85dc13dabbb46bf4e694"
+    },
+    {
+      "role": "script",
+      "path": "artifacts/allgen_analysis.py",
+      "bytes": 6217,
+      "sha256": "1c7c707a6e0a89e3392f90d3c80140d1eb8a3d52b091d2cf87f1673153c0e8bb"
+    },
+    {
+      "role": "script",
+      "path": "artifacts/compare_arms.py",
+      "bytes": 2868,
+      "sha256": "7d002cc5fc3ba8da8793c72fc13cc71d6e483ea370a774187b5630ed1fae51b1"
+    },
+    {
+      "role": "script",
+      "path": "artifacts/proc_as_script.py",
+      "bytes": 684,
+      "sha256": "1717e7b5446c816520e68a614590bc408137538f4b6f12f49d80873f77ae3e91"
+    },
+    {
+      "role": "procedure",
+      "path": "artifacts/variation-all-genomic-exprs-proc.sql",
+      "bytes": 10828,
+      "sha256": "a72318490c2e7f602d014c62afa7dccdf5307a6e62c7cc63a0ac7dde08af9ba3"
+    },
+    {
+      "role": "script",
+      "path": "artifacts/variation-all-genomic-exprs-2026-10-24.sql",
+      "bytes": 10892,
+      "sha256": "980bf105744c287fcccf3852f9bbc411fda59d27073ecd9e489cd2339b971f13"
+    },
+    {
+      "role": "job-list",
+      "path": "artifacts/batch-jobs.txt",
+      "bytes": 459,
+      "sha256": "afc3fdec3311b4e51a5917c228024da5c02f8c46fd60a647246fd05e9c1374db"
+    },
+    {
+      "role": "analysis-log",
+      "path": "artifacts/analysis.log",
+      "bytes": 4038,
+      "sha256": "c5eb25ce5c559074bcabc10004aa59910415700c6ec66982018fa2032833fc40"
+    },
+    {
+      "role": "provenance",
+      "path": "artifacts/provenance-r1-A.json",
+      "bytes": 74674,
+      "sha256": "ebf169c6ae7de91f2e7d74219a53ca4c9ddcfc082d4b629886bd61f2ae273fa3"
+    },
+    {
+      "role": "provenance",
+      "path": "artifacts/provenance-r1-B.json",
+      "bytes": 81351,
+      "sha256": "4b2bee420c200d5c636186c0f08b1ac28cd5ad27a1071fb7942d849d812db7bd"
+    },
+    {
+      "role": "provenance",
+      "path": "artifacts/provenance-r1-D.json",
+      "bytes": 75199,
+      "sha256": "7a95737fa142ee0cd9e2de0d0c3ca7f372e79bb872db6eea7c1db6f33a5fcd4d"
+    },
+    {
+      "role": "provenance",
+      "path": "artifacts/provenance-r1-Cg.json",
+      "bytes": 89351,
+      "sha256": "55555f8ccd92cf1880765c35e564d1ec277af6bb2f8ab1ec9972de92c5993548"
+    },
+    {
+      "role": "provenance",
+      "path": "artifacts/provenance-r2-A.json",
+      "bytes": 73424,
+      "sha256": "03f5978b39f241fe2192a734ca8fe07545b6bffa2646eb31c25675915e02d88f"
+    },
+    {
+      "role": "provenance",
+      "path": "artifacts/provenance-r2-B.json",
+      "bytes": 80159,
+      "sha256": "fdf7df01c1cedd57d083daac0af89d4eb07bab85869aad198e82d43aa00c0123"
+    },
+    {
+      "role": "provenance",
+      "path": "artifacts/provenance-r2-D.json",
+      "bytes": 75861,
+      "sha256": "5cf1cd93162e1323936cd0ca49bd188145efeabf35c1a6fdff49bec39aab4c33"
+    },
+    {
+      "role": "provenance",
+      "path": "artifacts/provenance-r2-Cg.json",
+      "bytes": 89579,
+      "sha256": "358521aad2f5d65f617a5bd0a12c78c567eb120f8b479291971616bd56f73a48"
+    },
+    {
+      "role": "provenance",
+      "path": "artifacts/provenance-r3-A.json",
+      "bytes": 72912,
+      "sha256": "12e25c046879cf28350076001ed79d377f563692a9dbac901f3ee8160a7d15cd"
+    },
+    {
+      "role": "provenance",
+      "path": "artifacts/provenance-r3-B.json",
+      "bytes": 80301,
+      "sha256": "8f5d8f1b7605d66954a95eb7385952cfa0054b99e060714aa89e59bc906e026c"
+    },
+    {
+      "role": "provenance",
+      "path": "artifacts/provenance-r3-D.json",
+      "bytes": 75206,
+      "sha256": "c958aa67b2eb09d065276c6232e94e23253deb78a0ca772f759d5036ba806e3d"
+    },
+    {
+      "role": "provenance",
+      "path": "artifacts/provenance-r3-Cg.json",
+      "bytes": 88195,
+      "sha256": "e08dd745cc52e2013168144b93686be1c69656f76c0a2dcefac00783f998decd"
+    }
+  ],
+  "result_summary": {
+    "input": "gs://clinvar-gkm/2026-10-24/dev/scratch/all-genomic/vi-all-genomic-exprs-*.jsonl.gz: 29,088,406 genomic expressions of 4,681,155 variations, ClinVar release 2026-10-24",
+    "backends": "genomic-2026-10-29 RefgetStore (archive, remote, range reads) and the SeqRepo built from it",
+    "machine": "Cloud Batch c4-highmem-8, 8 workers, us-east1",
+    "outputs_identical": "12 of 12 (4 arms x 3 rounds), fingerprint 3c5e751223f99130/2eea0c7272a6e8e8",
+    "errors": "189,251 (0.65%) in every output",
+    "translate_seconds_mean": {
+      "A": 3497.1,
+      "D": 3634.1,
+      "B": 4105.3,
+      "Cg": 4909.7
+    },
+    "worker_peak_rss_sum_gib": {
+      "A": 31.8,
+      "D": 2.9,
+      "B": 32.0,
+      "Cg": 2.5
+    },
+    "allele_groups_with_2_or_more_expressions": {
+      "groups": 10646293,
+      "agree": 10646285,
+      "disagree": 8
+    }
+  },
+  "validations": [
+    {
+      "name": "outputs-identical",
+      "result": "pass",
+      "detail": "all 12 outputs hold 29,088,406 records with distinct keys and the same order-independent (key, out) fingerprint, 3c5e751223f99130/2eea0c7272a6e8e8 (artifacts/analysis.log)"
+    },
+    {
+      "name": "downloads-complete",
+      "result": "pass",
+      "detail": "each local output file has its GCS object's size"
+    },
+    {
+      "name": "provenance-consistent",
+      "result": "pass",
+      "detail": "every provenance file reports 29,088,406 records and identical per-class counts"
+    }
+  ],
+  "publication": null
+}
