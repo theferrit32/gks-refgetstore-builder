@@ -298,7 +298,10 @@ The disagreements come from ClinVar's input, not from translation:
 ### ClinVar's `issue` against the outcome
 
 `variation_identity_build` labels expressions it expects vrs-python to reject.
-vrsify ignores the label and attempts every expression:
+vrsify ignores the label and attempts every expression. The labels here are
+per expression: `variation_all_genomic_exprs` recomputes the HGVS rules for
+every spelling and does not carry the per-variation issues `variation_identity`
+holds (such as `range copies are not supported.`).
 
 | issue | records | translated | error |
 | --- | ---: | ---: | ---: |
@@ -317,10 +320,10 @@ Errors on expressions without an issue:
 | error | records | cause |
 | --- | ---: | --- |
 | `UnresolvableAccessionError: Unable to resolve <accession>` | 29,968 | accession in no source: chiefly NG_ versions absent from both RefSeqGene and the biological-region file |
-| `UnresolvableAccessionError: Unable to resolve GRCh37:MT` | 3,115 | GRCh37 gnomAD-style mitochondrial ids; the store's `GRCh37` namespace has no `MT` alias |
-| `ValueError: Unable to parse data as hgvs variation` | 3,053 | HGVS the parser rejects |
+| `UnresolvableAccessionError: Unable to resolve GRCh37:MT` | 3,115 | GRCh37 gnomAD-style mitochondrial Allele ids; the store's `GRCh37` namespace mirrors the original GRCh37 report, which has no mitochondrion (it entered with GRCh37.p2). clinvar-ingest#326 |
+| `ValueError: Unable to parse data as hgvs variation` | 3,053 | gnomAD-style expressions of copy-number variations: vrsify sends every copy-number record to vrs-python's `CnvTranslator` as HGVS, the only format it supports. All 3,053 gnomAD rows of CopyNumberChange and CopyNumberCount, including 21 large mtDNA deletions. clinvar-ingest#328 |
 | `DataProxyValidationError: Reference mismatch` | 315 | the expression's reference base is not the sequence's: 266 on NCBI36, 49 on GRCh37/38 |
-| `KeyError: 'absolute_copies'` | 127 | CopyNumberCount records with only `range_copies`; vrsify's `translate.py` reads `absolute_copies` unconditionally |
+| `KeyError: 'absolute_copies'` | 127 | CopyNumberCount records with only `range_copies` (95 variations, all labelled `range copies are not supported.` in `variation_identity`); vrsify's `translate.py` reads `absolute_copies` unconditionally, though vrs-python accepts a Range for `copies`. clinvar-ingest#327 |
 | `ValueError: Must provide a 'del' or 'dup'` | 53 | copy-number HGVS that is neither |
 | `ValidationError` on `Range`, uncertain ranges, interval bounds | 23 | malformed or unsupported ranges |
 | `not translated: non-genomic expression` | 9 | `c.` expressions in rows typed genomic |
